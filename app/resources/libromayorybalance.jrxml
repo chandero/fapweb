@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.3.1.final using JasperReports Library version 6.3.1  -->
+<!-- 2019-03-28T15:57:04 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="libromayorybalance" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Key" uuid="12a193e5-c42b-453a-b4bc-fbcd612719d8">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<parameter name="EMPRESA" class="java.lang.String">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+	</parameter>
+	<parameter name="NIT" class="java.lang.String">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+	</parameter>
+	<parameter name="PAGINA_LIBRO" class="java.lang.Long">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+	</parameter>
+	<parameter name="USUARIO" class="java.lang.String"/>
+	<parameter name="ARCHIVO" class="java.lang.String"/>
+	<parameter name="ANHO" class="java.lang.String"/>
+	<parameter name="PERIODO" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="codigo" class="java.lang.String"/>
+	<field name="nombre" class="java.lang.String"/>
+	<field name="anterior" class="java.math.BigDecimal"/>
+	<field name="debito" class="java.math.BigDecimal"/>
+	<field name="credito" class="java.math.BigDecimal"/>
+	<field name="actual" class="java.math.BigDecimal"/>
+	<variable name="PAGINA_LIBRO" class="java.lang.Long" incrementType="Page" calculation="Sum">
+		<variableExpression><![CDATA[1L]]></variableExpression>
+		<initialValueExpression><![CDATA[$P{PAGINA_LIBRO}]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_ANTERIOR" class="java.math.BigDecimal" incrementType="Report" calculation="Sum">
+		<variableExpression><![CDATA[$F{anterior}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_DEBITO" class="java.math.BigDecimal" resetType="None" incrementType="Report" calculation="Sum">
+		<variableExpression><![CDATA[$F{debito}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_CREDITO" class="java.math.BigDecimal" resetType="None" incrementType="Report" calculation="Sum">
+		<variableExpression><![CDATA[$F{credito}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_ACTUAL" class="java.math.BigDecimal" resetType="None" incrementType="Report" calculation="Sum">
+		<variableExpression><![CDATA[$F{actual}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<pageHeader>
+		<band height="39" splitType="Stretch">
+			<staticText>
+				<reportElement x="180" y="0" width="261" height="21" uuid="1c2bcb3c-9ba5-4313-b303-b97a322e6bdd"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[LIBRO MAYOR Y BALANCE]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="0" width="180" height="16" uuid="213a3f84-dd14-48fd-beec-1826b9ac642a">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{EMPRESA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="18" width="180" height="14" uuid="a62b1eeb-5eb9-4f4a-8097-5b7950186579">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$P{NIT}]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Master">
+				<reportElement x="472" y="1" width="100" height="20" uuid="9ce32db9-72a3-47ba-b64e-027cc1a40662"/>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{MASTER_CURRENT_PAGE} + $P{PAGINA_LIBRO}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="210" y="25" width="40" height="13" uuid="c7cb4039-4328-4854-982c-0d5cb4de25b2">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<text><![CDATA[Año:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="310" y="24" width="40" height="14" uuid="3a8a435a-e388-4e91-8a8a-3bdedcfe4308"/>
+				<text><![CDATA[Periodo:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="250" y="24" width="45" height="14" uuid="4435fb93-c6ed-4b6b-b430-50875420eaf3"/>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[$P{ANHO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="350" y="25" width="81" height="13" uuid="add6546e-cbea-46ff-bb72-29fde8972926"/>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[$P{PERIODO}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="22" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+			<staticText>
+				<reportElement x="0" y="0" width="50" height="20" uuid="9a144010-8ba1-43dd-8d97-c93ca6311fe0"/>
+				<textElement textAlignment="Center">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[CODIGO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="50" y="0" width="210" height="20" uuid="393a98da-9fab-4c73-8ad9-6d32a2c54103"/>
+				<textElement textAlignment="Center">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[NOMBRE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="273" y="0" width="70" height="20" uuid="0198cfd8-a119-4573-8f0b-d04fcf10c526"/>
+				<textElement textAlignment="Center">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[SALDO ANTERIOR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="348" y="0" width="70" height="20" uuid="8093aa2c-f004-4d5b-a8d1-7502dad581d6">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[DEBITO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="424" y="0" width="70" height="20" uuid="c502c3ae-aa71-4b53-85dd-bdbcaa063aac">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[CREDITO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="500" y="0" width="70" height="20" uuid="029b5624-4f32-4b3d-af39-5737633c52bb"/>
+				<textElement textAlignment="Center">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[SALDO ACTUAL]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="14" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="50" height="13" uuid="a1b7e607-b8e0-453a-9298-c117bac18464"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{codigo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="50" y="0" width="210" height="13" uuid="4c11baff-606f-424e-acd0-0627d254d3cf"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nombre}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;(#,##0.00)">
+				<reportElement x="270" y="0" width="75" height="13" uuid="a2bf084c-a56b-4892-821e-d50b12004524">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{anterior}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;(#,##0.00)">
+				<reportElement x="348" y="0" width="70" height="13" uuid="8b30e61f-e43b-4a11-a0b0-315849ef00e3">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{debito}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;(#,##0.00)">
+				<reportElement x="424" y="0" width="70" height="13" uuid="77e0d677-18bf-45f6-b5e5-c270a2f4c537">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{credito}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;(#,##0.00)">
+				<reportElement x="497" y="0" width="75" height="13" uuid="0fe66edf-6c77-47bd-8cfe-5f336c42fb89">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{actual}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="46" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+			<textField evaluationTime="Master">
+				<reportElement x="494" y="0" width="76" height="13" uuid="d8830dcc-c89c-4024-b3dc-e026a32c5b6a"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[msg("Página {0} de {1}", $V{MASTER_CURRENT_PAGE}, $V{MASTER_TOTAL_PAGES})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="40" y="13" width="440" height="14" uuid="f879a187-0dee-4de4-ad57-0ba2067e5f45"/>
+				<textFieldExpression><![CDATA[$P{ARCHIVO}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="13" width="40" height="14" uuid="eaa5c3aa-6b65-464f-9df2-08a1e351aaaa"/>
+				<text><![CDATA[Archivo:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="-1" width="180" height="14" uuid="4b836d13-6f6c-429d-a990-dcb773255a0f">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[CONCATENATE("Generado:", DATEFORMAT(NOW( ),"YYYY/MM/dd HH:MM" ))]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="27" width="40" height="14" uuid="13ce0e6b-7205-4ea6-96e4-ae0b2e6640b0"/>
+				<text><![CDATA[Usuario:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="40" y="27" width="140" height="14" uuid="3613627b-818a-4432-ab52-9352ca38da23"/>
+				<textFieldExpression><![CDATA[$P{USUARIO}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="15">
+			<staticText>
+				<reportElement x="121" y="0" width="160" height="13" uuid="855ede61-c26f-4efc-b2b6-bc31a295255d">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<text><![CDATA[TOTALES:]]></text>
+			</staticText>
+			<textField evaluationTime="Master" pattern="#,##0.00;(#,##0.00)">
+				<reportElement x="271" y="0" width="75" height="13" uuid="15d43bfd-a287-44d1-9762-5c45d32f7b21">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{TOTAL_ANTERIOR}]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Master" pattern="#,##0.00;(#,##0.00)">
+				<reportElement x="349" y="1" width="70" height="13" uuid="f7b06218-2168-4608-a971-f30ab02bc684">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{TOTAL_DEBITO}]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Master" pattern="#,##0.00;(#,##0.00)">
+				<reportElement x="425" y="0" width="70" height="13" uuid="c5817516-6e4e-462f-a9e1-014f9ecab44f"/>
+				<textElement textAlignment="Right">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{TOTAL_CREDITO}]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Master" pattern="#,##0.00;(#,##0.00)">
+				<reportElement x="497" y="0" width="75" height="13" uuid="7bf739b0-0674-4c5f-a515-bc086687f6f9">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{TOTAL_ACTUAL}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

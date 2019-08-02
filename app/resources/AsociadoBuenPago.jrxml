@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.3.1.final using JasperReports Library version 6.3.1  -->
+<!-- 2019-05-15T11:57:55 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="AsociadoBuenPago" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="96c80526-bec1-4ffb-b59e-ae545de9334c">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<parameter name="EMPRESA" class="java.lang.String"/>
+	<parameter name="NIT" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="primer_apellido" class="java.lang.String"/>
+	<field name="segundo_apellido" class="java.lang.String"/>
+	<field name="nombre" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="documento" class="java.lang.String"/>
+	<field name="telefono" class="java.lang.String"/>
+	<field name="dias" class="java.lang.Integer"/>
+	<pageHeader>
+		<band height="35" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="180" height="16" uuid="6fab93ec-b6f9-4a99-8960-dc0dc0a5f840">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{EMPRESA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="18" width="180" height="14" uuid="2eeb2fad-d5d2-4a94-a7bc-f0fea79216f3">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$P{NIT}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="189" y="2" width="251" height="14" uuid="f2e5c0a9-c0cf-421e-999f-7159faf8eede"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[ASOCIADOS BUEN COMPORTAMIENTO DE PAGO]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="16" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="280" height="15" uuid="6673b55e-455b-4ba6-8156-680459872e87"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[ASOCIADO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="280" y="0" width="100" height="15" uuid="fd518128-c1c0-456f-9941-97214ae95c6c"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[DOCUMENTO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="380" y="0" width="100" height="15" uuid="c57adad5-fa76-472a-bb83-0327f74797f7"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[TELÉFONOS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="480" y="0" width="100" height="15" uuid="4b4c0519-7119-4e2d-abf0-f97765018378"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[MAXIMOS DIAS MORA]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="-1" width="281" height="14" uuid="d198c720-f5a0-4358-91d3-7ad95d039199"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[CONCATENATE($F{primer_apellido}," ",$F{segundo_apellido}," ",$F{nombre})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="280" y="0" width="100" height="13" uuid="7d4b9ee8-68b5-441f-bcac-4830bb709a0f"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{documento}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="380" y="-1" width="100" height="14" uuid="23d09759-44b4-41b4-9360-ff1189090474"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{telefono}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="480" y="-1" width="100" height="14" uuid="967737d0-aa53-4e5f-a71a-5895509e535e">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{dias}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="13" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="180" height="11" uuid="73f6f026-8c83-4859-bdcc-b2ef1a7d7438">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[CONCATENATE("Generado:", DATEFORMAT(NOW( ),"YYYY/MM/dd HH:MM" ))]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

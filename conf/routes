@@ -1,0 +1,88 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                           controllers.FrontController.index()
+
+# Usuarios
+# GET     /api/u/t                        controllers.UsuarioController.todos()
++ nocsrf
+GET     /api/u/a/:u/:c                  controllers.UsuarioController.autenticar(u: String, c: String)
++ nocsrf
+GET     /api/usua/recovery/:e           controllers.UsuarioController.recuperarClave(e: String)
++ nocsrf
+GET     /api/usua/link/:e               controllers.UsuarioController.linkValidator(e: String)
++ nocsrf
+POST    /api/usua/change                controllers.UsuarioController.cambiarClave()
+GET     /api/u/bpe/:u                   controllers.UsuarioController.buscarporemail(u: String)      
+GET     /api/u/bpi/:id                  controllers.UsuarioController.buscarporid(id: Long) 
+GET     /api/u/ui                       controllers.UsuarioController.userinfo()
+GET     /api/usua/get/:p/:c             controllers.UsuarioController.todos(p: Long, c: Long)
+POST    /api/usua/save                  controllers.UsuarioController.guardar
+
+
+GET     /api/empr/get/:p/:c             controllers.EmpresaController.todos(p:Long, c:Long)
+GET     /api/empr/:id                   controllers.EmpresaController.buscarPorId(id: Long)
+GET     /api/empr/get/u                 controllers.EmpresaController.buscarPorUsuario()
+GET     /api/empr/del/:id               controllers.EmpresaController.borrarEmpresa(id: Long)
+POST    /api/empr/save                  controllers.EmpresaController.guardarEmpresa
+POST    /api/empr/upd                   controllers.EmpresaController.actualizarEmpresa
+
+# Municipios
+GET     /api/muni/get/:id               controllers.MunicipioController.buscarpordepartamento(id: Long)
+GET     /api/muni/all                   controllers.MunicipioController.todos
+
+GET     /api/barr/get/:id/:p/:c         controllers.BarrioController.buscarpormunicipio(id: Long, p:Long, c:Long)
+GET     /api/barr/get/empr              controllers.BarrioController.buscarporempresa
+GET     /api/barr/byid/:id              controllers.BarrioController.buscarporid(id: Long)
+GET     /api/barr/del/:id               controllers.BarrioController.borrarBarrio(id: Long)
+POST    /api/barr/save                  controllers.BarrioController.guardarBarrio
+POST    /api/barr/upd                   controllers.BarrioController.actualizarBarrio
+
+GET     /api/tipobarr/get               controllers.BarrioController.obtenertipobarrio
+
+GET     /api/depa/get                   controllers.DepartamentoController.todos()
+
+GET     /api/perf/get/:p/:c             controllers.PerfilController.todos(p:Long, c:Long)
+
+POST    /api/calc/t                     controllers.CalculoController.tabla
+
+# Informes
+
+# Informes Otros
+GET     /api/info/genlm/:p/:a           controllers.LibroMayorController.generar(p:Int, a:Int)
+GET     /api/info/conlm/:a              controllers.LibroMayorController.consultar(a:Int)
+GET     /api/info/verlm/:a/:p/:c        controllers.LibroMayorController.ver(a:Int, p:Int, c:Int)
+POST    /api/info/gcbp                  controllers.InformeAsociadoBuenPagoController.generar
+GET     /api/info/ccbp                  controllers.InformeAsociadoBuenPagoController.consultar
+GET     /api/info/ecbp                  controllers.InformeAsociadoBuenPagoController.exportar
+GET     /api/info/conc/:c               controllers.InformeColocacionCausacionController.consultar(c: String)
+GET     /api/info/extc/:c/:i/:f         controllers.InformeColocacionCausacionController.extracto(c: String, i: Long, f: Long)
+GET     /api/info/expc/:c/:e/:t         controllers.InformeColocacionCausacionController.exportar(c: String, e: Long, t: String)
+
+# Tipos
+GET     /api/ti/obt                     controllers.TipoIdentificacionController.obtenerListaTipoIdentificacion
+GET     /api/ti/:t                      controllers.TipoIdentificacionController.obtenerListaTipoIdentificacionExterna(t: String)
+GET     /api/tp/obt                     controllers.TipoPersonaController.obtenerLista
+GET     /api/tec/obt                    controllers.TipoEstadoCivilController.obtenerLista
+GET     /api/tne/obt                    controllers.TipoNivelEscolaridadController.obtenerLista
+GET     /api/tet/obt                    controllers.TipoEstratoController.obtenerLista
+GET     /api/tvd/obt                    controllers.TipoViviendaController.obtenerLista
+GET     /api/toc/obt                    controllers.TipoOcupacionController.obtenerLista
+GET     /api/tco/obt                    controllers.TipoContratoController.obtenerLista
+GET     /api/tcu/obt                    controllers.TipoCiiuController.obtenerLista
+GET     /api/td/obt                     controllers.TipoDireccionController.obtenerLista
+GET     /api/tt/obt                     controllers.TipoParentescoController.obtenerLista
+GET     /api/tr/obt                     controllers.TipoReferenciaController.obtenerLista
+
+# Persona
+GET     /api/pers/ver/:i/:p             controllers.PersonaController.obtener(i:Int , p:String)
+POST    /api/pers/gdr                   controllers.PersonaController.guardar()
+
+# Solicitud
+POST   /api/soex/                       controllers.SolicitudExternaController.crear()
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.at(path="/public", file)
+
