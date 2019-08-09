@@ -1,6 +1,6 @@
 #FileLock
-#Fri Aug 02 14:19:34 COT 2019
+#Fri Aug 09 07:59:40 COT 2019
 hostName=FUNAPOYO_SISTEM
-id=16c53c5d47dc21f4039e9d671e0e5efda046c0569a3
+id=16c76769aa8adc3b4870311cf9945364303d8b07fef
 method=file
-server=10.2.0.26\:49963
+server=192.168.0.109\:50695

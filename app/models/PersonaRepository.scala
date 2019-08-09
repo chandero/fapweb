@@ -99,7 +99,7 @@ case class Persona_d(
 case class Persona_e(
     numero_hijos: Option[Int],
     id_ocupacion: Option[Int],
-    id_tipo_contrato: Option[Int],
+    id_tipocontrato: Option[Int],
     descripcion_contrato: Option[String],
     id_sector: Option[Int],
     descripcion_sector: Option[String],
@@ -826,7 +826,7 @@ object Persona_e {
     def writes(pe: Persona_e) = Json.obj(
       "numero_hijos" -> pe.numero_hijos,
       "id_ocupacion" -> pe.id_ocupacion,
-      "id_tipo_contrato" -> pe.id_tipo_contrato,
+      "id_tipocontrato" -> pe.id_tipocontrato,
       "descripcion_contrato" -> pe.descripcion_contrato,
       "id_sector" -> pe.id_sector,
       "descripcion_sector" -> pe.descripcion_sector,
@@ -1089,13 +1089,12 @@ class PersonaRepository @Inject()(dbapi: DBApi)(
 
     def guardar(p: Persona): Future[Boolean] = {
       db.withConnection { implicit connection =>
-        
         var a = p.a.get
         var b = p.b.get
         var c = p.c.get
         var d = p.d.get
         var e = p.e.get
-        var f = p.e.get
+        var f = p.f.get
         var direcciones = p.direcciones
         var referencias = p.referencias
         var beneficiarios = p.beneficiarios
@@ -1118,11 +1117,16 @@ class PersonaRepository @Inject()(dbapi: DBApi)(
             DEPTO_NACIMIENTO = {depto_nacimiento},
             PAIS_NACIMIENTO = {pais_nacimiento},
             ID_TIPO_ESTADO_CIVIL = {id_tipo_estado_civil},
-            ID_CONYUGUE = {id_conyuge},
-            ID_IDENTIFICACION_CONYUGUE = {id_identificacion_conyuge},
-            NOMBRE_CONYUGUE = {nombre_conyuge},
-            PRIMER_APELLIDO_CONYUGUE = {primer_apellido_conyuge},
-            SEGUNDO_APELLIDO_CONYUGUE = {segundo_apellido_conyuge},
+            ID_CONYUGE = {id_conyuge},
+            ID_IDENTIFICACION_CONYUGE = {id_identificacion_conyuge},
+            NOMBRE_CONYUGE = {nombre_conyuge},
+            PRIMER_APELLIDO_CONYUGE = {primer_apellido_conyuge},
+            SEGUNDO_APELLIDO_CONYUGE = {segundo_apellido_conyuge},
+            ID_APODERADO = {id_apoderado},
+            ID_IDENTIFICACION_APODERADO =  {id_identificacion_apoderado},
+            NOMBRE_APODERADO = {nombre_apoderado},
+            PRIMER_APELLIDO_APODERADO = {primer_apellido_apoderado},
+            SEGUNDO_APELLIDO_APODERADO = {segundo_apellido_apoderado},
             PROFESION = {profesion},
             ID_ESTADO = {id_estado},
             ID_TIPO_RELACION = {id_tipo_relacion},
@@ -1133,8 +1137,8 @@ class PersonaRepository @Inject()(dbapi: DBApi)(
             DECLARACION = {declaracion},
             INGRESOS_A_PRINCIPAL = {ingresos_a_principal},
             INGRESOS_OTROS = {ingresos_otros},
-            INGRESOS_CONYUGUE = {ingresos_conyuge},
-            INGRESOS_CONYUGUE_OTROS = {ingresos_conyuge_otros},
+            INGRESOS_CONYUGE = {ingresos_conyuge},
+            INGRESOS_CONYUGE_OTROS = {ingresos_conyuge_otros},
             DESC_INGR_OTROS = {desc_ingr_otros},
             EGRESOS_ALQUILER = {egresos_alquiler},
             EGRESOS_SERVICIOS = {egresos_servicios},
@@ -1143,8 +1147,8 @@ class PersonaRepository @Inject()(dbapi: DBApi)(
             EGRESOS_DEUDAS = {egresos_deudas},
             EGRESOS_OTROS = {egresos_otros},
             DESC_EGRE_OTROS = {desc_egre_otros},
-            EGRESOS_CONYUGUE = {egresos_conyuge},
-            OTROS_EGRESOS_CONYUGUE = {otros_egresos_conyuge},
+            EGRESOS_CONYUGE = {egresos_conyuge},
+            OTROS_EGRESOS_CONYUGE = {otros_egresos_conyuge},
             TOTAL_ACTIVOS = {total_activos},
             TOTAL_PASIVOS = {total_pasivos},
             EDUCACION = {educacion},
@@ -1158,7 +1162,12 @@ class PersonaRepository @Inject()(dbapi: DBApi)(
             EMAIL = {email},
             ID_EMPLEADO = {id_empleado},
             FECHA_ACTUALIZACION = {fecha_actualizacion}
+            WHERE
+            ID_IDENTIFICACION = {id_identificacion} and
+            ID_PERSONA = {id_persona}
         """).on(
+          'id_identificacion -> a.id_identificacion,
+          'id_persona -> a.id_persona,
           'lugar_expedicion -> a.lugar_expedicion,
           'fecha_expedicion -> a.fecha_expedicion,
           'nombre -> a.nombre,
@@ -1176,6 +1185,11 @@ class PersonaRepository @Inject()(dbapi: DBApi)(
           'nombre_conyuge -> a.nombre_conyuge,
           'primer_apellido_conyuge -> a.primer_apellido_conyuge,
           'segundo_apellido_conyuge -> a.segundo_apellido_conyuge,
+          'id_apoderado -> b.id_apoderado,
+          'id_identificacion_apoderado -> b.id_identificacion_apoderado,
+          'nombre_apoderado -> b.nombre_apoderado,
+          'primer_apellido_apoderado -> b.primer_apellido_apoderado,
+          'segundo_apellido_apoderado -> b.segundo_apellido_apoderado,          
           'profesion -> b.profesion,
           'id_estado -> b.id_estado,
           'id_tipo_relacion -> b.id_tipo_relacion,
@@ -1215,60 +1229,130 @@ class PersonaRepository @Inject()(dbapi: DBApi)(
 
         if (!actualizadoP) {
           insertadoP = SQL("""
-            UPDATE \"gen$persona\" SET 
-            LUGAR_EXPEDICION = {lugar_expedicion},
-            FECHA_EXPEDICION = {fecha_expedicion},
-            NOMBRE = {nombre},
-            PRIMER_APELLIDO = {primer_apellido},
-            SEGUNDO_APELLIDO = {segundo_apellido},
-            ID_TIPO_PERSONA = {id_tipo_persona},
-            SEXO = {sexo},
-            LUGAR_NACIMIENTO = {lugar_nacimiento},
-            PROVINCIA_NACIMIENTO = {provincia_nacimiento},
-            DEPTO_NACIMIENTO = {depto_nacimiento},
-            PAIS_NACIMIENTO = {pais_nacimiento},
-            ID_TIPO_ESTADO_CIVIL = {id_tipo_estado_civil},
-            ID_CONYUGUE = {id_conyuge},
-            ID_IDENTIFICACION_CONYUGUE = {id_identificacion_conyuge},
-            NOMBRE_CONYUGUE = {nombre_conyuge},
-            PRIMER_APELLIDO_CONYUGUE = {primer_apellido_conyuge},
-            SEGUNDO_APELLIDO_CONYUGUE = {segundo_apellido_conyuge},
-            PROFESION = {profesion},
-            ID_ESTADO = {id_estado},
-            ID_TIPO_RELACION = {id_tipo_relacion},
-            ID_CIIU = {id_ciiu},
-            EMPRESA_LABORA = {empresa_labora},
-            FECHA_INGRESO_EMPRESA = {fecha_ingreso_empresa},
-            CARGO_ACTUAL = {cargo_actual},
-            DECLARACION = {declaracion},
-            INGRESOS_A_PRINCIPAL = {ingresos_a_principal},
-            INGRESOS_OTROS = {ingresos_otros},
-            INGRESOS_CONYUGUE = {ingresos_conyuge},
-            INGRESOS_CONYUGUE_OTROS = {ingresos_conyuge_otros},
-            DESC_INGR_OTROS = {desc_ingr_otros},
-            EGRESOS_ALQUILER = {egresos_alquiler},
-            EGRESOS_SERVICIOS = {egresos_servicios},
-            EGRESOS_TRANSPORTE = {egresos_transporte},
-            EGRESOS_ALIMENTACION = {egresos_alimentacion},
-            EGRESOS_DEUDAS = {egresos_deudas},
-            EGRESOS_OTROS = {egresos_otros},
-            DESC_EGRE_OTROS = {desc_egre_otros},
-            EGRESOS_CONYUGUE = {egresos_conyuge},
-            OTROS_EGRESOS_CONYUGUE = {otros_egresos_conyuge},
-            TOTAL_ACTIVOS = {total_activos},
-            TOTAL_PASIVOS = {total_pasivos},
-            EDUCACION = {educacion},
-            RETEFUENTE = {retefuente},
-            ACTA = {acta},
-            FECHA_REGISTRO = {fecha_registro},
-            ESCRITURA_CONSTITUCION = {escritura_constitucion},
-            DURACION_SOCIEDAD = {duracion_sociedad},
-            CAPITAL_SOCIAL = {capital_social},
-            MATRICULA_MERCANTIL = {matricula_mercantil},
-            EMAIL = {email},
-            ID_EMPLEADO = {id_empleado},
-            FECHA_ACTUALIZACION = {fecha_actualizacion}
+            INSERT INTO \"gen$persona\" (
+              ID_IDENTIFICACION, 
+              ID_PERSONA, 
+              LUGAR_EXPEDICION,
+              FECHA_EXPEDICION,
+              NOMBRE,
+              PRIMER_APELLIDO,
+              SEGUNDO_APELLIDO,
+              ID_TIPO_PERSONA,
+              SEXO,
+              LUGAR_NACIMIENTO,
+              PROVINCIA_NACIMIENTO,
+              DEPTO_NACIMIENTO,
+              PAIS_NACIMIENTO,
+              ID_TIPO_ESTADO_CIVIL,
+              ID_CONYUGE,
+              ID_IDENTIFICACION_CONYUGE,
+              NOMBRE_CONYUGE,
+              PRIMER_APELLIDO_CONYUGE,
+              SEGUNDO_APELLIDO_CONYUGE,
+              ID_APODERADO,
+              ID_IDENTIFICACION_APODERADO,
+              NOMBRE_APODERADO,
+              PRIMER_APELLIDO_APODERADO,
+              SEGUNDO_APELLIDO_APODERADO,
+              PROFESION,
+              ID_ESTADO,
+              ID_TIPO_RELACION,
+              ID_CIIU,
+              EMPRESA_LABORA,
+              FECHA_INGRESO_EMPRESA,
+              CARGO_ACTUAL,
+              DECLARACION,
+              INGRESOS_A_PRINCIPAL,
+              INGRESOS_OTROS,
+              INGRESOS_CONYUGE,
+              INGRESOS_CONYUGE_OTROS,
+              DESC_INGR_OTROS,
+              EGRESOS_ALQUILER,
+              EGRESOS_SERVICIOS,
+              EGRESOS_TRANSPORTE,
+              EGRESOS_ALIMENTACION,
+              EGRESOS_DEUDAS,
+              EGRESOS_OTROS,
+              DESC_EGRE_OTROS,
+              EGRESOS_CONYUGE,
+              OTROS_EGRESOS_CONYUGE,
+              TOTAL_ACTIVOS,
+              TOTAL_PASIVOS,
+              EDUCACION,
+              RETEFUENTE,
+              ACTA,
+              FECHA_REGISTRO,
+              ESCRITURA_CONSTITUCION,
+              DURACION_SOCIEDAD,
+              CAPITAL_SOCIAL,
+              MATRICULA_MERCANTIL,
+              EMAIL,
+              ID_EMPLEADO,
+              FECHA_ACTUALIZACION
+              ) VALUES (
+                {id_identificacion},
+                {id_persona},
+                {lugar_expedicion},
+                {fecha_expedicion},
+                {nombre},
+                {primer_apellido},
+                {segundo_apellido},
+                {id_tipo_persona},
+                {sexo},
+                {lugar_nacimiento},
+                {provincia_nacimiento},
+                {depto_nacimiento},
+                {pais_nacimiento},
+                {id_tipo_estado_civil},
+                {id_conyuge},
+                {id_identificacion_conyuge},
+                {nombre_conyuge},
+                {primer_apellido_conyuge},
+                {segundo_apellido_conyuge},
+                {id_apoderado},
+                {id_identificacion_apoderado},
+                {nombre_apoderado},
+                {primer_apellido_apoderado},
+                {segundo_apellido_apoderado},
+                {profesion},
+                {id_estado},
+                {id_tipo_relacion},
+                {id_ciiu},
+                {empresa_labora},
+                {fecha_ingreso_empresa},
+                {cargo_actual},
+                {declaracion},
+                {ingresos_a_principal},
+                {ingresos_otros},
+                {ingresos_conyuge},
+                {ingresos_conyuge_otros},
+                {desc_ingr_otros},
+                {egresos_alquiler},
+                {egresos_servicios},
+                {egresos_transporte},
+                {egresos_alimentacion},
+                {egresos_deudas},
+                {egresos_otros},
+                {desc_egre_otros},
+                {egresos_conyuge},
+                {otros_egresos_conyuge},
+                {total_activos},
+                {total_pasivos},
+                {educacion},
+                {retefuente},
+                {acta},
+                {fecha_registro},
+                {escritura_constitucion},
+                {duracion_sociedad},
+                {capital_social},
+                {matricula_mercantil},
+                {email},
+                {id_empleado},
+                {fecha_actualizacion}
+              )
           """).on(
+            'id_identificacion -> a.id_identificacion,
+            'id_persona -> a.id_persona,
             'lugar_expedicion -> a.lugar_expedicion,
             'fecha_expedicion -> a.fecha_expedicion,
             'nombre -> a.nombre,
@@ -1286,6 +1370,11 @@ class PersonaRepository @Inject()(dbapi: DBApi)(
             'nombre_conyuge -> a.nombre_conyuge,
             'primer_apellido_conyuge -> a.primer_apellido_conyuge,
             'segundo_apellido_conyuge -> a.segundo_apellido_conyuge,
+            'id_apoderado -> b.id_apoderado,
+            'id_identificacion_apoderado -> b.id_identificacion_apoderado,
+            'nombre_apoderado -> b.nombre_apoderado,
+            'primer_apellido_apoderado -> b.primer_apellido_apoderado,
+            'segundo_apellido_apoderado -> b.segundo_apellido_apoderado,
             'profesion -> b.profesion,
             'id_estado -> b.id_estado,
             'id_tipo_relacion -> b.id_tipo_relacion,
@@ -1324,6 +1413,93 @@ class PersonaRepository @Inject()(dbapi: DBApi)(
           ).executeUpdate() > 0
         }
         if (insertadoP || actualizadoP) {
+          // Borrado persadicional
+          SQL("""DELETE FROM \"gen$persadicional\" WHERE ID_IDENTIFICACION = {id_identificacion} AND ID_PERSONA = {id_persona}""").
+          on(
+            'id_identificacion -> a.id_identificacion,
+            'id_persona -> a.id_persona
+          ).executeUpdate()
+
+          // Insertar datos de persadicional
+          SQL("""INSERT INTO \"gen$persadicional\" (
+            ID_IDENTIFICACION,
+            ID_PERSONA,
+            NUMERO_HIJOS,
+            ID_OCUPACION,
+            ID_TIPOCONTRATO,
+            DESCRIPCION_CONTRATO,
+            ID_SECTOR,
+            DESCRIPCION_SECTOR,
+            VENTA_ANUAL,
+            FECHA_ULTIMO_BALANCE,
+            NUMERO_EMPLEADOS,
+            DECLARA_RENTA,
+            PERSONAS_A_CARGO,
+            ID_ESTRATO,
+            CABEZAFAMILIA,
+            ID_ESTUDIO,
+            ID_TIPOVIVIENDA
+          ) VALUES (
+            {id_identificacion},
+            {id_persona},
+            {numero_hijos},
+            {id_ocupacion},
+            {id_tipocontrato},
+            {descripcion_contrato},
+            {id_sector},
+            {descripcion_sector},
+            {venta_anual},
+            {fecha_ultimo_balance},
+            {numero_empleados},
+            {declara_renta},
+            {personas_a_cargo},
+            {id_estrato},
+            {cabezafamilia},
+            {id_estudio},
+            {id_tipovivienda}
+          )""").on(
+            'id_identificacion -> a.id_identificacion,
+            'id_persona -> a.id_persona,
+            'numero_hijos -> e.numero_hijos,
+            'id_ocupacion -> e.id_ocupacion,
+            'id_tipocontrato -> e.id_tipocontrato,
+            'descripcion_contrato -> e.descripcion_contrato,
+            'id_sector -> e.id_sector,
+            'descripcion_sector -> e.descripcion_sector,
+            'venta_anual -> e.venta_anual,
+            'fecha_ultimo_balance -> e.fecha_ultimo_balance,
+            'numero_empleados -> e.numero_empleados,
+            'declara_renta -> e.declara_renta,
+            'personas_a_cargo -> e.personas_a_cargo,
+            'id_estrato -> e.id_estrato,
+            'cabezafamilia -> e.cabezafamilia,
+            'id_estudio -> e.id_estudio,
+            'id_tipovivienda -> e.id_tipovivienda
+          ).executeUpdate()
+
+          // Borrando personaextra
+          SQL("""DELETE FROM \"gen$personaextra\" WHERE ID_IDENTIFICACION = {id_identificacion} AND ID_PERSONA = {id_persona}""").
+          on(
+            'id_identificacion -> a.id_identificacion,
+            'id_persona -> a.id_persona
+          ).executeUpdate()
+
+          // Insertar personaextra
+          SQL("""INSERT INTO \"gen$personaextra\" (
+                  ID_IDENTIFICACION, 
+                  ID_PERSONA, 
+                  ES_PROVEEDOR, 
+                  NUMERO_RUT) VALUES (
+                    {id_identificacion},
+                    {id_persona},
+                    {es_proveedor},
+                    {numero_rut}
+                  )""").on(
+                    'id_identificacion -> a.id_identificacion,
+                    'id_persona -> a.id_persona,
+                    'es_proveedor -> f.es_proveedor,
+                    'numero_rut -> f.numero_rut
+          ).executeUpdate()
           // Borrando direcciones previas
           SQL("""DELETE FROM \"gen$direccion\" WHERE ID_IDENTIFICACION = {id_identificacion} and ID_PERSONA = {id_persona}""").
           on(
@@ -1374,15 +1550,14 @@ class PersonaRepository @Inject()(dbapi: DBApi)(
 
           // Borrando Referencias Previas
           SQL("""DELETE FROM \"gen$referencias\" WHERE TIPO_ID_REFERENCIA = {id_identificacion} and ID_REFERENCIA = {id_persona}""").
-             on(
-              'id_identificacion -> a.id_identificacion,
-              'id_persona -> a.id_persona
+          on(
+            'id_identificacion -> a.id_identificacion,
+            'id_persona -> a.id_persona
           ).executeUpdate()
           
           for(r <- referencias) {
             // Insertando nuevas referencias
-            for (r <- referencias) {
-              SQL("""INSERT INTO \"gen$referencia\" (
+            SQL("""INSERT INTO \"gen$referencias\" (
                      TIPO_ID_REFERENCIA, 
                      ID_REFERENCIA,
                      CONSECUTIVO_REFERENCIA,
@@ -1403,7 +1578,7 @@ class PersonaRepository @Inject()(dbapi: DBApi)(
                        {telefono_referencia},
                        {tipo_referencia},
                        {parentesco_referencia}
-              )""").on(
+            )""").on(
                        'id_identificacion -> a.id_identificacion,
                        'id_persona -> a.id_persona,
                        'consecutivo_referencia -> r.consecutivo_referencia,
@@ -1412,14 +1587,13 @@ class PersonaRepository @Inject()(dbapi: DBApi)(
                        'nombre_referencia -> r.nombre_referencia,
                        'direccion_referencia -> r.direccion_referencia,
                        'telefono_referencia -> r.telefono_referencia,
-                       'tipo_referencia -> r.telefono_referencia,
+                       'tipo_referencia -> r.tipo_referencia,
                        'parentesco_referencia -> r.parentesco_referencia
-              ).executeUpdate()
-            }
+            ).executeUpdate()
           }
 
           // Borrar beneficiarios previos
-          SQL("""DELETE FROM \"gen$beneficiario\" WHERE ID_IDENTIFICACION = {id_identificacion} and ID_REFERENCIA = {id_referencia}""").
+          SQL("""DELETE FROM \"gen$beneficiario\" WHERE ID_IDENTIFICACION = {id_identificacion} and ID_PERSONA = {id_persona}""").
           on(
               'id_identificacion -> a.id_identificacion,
               'id_persona -> a.id_persona

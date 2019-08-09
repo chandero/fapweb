@@ -115,6 +115,7 @@
     "svgo": "1.0.5",
     "uglifyjs-webpack-plugin": "1.2.7",
     "url-loader": "1.0.1",
+    "vue-currency-input": "^1.7.1",
     "vue-loader": "15.3.0",
     "vue-style-loader": "4.1.2",
     "vue-template-compiler": "2.5.17",

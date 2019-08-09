@@ -8,871 +8,146 @@
         ref="form"
         :model="form"
         label-position="top">
-        <el-row :gutter="6">
-          <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
-            <el-form-item prop="a.id_identificacion" label="Tipo de Documento">
-              <el-select :disabled="es_bloqueo" v-model="form.a.id_identificacion" filterable>
-                <el-option v-for="t in tipo_documento" :key="t.id_identificacion" :label="t.descripcion_identificacion" :value="t.id_identificacion" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="24" :md="5" :lg="6" :xl="6">
-            <el-form-item prop="a.id_persona" label="Número de Documento">
-              <el-input :disabled="es_bloqueo" v-model="form.a.id_persona" @blur="buscarPersona" />
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="24" :md="6" :lg="4" :xl="4">
-            <el-form-item prop="a.fecha_expedicion" label="Fecha de Expedición">
-              <el-date-picker v-model="form.a.fecha_expedicion"/>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="24" :md="7" :lg="8" :xl="8">
-            <el-form-item prop="a.lugar_expedicion" label="Lugar de Expedición">
-              <el-input v-model="form.a.lugar_expedicion"/>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="4">
-          <el-col :xs="24" :sm="24" :md="7" :lg="7" :xl="7">
-            <el-form-item prop="a.primer_apellido" label="Primer Apellido">
-              <el-input v-model="form.a.primer_apellido"/>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="24" :md="7" :lg="7" :xl="7">
-            <el-form-item prop="a.segundo_apellido" label="Segundo Apellido">
-              <el-input v-model="form.a.segundo_apellido"/>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
-            <el-form-item prop="a.nombre" label="Nombre">
-              <el-input v-model="form.a.nombre"/>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="4">
-          <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
-            <el-form-item prop="a.fecha_nacimiento" label="Fecha Nacimiento">
-              <el-date-picker v-model="form.a.fecha_nacimiento"/>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
-            <el-form-item prop="a.id_tipo_persona" label="Tipo de Persona">
-              <el-select v-model="form.a.id_tipo_persona" filterable>
-                <el-option v-for="t in tipo_persona" :key="t.id" :label="t.descripcion" :value="t.id" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
-            <el-form-item prop="a.sexo" label="Genero">
-              <el-select v-model="form.a.sexo" filterable>
-                <el-option v-for="t in genero" :key="t.id" :label="t.descripcion" :value="t.id" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
-            <el-form-item prop="a.id_tipo_estado_civil" label="Estado Civil">
-              <el-select v-model="form.a.id_tipo_estado_civil" filterable>
-                <el-option v-for="t in tipo_estado_civil" :key="t.id" :label="t.descripcion" :value="t.id" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="4">
-          <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
-            <el-form-item prop="a.lugar_nacimiento" label="Lugar de Nacimiento">
-              <el-input v-model="form.a.lugar_nacimiento"/>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
-            <el-form-item prop="a.provincia_nacimiento" label="Provincia de Nacimiento">
-              <el-input v-model="form.a.provincia_nacimiento"/>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
-            <el-form-item prop="a.depto_nacimiento" label="Departamento de Nacimiento">
-              <el-input v-model="form.a.depto_nacimiento"/>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
-            <el-form-item prop="a.pais_nacimiento" label="País de Nacimiento">
-              <el-input v-model="form.a.pais_nacimiento"/>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="4">
-          <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
-            <el-form-item prop="e.id_estudio" label="Nivel de Escolaridad">
-              <el-select v-model="form.e.id_estudio" filterable>
-                <el-option v-for="e in escolaridad" :key="e.id" :label="e.descripcion" :value="e.id" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
-            <el-form-item prop="e.id_estrato" label="Estrato Socioeconómico">
-              <el-select v-model="form.e.id_estrato" filterable>
-                <el-option v-for="e in estratos" :key="e.id" :label="e.descripcion" :value="e.id" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
-            <el-form-item prop="e.id_tipovivienda" label="Tipo de Vivienda">
-              <el-select v-model="form.e.id_tipovivienda" filterable>
-                <el-option v-for="e in tiposvivienda" :key="e.id" :label="e.descripcion" :value="e.id" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="12" :sm="12" :md="3" :lg="3" :xl="3">
-            <el-form-item prop="f.es_proveedor" label="Es Proveedor">
-              <el-checkbox v-model="form.f.es_proveedor" />
-            </el-form-item>
-          </el-col>
-          <el-col :xs="12" :sm="12" :md="3" :lg="3" :xl="3">
-            <el-form-item prop="f.numero_rut" label="RUT">
-              <el-input :disabled="!form.f.es_proveedor" v-model="form.f.numero_rut"/>
-            </el-form-item>
-          </el-col>
-        </el-row>
         <el-collapse v-model="activeNames">
-          <ElCollapseItem name="conyuge" title="Información del Conyuge">
-            <el-row :gutter="4" >
-              <el-col :xs="24" :sm="24" :md="5" :lg="6" :xl="6">
-                <el-form-item prop="a.id_identificacion_conyuge" label="Tipo de Documento">
-                  <el-select v-model="form.a.id_identificacion_conyuge" filterable>
+          <el-collapse-item name="1" title="Información del Solicitante">
+            <el-row :gutter="4">
+              <el-col :xs="24" :sm="24" :md="5" :lg="5" :xl="5">
+                <el-form-item prop="id_identificacion" label="Tipo de Documento">
+                  <el-select :disabled="es_bloqueo" v-model="form.id_identificacion" filterable>
                     <el-option v-for="t in tipo_documento" :key="t.id_identificacion" :label="t.descripcion_identificacion" :value="t.id_identificacion" />
                   </el-select>
                 </el-form-item>
               </el-col>
-              <el-col :xs="24" :sm="24" :md="5" :lg="6" :xl="6">
-                <el-form-item prop="a.id_conyuge" label="Número de Documento">
-                  <el-input v-model="form.a.id_conyuge" />
+              <el-col :xs="24" :sm="24" :md="5" :lg="5" :xl="5">
+                <el-form-item prop="id_persona" label="Número de Documento">
+                  <el-input :disabled="es_bloqueo" v-model="form.id_persona" @blur="buscarPersona" />
                 </el-form-item>
               </el-col>
-            </el-row>
-            <el-row :gutter="6">
-              <el-col :xs="24" :sm="24" :md="7" :lg="7" :xl="7">
-                <el-form-item prop="a.primer_apellido_conyuge" label="Primer Apellido">
-                  <el-input v-model="form.a.primer_apellido_conyuge" />
-                </el-form-item>
-              </el-col>
-              <el-col :xs="24" :sm="24" :md="7" :lg="7" :xl="7">
-                <el-form-item prop="a.segundo_apellido_conyuge" label="Segundo Apellido">
-                  <el-input v-model="form.a.segundo_apellido_conyuge" />
-                </el-form-item>
-              </el-col>
-              <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
-                <el-form-item prop="a.nombre_conyuge" label="Nombre">
-                  <el-input v-model="form.a.nombre_conyuge" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row :gutter="6">
-              <el-col :xs="24" :sm="24" :md="7" :lg="7" :xl="7">
-                <el-form-item prop="a.ingresos_conyuge" label="Ingreso Principal">
-                  <el-input v-model="form.a.ingresos_conyuge" />
-                </el-form-item>
-              </el-col>
-              <el-col :xs="24" :sm="24" :md="7" :lg="7" :xl="7">
-                <el-form-item prop="a.ingresos_conyuge_otros" label="Otros Ingresos">
-                  <el-input v-model="form.a.ingresos_conyuge_otros" />
-                </el-form-item>
-              </el-col>
-              <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
-                <el-form-item prop="a.egresos_conyuge" label="Egreso Principal">
-                  <el-input v-model="form.a.egresos_conyuge" />
-                </el-form-item>
-              </el-col>
-              <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
-                <el-form-item prop="a.egresos_conyuge" label="Egresos Otros">
-                  <el-input v-model="form.a.otros_egresos_conyuge" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-          </ElCollapseItem>
-          <ElCollapseItem name="laboral" title="INFORMACION LABORAL">
-            <el-row :gutter="4">
-              <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
-                <el-form-item prop="e.id_ocupacion" label="Ocupación">
-                  <el-select v-model="form.e.id_ocupacion" filterable>
-                    <el-option v-for="e in tiposocupacion" :key="e.id" :label="e.descripcion" :value="e.id" />
-                  </el-select>
-                </el-form-item>
-              </el-col>
-              <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
-                <el-form-item label="Madre Cabeza de Familia">
-                  <el-checkbox v-model="form.e.cabezafamilia" />
-                </el-form-item>
-              </el-col>
-              <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
-                <el-form-item prop="e.id_tipo_contrato" label="Contrato">
-                  <el-select v-model="form.e.id_tipo_contrato" filterable>
-                    <el-option v-for="e in tiposcontrato" :key="e.id" :label="e.descripcion" :value="e.id" />
-                  </el-select>
-                </el-form-item>
-              </el-col>
-              <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6">
-                <el-form-item prop="e.descripcion_contrato" label="Descripción Contrato">
-                  <el-input :disabled="form.e.id_tipo_contrato != 3" v-model="form.e.descripcion_contrato"/>
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row :gutter="4">
-              <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
-                <el-form-item prop="b.profesion" label="Profesión">
-                  <el-input v-model="form.b.profesion"/>
-                </el-form-item>
-              </el-col>
-              <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
-                <el-form-item prop="b.empresa_labora" label="Empresa">
-                  <el-input v-model="form.b.empresa_labora"/>
-                </el-form-item>
-              </el-col>
-              <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
-                <el-form-item prop="b.cargo_actual" label="Cargo">
-                  <el-input v-model="form.b.cargo_actual"/>
-                </el-form-item>
-              </el-col>
-              <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
-                <el-form-item prop="b.fecha_ingreso_empresa" label="Fecha Ingreso">
-                  <el-date-picker v-model="form.b.fecha_ingreso_empresa" type="date" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row :gutter="4">
               <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                <el-form-item prop="b.id_ciiu" label="CIIU">
-                  <el-select v-model="form.b.id_ciiu" filterable style="width: 90%;">
-                    <el-option v-for="e in tiposciiu" :key="e.id" :label="e.descripcion" :value="e.id" />
-                  </el-select>
+                <el-form-item prop="id_persona" label="Nombre Completo">
+                  <el-input v-model="nombre" readonly />
                 </el-form-item>
               </el-col>
-              <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
-                <el-form-item prop="e.declara_renta" label="Declara Renta">
-                  <el-checkbox v-model="form.e.declara_renta" />
-                </el-form-item>
-              </el-col>
-              <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
-                <el-form-item prop="c.retefuente" label="Aplica Retención en la Fuente">
-                  <el-checkbox v-model="form.c.retefuente" />
+              <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
+                <el-form-item>
+                  <el-button :disabled="form.id_identificacion == null || form.id_persona == null" type="success" icon="el-icon-edit" circle title="Actualizar Información de la Persona" @click="actualizarPersona(form.id_identificacion, form.id_persona)"/>
                 </el-form-item>
               </el-col>
             </el-row>
-            <el-card class="box-card">
-              <div slot="header" class="clearfix">
-                <span>INGRESOS / EGRESOS</span>
-              </div>
-              <el-card class="box-card">
-                <div slot="header" class="clearfix">
-                  <span>Ingresos</span>
-                </div>
-                <el-row :gutter="4">
-                  <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-                    <el-form-item prop="b.declaracion" label="Declaración de Fondos">
-                      <el-input v-model="form.b.declaracion" />
-                    </el-form-item>
-                  </el-col>
-                </el-row>
-                <el-row :gutter="4">
-                  <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                    <el-form-item prop="b.ingresos_a_principal" label="Ingresos Actividad Principal">
-                      <el-input v-model="form.b.ingresos_a_principal" type="number" />
-                    </el-form-item>
-                  </el-col>
-                  <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                    <el-form-item prop="b.ingresos_otros" label="Ingresos Otra Actividad">
-                      <el-input v-model="form.b.ingresos_otros" />
-                    </el-form-item>
-                  </el-col>
-                </el-row>
-                <el-row :gutter="4">
-                  <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-                    <el-form-item prop="b.desc_ingr_otros" label="Descripción Otros Ingresos">
-                      <el-input v-model="form.b.desc_ingr_otros" />
-                    </el-form-item>
-                  </el-col>
-                </el-row>
-              </el-card>
-              <el-card class="box-card">
-                <div slot="header" class="clearfix">
-                  <span>Egresos</span>
-                </div>
-                <el-row :gutter="4">
-                  <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                    <el-form-item prop="c.egresos_alquiler" label="Arriendo">
-                      <el-input v-model="form.c.egresos_alquiler" type="number" />
-                    </el-form-item>
-                  </el-col>
-                  <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                    <el-form-item prop="c.egresos_transporte" label="Transporte">
-                      <el-input v-model="form.c.egresos_transporte" />
-                    </el-form-item>
-                  </el-col>
-                </el-row>
-                <el-row :gutter="4">
-                  <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                    <el-form-item prop="c.egresos_servicios" label="Servicios">
-                      <el-input v-model="form.c.egresos_servicios" />
-                    </el-form-item>
-                  </el-col>
-                  <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                    <el-form-item prop="c.egresos_alimentacion" label="Alimentación">
-                      <el-input v-model="form.c.egresos_alimentacion" />
-                    </el-form-item>
-                  </el-col>
-                </el-row>
-                <el-row :gutter="4">
-                  <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                    <el-form-item prop="c.egresos_deudas" label="Prestamos">
-                      <el-input v-model="form.c.egresos_deudas" />
-                    </el-form-item>
-                  </el-col>
-                  <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                    <el-form-item prop="c.egresos_otros" label="Otros Egresos">
-                      <el-input v-model="form.c.egresos_otros" />
-                    </el-form-item>
-                  </el-col>
-                </el-row>
-                <el-row :gutter="4">
-                  <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-                    <el-form-item prop="c.desc_egre_otros" label="Descripción Otros Egresos">
-                      <el-input v-model="form.c.desc_egre_otros" />
-                    </el-form-item>
-                  </el-col>
-                </el-row>
-                <el-row :gutter="4">
-                  <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                    <el-form-item prop="c.total_activos" label="Total Activos">
-                      <el-input v-model="form.c.total_activos" />
-                    </el-form-item>
-                  </el-col>
-                  <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                    <el-form-item prop="c.total_pasivos" label="Total Pasivos">
-                      <el-input v-model="form.c.total_pasivos" />
-                    </el-form-item>
-                  </el-col>
-                </el-row>
-              </el-card>
-            </el-card>
-          </ElCollapseItem>
-          <ElCollapseItem name="direccion" title="DIRECCIONES">
-            <el-card>
-              <el-row>
-                <el-col :xs="24" :sm="24" :md="1" :lg="1" :xl="1">
-                  <span>Id</span>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
-                  <span>Tipo Dirección</span>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="5" :lg="5" :xl="5">
-                  <span>Dirección</span>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
-                  <span>Barrio</span>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
-                  <span>Municipio</span>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
-                  <span>Teléfono</span>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
-                  <span>Teléfono</span>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
-                  <span>Teléfono</span>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
-                  <span>Teléfono</span>
-                </el-col>
-              </el-row>
-              <el-row v-for="(d, didx) in form.direcciones" :key="d.consecutivo" :gutter="4">
-                <el-col :xs="24" :sm="24" :md="1" :lg="1" :xl="1">
-                  <el-form-item><span>{{ d.consecutivo }}</span></el-form-item>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
-                  <el-form-item>
-                    <el-select v-model="d.id_direccion" :placeholder="$t('credito.solicitud.tipo_direccion_select')" filterable clearable style="width: 100%;">
-                      <el-option v-for="td in tiposdireccion" :key="td.id" :label="td.descripcion" :value="td.id" />
-                    </el-select>
-                  </el-form-item>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
-                  <el-form-item><el-input v-model="d.direccion" /></el-form-item>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
-                  <el-form-item><el-input v-model="d.barrio" /></el-form-item>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
-                  <el-form-item>
-                    <el-select v-model="d.cod_municipio" :placeholder="$t('credito.solicitud.municipio_select')" filterable clearable style="width: 100%;">
-                      <el-option v-for="m in municipios" :key="m.cod_municipio" :label="m.nombre" :value="m.cod_municipio" />
-                    </el-select>
-                  </el-form-item>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
-                  <el-form-item><el-input v-model="d.telefono1" style="font-size: 12px;" /></el-form-item>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
-                  <el-form-item><el-input v-model="d.telefono2" style="font-size: 12px;" /></el-form-item>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
-                  <el-form-item><el-input v-model="d.telefono3" style="font-size: 12px;" /></el-form-item>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
-                  <el-form-item><el-input v-model="d.telefono4" style="font-size: 12px;" /></el-form-item>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="1" :lg="1" :xl="1">
-                  <el-button style="display: table-cell;" type="danger" size="mini" circle icon="el-icon-minus" title="Borrar Dirección" @click="borrarDireccion(didx)" />
-                </el-col>
-              </el-row>
-              <el-row>
-                <el-col :span="2">
-                  <el-input v-model="addinputdireccion" type="number" />
-                </el-col>
-                <el-col :span="22">
-                  <el-button style="display: table-cell;" type="primary" size="mini" circle icon="el-icon-plus" title="Adicionar Nueva Dirección" @click="onAddDireccion()" />
-                </el-col>
-              </el-row>
-            </el-card>
-          </ElCollapseItem>
-          <ElCollapseItem name="referencia" title="REFERENCIAS">
-            <el-card>
-              <el-row>
-                <el-col :xs="24" :sm="24" :md="1" :lg="1" :xl="1">
-                  <span>Id</span>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
-                  <span>Tipo Referencia</span>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
-                  <span>Primer Apellido</span>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
-                  <span>Segundo Apellido</span>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
-                  <span>Nombre</span>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
-                  <span>Parentesco</span>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="5" :lg="5" :xl="5">
-                  <span>Dirección</span>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
-                  <span>Teléfono</span>
-                </el-col>
-              </el-row>
-              <el-row v-for="(r, ridx) in form.referencias" :key="r.consecutivo" :gutter="4">
-                <el-col :xs="24" :sm="24" :md="1" :lg="1" :xl="1">
-                  <el-form-item><span>{{ r.consecutivo_referencia }}</span></el-form-item>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
-                  <el-form-item>
-                    <el-select v-model="r.tipo_referencia" :placeholder="$t('credito.solicitud.tipo_referencia_select')" filterable clearable style="width: 100%;">
-                      <el-option v-for="tr in tiposreferencia" :key="tr.id" :label="tr.descripcion" :value="tr.id" />
-                    </el-select>
-                  </el-form-item>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
-                  <el-form-item><el-input v-model="r.primer_apellido_referencia" /></el-form-item>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
-                  <el-form-item><el-input v-model="r.segundo_apellido_referencia" /></el-form-item>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
-                  <el-form-item><el-input v-model="r.nombre_referencia" /></el-form-item>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
-                  <el-form-item>
-                    <el-select v-model="r.parentesco_referencia" :placeholder="$t('credito.solicitud.tipo_parentesco_select')" filterable clearable style="width: 100%;">
-                      <el-option v-for="tp in tiposparentesco" :key="tp.id" :label="tp.descripcion" :value="tp.id" />
-                    </el-select>
-                  </el-form-item>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
-                  <el-form-item><el-input v-model="r.direccion_referencia" style="font-size: 12px;" /></el-form-item>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
-                  <el-form-item><el-input v-model="r.telefono_referencia" style="font-size: 12px;" /></el-form-item>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="1" :lg="1" :xl="1">
-                  <el-button style="display: table-cell;" type="danger" size="mini" circle icon="el-icon-minus" title="Borrar Referencia" @click="borrarReferencia(ridx)" />
-                </el-col>
-              </el-row>
-              <el-row>
-                <el-col :span="2">
-                  <el-input v-model="addinputreferencia" type="number" />
-                </el-col>
-                <el-col :span="22">
-                  <el-button style="display: table-cell;" type="primary" size="mini" circle icon="el-icon-plus" title="Adicionar Nueva Referencia" @click="onAddReferencia()" />
-                </el-col>
-              </el-row>
-            </el-card>
-          </ElCollapseItem>
-          <ElCollapseItem name="beneficiario" title="BENEFICIARIOS">
-            <el-card>
-              <el-row>
-                <el-col :xs="24" :sm="24" :md="1" :lg="1" :xl="1">
-                  <span>Id</span>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
-                  <span>Primer Apellido</span>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
-                  <span>Segundo Apellido</span>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
-                  <span>Nombre</span>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="5" :lg="5" :xl="5">
-                  <span>Parentesco</span>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
-                  <span>Porcentaje</span>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
-                  <span>Auxilio</span>
-                </el-col>
-              </el-row>
-              <el-row v-for="(b, bidx) in form.beneficiarios" :key="b.consecutivo" :gutter="4">
-                <el-col :xs="24" :sm="24" :md="1" :lg="1" :xl="1">
-                  <el-form-item><span>{{ b.consecutivo }}</span></el-form-item>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
-                  <el-form-item><el-input v-model="b.primer_apellido_referencia" /></el-form-item>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
-                  <el-form-item><el-input v-model="b.segundo_apellido_referencia" /></el-form-item>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
-                  <el-form-item><el-input v-model="b.nombre_referencia" /></el-form-item>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="5" :lg="5" :xl="5">
-                  <el-form-item>
-                    <el-select v-model="b.id_parentesco" :placeholder="$t('credito.solicitud.tipo_parentesco_select')" filterable clearable style="width: 100%;">
-                      <el-option v-for="tp in tiposparentesco" :key="tp.id" :label="tp.descripcion" :value="tp.id" />
-                    </el-select>
-                  </el-form-item>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
-                  <el-form-item><el-input v-model="b.porcentaje" /></el-form-item>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
-                  <el-form-item><el-checkbox v-model="b.auxilio" /></el-form-item>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="1" :lg="1" :xl="1">
-                  <el-button style="display: table-cell;" type="danger" size="mini" circle icon="el-icon-minus" title="Borrar Beneficiario" @click="borrarBeneficiario(bidx)" />
-                </el-col>
-              </el-row>
-              <el-row>
-                <el-col :span="2">
-                  <el-input v-model="addinputbeneficiario" type="number" />
-                </el-col>
-                <el-col :span="22">
-                  <el-button style="display: table-cell;" type="primary" size="mini" circle icon="el-icon-plus" title="Adicionar Nuevo Beneficiario" @click="onAddBeneficiario()" />
-                </el-col>
-              </el-row>
-            </el-card>
-          </ElCollapseItem>
-          <ElCollapseItem name="hijo" title="HIJOS">
-            <el-card>
-              <el-row :gutter="4">
-                <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
-                  <el-form-item label="Número de Hijos"><el-input v-model="form.e.numero_hijos" type="number" /></el-form-item>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
-                  <el-form-item label="Personas a Cargo"><el-input v-model="form.e.personas_a_cargo" type="number" /></el-form-item>
-                </el-col>
-              </el-row>
-              <el-row>
-                <el-col :xs="24" :sm="24" :md="1" :lg="1" :xl="1">
-                  <span>Id</span>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="5" :lg="5" :xl="5">
-                  <span>Primer Apellido</span>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="5" :lg="5" :xl="5">
-                  <span>Segundo Apellido</span>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="5" :lg="5" :xl="5">
-                  <span>Nombre</span>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
-                  <span>Fecha Nacimiento</span>
-                </el-col>
-              </el-row>
-              <el-row v-for="(h, hidx) in form.hijos" :key="h.consecutivo_hijo" :gutter="4">
-                <el-col :xs="24" :sm="24" :md="1" :lg="1" :xl="1">
-                  <el-form-item><span>{{ h.consecutivo_hijo }}</span></el-form-item>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="5" :lg="5" :xl="5">
-                  <el-form-item><el-input v-model="h.primer_apellido" /></el-form-item>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="5" :lg="5" :xl="5">
-                  <el-form-item><el-input v-model="h.segundo_apellido" /></el-form-item>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="5" :lg="5" :xl="5">
-                  <el-form-item><el-input v-model="h.nombre" /></el-form-item>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
-                  <el-form-item><el-date-picker v-model="h.fecha_nacimiento" /></el-form-item>
-                </el-col>
-                <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
-                  <el-button style="display: table-cell;" type="danger" size="mini" circle icon="el-icon-minus" title="Borrar Hijo" @click="borrarHijo(hidx)" />
-                </el-col>
-              </el-row>
-              <el-row>
-                <el-col :span="2">
-                  <el-input v-model="addinputhijo" type="number" />
-                </el-col>
-                <el-col :span="22">
-                  <el-button style="display: table-cell;" type="primary" size="mini" circle icon="el-icon-plus" title="Adicionar Nuevo Hijo" @click="onAddHijo()" />
-                </el-col>
-              </el-row>
-            </el-card>
-          </ElCollapseItem>
+          </el-collapse-item>
+          <el-collapse-item v-if="solicitante_existe" name="2" title="INFORMACIÓN DE LA SOLICITUD">
+            <el-row>
+              <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
+                <el-form-item label="Fecha Recepcion">
+                  <el-date-picker v-model="form.fecha_recepcion" readonly />
+                </el-form-item>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
+                <el-form-item label="Valor Solcitado">
+                  <el-input
+                    v-currency= "{
+                      currency: 'COP',
+                      locale: es,
+                      distractionFree: true,
+                      min: null,
+                      max: null,
+                      validateOnInput: false
+                    }"
+                    v-model="form.valor_solicitado" />
+                </el-form-item>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
+                <el-form-item label="Tipo de Cuota">
+                  <el-select v-model="form.tipo_cuota" filterable>
+                    <el-option v-for="t in tipos_cuota" :key="t.id" :label="t.descripcion" :value="t.id" />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </el-collapse-item>
         </el-collapse>
-        <el-row>
-          <el-col>
-            <el-button type="primary">Guardar Persona</el-button>
-          </el-col>
-        </el-row>
       </el-form>
+      <el-dialog
+        :visible.sync="dialogPersonaVisible"
+        class="pdialog">
+        <PersonaComponent :id_identificacion="id_identificacion" :id_persona="id_persona" />
+        <el-button type="primary" @click="dialogPersonaVisible = false" >Cerrar</el-button>
+      </el-dialog>
     </el-main>
-    <el-dialog title="Guardar Información de la Persona"></el-dialog>
   </el-container>
 </template>
 <script>
-import { obtenerListaTipoIdentificacion, obtenerListaTipoPersona, obtenerListaTipoEstadoCivil,
-  obtenerListaTipoNivelEscolaridad, obtenerListaTipoEstrato, obtenerListaTipoVivienda, obtenerListaTipoOcupacion, obtenerListaTipoContrato,
-  obtenerListaTipoCiiu, obtenerListaTipoDireccion, obtenerListaMunicipios, obtenerListaTipoReferencia, obtenerListaTipoParentesco } from '@/api/tipos'
-import { obtenerPersona, guardarPersona } from '@/api/persona'
+import PersonaComponent from '@/components/Persona'
+import { obtenerListaTipoIdentificacion } from '@/api/tipos'
+import { obtenerPersona } from '@/api/persona'
 
 export default {
+  components: {
+    PersonaComponent
+  },
   data() {
     return {
-      es_bloqueo: false,
+      activeNames: ['1', '2', '3'],
+      dialogPersonaVisible: false,
+      solicitanteNoValido: true,
       tipo_documento: [],
-      tipo_persona: [],
-      tipo_estado_civil: [],
-      escolaridad: [],
-      estratos: [],
-      tiposvivienda: [],
-      tiposocupacion: [],
-      tiposcontrato: [],
-      tiposciiu: [],
-      tiposdireccion: [],
-      tiposreferencia: [],
-      tiposparentesco: [],
-      municipios: [],
-      addinputdireccion: 1,
-      addinputreferencia: 1,
-      addinputbeneficiario: 1,
-      addinputhijo: 1,
-      activeNames: ['conyuge', 'laboral', 'direccion', 'referencia', 'beneficiario', 'hijo'],
-      genero: [{ id: 'M', descripcion: 'MASCULINO' }, { id: 'F', descripcion: 'FEMENINO' }, { id: 'N', descripcion: 'NINGUNO' }],
+      tipos_cuota: [],
+      id_identificacion: null,
+      id_persona: null,
+      nombre: null,
+      es_bloqueo: false,
+      codeudorNoValido: true,
       form: {
-        a: {
-          id_identificacion: null,
-          id_persona: null,
-          lugar_expedicion: null,
-          fecha_expedicion: null,
-          nombre: null,
-          primer_apellido: null,
-          segundo_apellido: null,
-          id_tipo_persona: null,
-          sexo: null,
-          fecha_nacimiento: null,
-          lugar_nacimiento: null,
-          provincia_nacimiento: null,
-          depto_nacimiento: null,
-          pais_nacimiento: null,
-          id_tipo_estado_civil: null,
-          id_conyuge: null,
-          id_identificacion_conyuge: null,
-          nombre_conyuge: null,
-          primer_apellido_conyuge: null,
-          segundo_apellido_conyuge: null
-        },
-        b: {
-          id_apoderado: null,
-          id_identificacion_apoderado: null,
-          nombre_apoderado: null,
-          primer_apellido_apoderado: null,
-          segundo_apellido_apoderado: null,
-          profesion: null,
-          id_estado: null,
-          id_tipo_relacion: null,
-          id_ciiu: null,
-          empresa_labora: null,
-          fecha_ingreso_empresa: null,
-          cargo_actual: null,
-          declaracion: null,
-          ingresos_a_principal: null,
-          ingresos_otros: null,
-          ingresos_conyuge: null,
-          ingresos_conyuge_otros: null,
-          desc_ingr_otros: null
-        },
-        c: {
-          egresos_alquiler: null,
-          egresos_servicios: null,
-          egresos_transporte: null,
-          egresos_alimentacion: null,
-          egresos_deudas: null,
-          egresos_otros: null,
-          desc_egre_otros: null,
-          egresos_conyuge: null,
-          otros_egresos_conyuge: null,
-          total_activos: null,
-          total_pasivos: null,
-          educacion: null,
-          retefuente: null,
-          acta: null,
-          fecha_registro: null,
-          foto: null,
-          firma: null,
-          escritura_constitucion: null
-        },
-        d: {
-          duracion_sociedad: null,
-          capital_social: null,
-          matricula_mercantil: null,
-          foto_huella: null,
-          datos_huella: null,
-          email: null,
-          id_empleado: null,
-          fecha_actualizacion: null
-        },
-        e: {
-          numero_hijos: null,
-          id_ocupacion: null,
-          id_tipo_contrato: null,
-          descripcion_contrato: null,
-          id_sector: null,
-          descripcion_sector: null,
-          venta_anual: null,
-          fecha_ultimo_balance: null,
-          numero_empleados: null,
-          declara_renta: null,
-          personas_a_cargo: null,
-          id_estrato: null,
-          cabezafamilia: null,
-          id_estudio: null,
-          id_tipovivienda: null
-        },
-        f: {
-          es_proveedor: null,
-          numero_rut: null
-        },
-        direcciones: [],
-        referencias: [],
-        beneficiarios: [],
-        hijos: []
-      },
-      direccion: {
-        consecutivo: null,
-        id_direccion: null,
-        direccion: null,
-        barrio: null,
-        cod_municipio: null,
-        municipio: null,
-        telefono1: null,
-        telefono2: null,
-        telefono3: null,
-        telefono4: null
-      },
-      referencia: {
-        consecutivo_referencia: null,
-        primer_apellido_referencia: null,
-        segundo_apellido_referencia: null,
-        nombre_referencia: null,
-        direccion_referencia: null,
-        telefono_referencia: null,
-        tipo_referencia: null,
-        parentesco_referencia: null
-      },
-      beneficiario: {
-        consecutivo: null,
-        primer_apellido: null,
-        segundo_apellido: null,
-        nombre: null,
-        id_parentesco: null,
-        porcentaje: null,
-        auxilio: null
-      },
-      hijo: {
-        consecutivo_hijo: null,
-        nombre: null,
-        primer_apellido: null,
-        segundo_apellido: null,
-        fecha_nacimiento: null
+        id_asesor: null,
+        id_solicitud: null,
+        id_identificacion: null,
+        id_persona: null,
+        valor_solicitado: null,
+        plazo: null,
+        amortizacion: null,
+        garantia: null,
+        tipo_cuota: null,
+        estado: null,
+        linea: null,
+        fecha_recepcion: new Date(),
+        oficina: null,
+        destino: null,
+        fecha_concepto: null,
+        id_empleado: null,
+        ente_aprobador: null,
+        numero_acta: null,
+        tasa_interes: null,
+        plazo_aprobado: null,
+        descripcion_garantia: null,
+        numero_codeudores: null,
+        respaldo: null,
+        valor_aprobado: null,
+        id_analisis: null,
+        ingresos: null,
+        disponible: null,
+        deducciones: null,
+        valor_cuota: null,
+        disponibilidad: null,
+        solv_economica: null,
+        exp_creditos: null,
+        inversion: null,
+        clasificacion: null,
+        es_desembolso_parcial: null,
+        pago_interes: null,
+        id_copia: null,
+        observacion: null,
+        s_vida: null,
+        s_exequial: null,
+        es_fundacion: null,
+        numero_riesgo: null,
+        fecha_analisis: null,
+        codeudores: []
       }
     }
   },
   beforeMount() {
     obtenerListaTipoIdentificacion().then(response => {
       this.tipo_documento = response.data
-      obtenerListaTipoPersona().then(response => {
-        this.tipo_persona = response.data
-        obtenerListaTipoEstadoCivil().then(response => {
-          this.tipo_estado_civil = response.data
-          obtenerListaTipoNivelEscolaridad().then(response => {
-            this.escolaridad = response.data
-            obtenerListaTipoEstrato().then(response => {
-              this.estratos = response.data
-              obtenerListaTipoVivienda().then(response => {
-                this.tiposvivienda = response.data
-                obtenerListaTipoOcupacion().then(response => {
-                  this.tiposocupacion = response.data
-                  obtenerListaTipoContrato().then(response => {
-                    this.tiposcontrato = response.data
-                    obtenerListaTipoCiiu().then(response => {
-                      this.tiposciiu = response.data
-                      obtenerListaTipoDireccion().then(response => {
-                        this.tiposdireccion = response.data
-                        obtenerListaMunicipios().then(response => {
-                          this.municipios = response.data
-                          obtenerListaTipoParentesco().then(response => {
-                            this.tiposparentesco = response.data
-                            obtenerListaTipoReferencia().then(response => {
-                              this.tiposreferencia = response.data
-                            }).catch(error => {
-                              console.log('Error consultando Tipo Referencia: ' + error)
-                            })
-                          }).catch(error => {
-                            console.log('Error consultanto Tipo Parentesco: ' + error)
-                          })
-                        }).catch(error => {
-                          console.log('Error consultando Municipios: ' + error)
-                        })
-                      }).catch(error => {
-                        console.log('Error consultando Tipo Direccion: ' + error)
-                      })
-                    }).catch(error => {
-                      console.log('Error consultando Tipo Ciiu:' + error)
-                    })
-                  }).catch(error => {
-                    console.log('Error consultando Tipo Contrato:' + error)
-                  })
-                }).catch(error => {
-                  console.log('Error consultando Tipo Ocupacion: ' + error)
-                })
-              }).catch(error => {
-                console.log('Error consultando Tipos Vivienda:' + error)
-              })
-            }).catch(error => {
-              console.log('Error consultando Estratos:' + error)
-            })
-          }).catch(error => {
-            console.log('Error consultando Escolaridad:' + error)
-          })
-        }).catch(error => {
-          console.log('Error consultando tipo persona:' + error)
-        })
-      }).catch(error => {
-        console.log('Error consultando tipo persona:' + error)
-      })
     }).catch(error => {
       console.log('Error consultando tipo identificación:' + error)
     })
@@ -884,82 +159,90 @@ export default {
         text: 'Cargando...',
         background: 'rgba(0, 0, 0, 0.7)'
       })
-      obtenerPersona(this.form.a.id_identificacion, this.form.a.id_persona).then(response => {
+      obtenerPersona(this.form.id_identificacion, this.form.id_persona).then(response => {
         loading.close()
         if (response.status === 200) {
-          this.es_bloqueo = true
-          this.form = response.data
-          this.form.c.retefuente = !!this.form.c.retefuente
-          this.form.d.declara_renta = !!this.form.d.declara_renta
-          this.form.e.cabezafamilia = !!this.form.e.cabezafamilia
-          this.form.e.es_proveedor = !!this.form.e.es_proveedor
-          // this.form.direcciones = !!this.form.direcciones
+          this.id_identificacion = response.data.a.id_identificacion
+          this.id_persona = response.data.a.id_persona
+          this.nombre = response.data.a.nombre + ' ' + response.data.a.primer_apellido + ' ' + response.data.a.segundo_apellido
+          this.solicitante_existe = true
         }
       }).catch(() => {
+        this.nombre = null
+        this.solicitante_existe = false
         loading.close()
+        this.$alert('Persona No Existe', 'Buscando Persona')
+        this.actualizarPersona(this.form.id_identificacion, this.form.id_persona)
       })
     },
-    onAddDireccion() {
-      const direccion = {
+    actualizarPersona(id_identificacion, id_persona) {
+      this.id_identificacion = id_identificacion
+      this.id_persona = id_persona
+      this.dialogPersonaVisible = true
+    },
+    borrarCodeudor(didx) {
+      this.$confirm('Seguro de Borrar al Codeudor. Continuar?', 'Advertencia', {
+        confirmButtonText: 'Sí',
+        cancelButtonText: 'No',
+        type: 'warning'
+      }).then(() => {
+        this.form.codeudores.splice(didx, 1)
+        var i = 1
+        this.form.codeudores.forEach(c => {
+          c.consecutivo = i
+          i++
+        })
+        this.$message({
+          type: 'success',
+          message: 'Borrado Finalizado'
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: 'Borrado Cancelado'
+        })
+      })
+    },
+    onAddCodeudor() {
+      const codeudor = {
         consecutivo: null,
-        id_direccion: null,
-        direccion: null,
-        barrio: null,
-        cod_municipio: null,
-        municipio: null,
-        telefono1: null,
-        telefono2: null,
-        telefono3: null,
-        telefono4: null
-      }
-      const csc = this.form.direcciones.length + 1
-      direccion.consecutivo = parseInt(csc)
-      this.form.direcciones.push(direccion)
-    },
-    onAddReferencia() {
-      const referencia = {
-        consecutivo_referencia: null,
-        primer_apellido_referencia: null,
-        segundo_apellido_referencia: null,
-        nombre_referencia: null,
-        direccion_referencia: null,
-        telefono_referencia: null,
-        tipo_referencia: null,
-        parentesco_referencia: null
-      }
-      const csc = this.form.referencias.length + 1
-      referencia.consecutivo_referencia = parseInt(csc)
-      this.form.referencias.push(referencia)
-    },
-    onAddBeneficiario() {
-      const beneficiario = {
-        consecutivo: null,
-        primer_apellido: null,
-        segundo_apellido: null,
+        id_identificacion: null,
+        id_persona: null,
         nombre: null,
-        id_parentesco: null,
-        porcentaje: null,
-        auxilio: null
+        es_codeudor: null,
+        es_conyuge: null
       }
-      const csc = this.form.beneficiarios.length + 1
-      beneficiario.consecutivo = parseInt(csc)
-      this.form.beneficiarios.push(beneficiario)
+      const csc = this.form.codeudores.length + 1
+      codeudor.consecutivo = parseInt(csc)
+      this.form.codeudores.push(codeudor)
     },
-    onAddHijo() {
-      const hijo = {
-        consecutivo_hijo: null,
-        nombre: null,
-        primer_apellido: null,
-        segundo_apellido: null,
-        fecha_nacimiento: null
-      }
-      const csc = this.form.hijos.length + 1
-      hijo.consecutivo_hijo = parseInt(csc)
-      this.form.hijos.push(hijo)
-    },
-    onGuardarPersona(){
-
+    onGuardarSolicitud() {
+      this.dialogPersonaVisible = false
+      this.form.retefuente = this.form.retefuente ? 1 : 0
+      this.form.cabezafamilia = this.form.cabezafamilia ? 1 : 0
+      guardarSolicitud(this.form).then(response => {
+        if (response.status === 200) {
+          this.$message({
+            message: 'Información guardada correctamente!',
+            type: 'success'
+          })
+        } else {
+          this.$message({
+            message: 'No se pudo guardar la información, por favor verifique los datos.',
+            type: 'warning'
+          })
+        }
+      }).catch(error => {
+        this.$message.error('Se presentó error guardando persona: ' + error)
+      })
     }
   }
 }
 </script>
+<style lang="scss" scoped>
+  .pdialog {
+    .el-dialog {
+      width: 80% !important;
+    }
+  }
+</style>

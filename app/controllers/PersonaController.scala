@@ -26,7 +26,10 @@ class PersonaController @Inject()(
             implicit request: Request[AnyContent] =>
               val usua_id = Utility.extraerUsuario(request)
               pService.obtener(id_identificacion, id_persona).map { p =>
-                Ok(Json.toJson(p))
+                p.a match {
+                  case Some(a) => Ok(Json.toJson(p))
+                  case None => NotFound
+                }
               }
         }
         

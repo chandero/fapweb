@@ -18,6 +18,6 @@ export function guardarPersona(p) {
   return request({
     url: '/pers/gdr',
     method: 'post',
-    data: data
+    data: data.p
   })
 }
