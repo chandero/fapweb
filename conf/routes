@@ -75,6 +75,13 @@ GET     /api/tcu/obt                    controllers.TipoCiiuController.obtenerLi
 GET     /api/td/obt                     controllers.TipoDireccionController.obtenerLista
 GET     /api/tt/obt                     controllers.TipoParentescoController.obtenerLista
 GET     /api/tr/obt                     controllers.TipoReferenciaController.obtenerLista
+GET     /api/tcc/obt                    controllers.TipoCuotaController.obtenerLista
+GET     /api/tlc/obt                    controllers.TipoLineaCreditoController.obtenerLista
+GET     /api/tgc/obt                    controllers.TipoGarantiaController.obtenerLista
+GET     /api/trc/obt                    controllers.TipoRespaldoController.obtenerLista
+GET     /api/ofi/obt                    controllers.OficinaController.obtenerLista
+GET     /api/ase/obt                    controllers.AsesorController.obtenerLista
+
 
 # Persona
 GET     /api/pers/ver/:i/:p             controllers.PersonaController.obtener(i:Int , p:String)

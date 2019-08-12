@@ -173,22 +173,22 @@
             <el-row :gutter="6">
               <el-col :xs="24" :sm="24" :md="7" :lg="7" :xl="7">
                 <el-form-item prop="a.ingresos_conyuge" label="Ingreso Principal">
-                  <el-input v-model="form.a.ingresos_conyuge" />
+                  <el-input v-currency="{locale, currency}" v-model="form.a.ingresos_conyuge" />
                 </el-form-item>
               </el-col>
               <el-col :xs="24" :sm="24" :md="7" :lg="7" :xl="7">
                 <el-form-item prop="a.ingresos_conyuge_otros" label="Otros Ingresos">
-                  <el-input v-model="form.a.ingresos_conyuge_otros" />
+                  <el-input v-currency="{locale, currency}" v-model="form.a.ingresos_conyuge_otros" />
                 </el-form-item>
               </el-col>
               <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
                 <el-form-item prop="a.egresos_conyuge" label="Egreso Principal">
-                  <el-input v-model="form.a.egresos_conyuge" />
+                  <el-input v-currency="{locale, currency}" v-model="form.a.egresos_conyuge" />
                 </el-form-item>
               </el-col>
               <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
-                <el-form-item prop="a.egresos_conyuge" label="Egresos Otros">
-                  <el-input v-model="form.a.otros_egresos_conyuge" />
+                <el-form-item prop="a.otros_egresos_conyuge" label="Egresos Otros">
+                  <el-input v-currency="{locale, currency}" v-model="form.a.otros_egresos_conyuge" />
                 </el-form-item>
               </el-col>
             </el-row>
@@ -279,12 +279,12 @@
                 <el-row :gutter="4">
                   <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
                     <el-form-item prop="b.ingresos_a_principal" label="Ingresos Actividad Principal">
-                      <el-input v-model="form.b.ingresos_a_principal" type="number" />
+                      <el-input v-currency="{locale, currency}" v-model="form.b.ingresos_a_principal" />
                     </el-form-item>
                   </el-col>
                   <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
                     <el-form-item prop="b.ingresos_otros" label="Ingresos Otra Actividad">
-                      <el-input v-model="form.b.ingresos_otros" />
+                      <el-input v-currency="{locale, currency}" v-model="form.b.ingresos_otros" />
                     </el-form-item>
                   </el-col>
                 </el-row>
@@ -303,36 +303,36 @@
                 <el-row :gutter="4">
                   <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
                     <el-form-item prop="c.egresos_alquiler" label="Arriendo">
-                      <el-input v-model="form.c.egresos_alquiler" type="number" />
+                      <el-input v-currency="{locale, currency}" v-model="form.c.egresos_alquiler" />
                     </el-form-item>
                   </el-col>
                   <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
                     <el-form-item prop="c.egresos_transporte" label="Transporte">
-                      <el-input v-model="form.c.egresos_transporte" />
+                      <el-input v-currency="{locale, currency}" v-model="form.c.egresos_transporte" />
                     </el-form-item>
                   </el-col>
                 </el-row>
                 <el-row :gutter="4">
                   <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
                     <el-form-item prop="c.egresos_servicios" label="Servicios">
-                      <el-input v-model="form.c.egresos_servicios" />
+                      <el-input v-currency="{locale, currency}" v-model="form.c.egresos_servicios" />
                     </el-form-item>
                   </el-col>
                   <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
                     <el-form-item prop="c.egresos_alimentacion" label="Alimentación">
-                      <el-input v-model="form.c.egresos_alimentacion" />
+                      <el-input v-currency="{locale, currency}" v-model="form.c.egresos_alimentacion" />
                     </el-form-item>
                   </el-col>
                 </el-row>
                 <el-row :gutter="4">
                   <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
                     <el-form-item prop="c.egresos_deudas" label="Prestamos">
-                      <el-input v-model="form.c.egresos_deudas" />
+                      <el-input v-currency="{locale, currency}" v-model="form.c.egresos_deudas" />
                     </el-form-item>
                   </el-col>
                   <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
                     <el-form-item prop="c.egresos_otros" label="Otros Egresos">
-                      <el-input v-model="form.c.egresos_otros" />
+                      <el-input v-currency="{locale, currency}" v-model="form.c.egresos_otros" />
                     </el-form-item>
                   </el-col>
                 </el-row>
@@ -346,12 +346,12 @@
                 <el-row :gutter="4">
                   <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
                     <el-form-item prop="c.total_activos" label="Total Activos">
-                      <el-input v-model="form.c.total_activos" />
+                      <el-input v-currency="{locale, currency}" v-model="form.c.total_activos" />
                     </el-form-item>
                   </el-col>
                   <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
                     <el-form-item prop="c.total_pasivos" label="Total Pasivos">
-                      <el-input v-model="form.c.total_pasivos" />
+                      <el-input v-currency="{locale, currency}" v-model="form.c.total_pasivos" />
                     </el-form-item>
                   </el-col>
                 </el-row>
@@ -680,6 +680,8 @@ export default {
   },
   data() {
     return {
+      locale: 'en',
+      currency: 'USD',
       es_bloqueo: false,
       dialogPersonaVisible: false,
       tipo_documento: [],
@@ -1076,6 +1078,20 @@ export default {
       this.dialogPersonaVisible = false
       this.form.c.retefuente = this.form.c.retefuente ? 1 : 0
       this.form.e.cabezafamilia = this.form.e.cabezafamilia ? 1 : 0
+      this.form.b.ingresos_a_principal = parseFloat(this.form.b.ingresos_a_principal)
+      this.form.b.ingresos_conyuge = parseFloat(this.form.b.ingresos_conyuge)
+      this.form.b.ingresos_conyuge_otros = parseFloat(this.form.b.ingresos_conyuge_otros)
+      this.form.b.ingresos_otros = parseFloat(this.form.b.ingresos_otros)
+      this.form.c.egresos_alimentacion = parseFloat(this.form.c.egresos_alimentacion)
+      this.form.c.egresos_alquiler = parseFloat(this.form.c.egresos_alquiler)
+      this.form.c.egresos_conyuge = parseFloat(this.form.c.egresos_deudas)
+      this.form.c.egresos_deudas = parseFloat(this.form.c.egresos_deudas)
+      this.form.c.egresos_otros = parseFloat(this.form.c.egresos_otros)
+      this.form.c.egresos_servicios = parseFloat(this.form.c.egresos_servicios)
+      this.form.c.egresos_transporte = parseFloat(this.form.c.egresos_servicios)
+      this.form.c.otros_egresos_conyuge = parseFloat(this.form.c.otros_egresos_conyuge)
+      this.form.c.total_activos = parseFloat(this.form.c.total_activos)
+      this.form.c.total_pasivos = parseFloat(this.form.c.total_pasivos)
       guardarPersona(this.form).then(response => {
         if (response.status === 200) {
           this.$message({

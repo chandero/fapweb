@@ -1,5 +1,5 @@
 <template>
-  <el-container style="height: 600px; overflow: scroll;">
+  <el-container>
     <el-header>
       <span>Nueva Solicitud</span>
     </el-header>
@@ -9,7 +9,25 @@
         :model="form"
         label-position="top">
         <el-collapse v-model="activeNames">
-          <el-collapse-item name="1" title="Información del Solicitante">
+          <el-collapse-item name="0" title="INFORMACIÓN INTERNA OFICINA">
+            <el-row :gutter="4">
+              <el-col :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
+                <el-form-item prop="oficina" label="Centro de Costo">
+                  <el-select v-model="form.oficina" filterable style="width: 90%;">
+                    <el-option v-for="o in oficinas" :key="o.id" :label="o.descripcion" :value="o.id" />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
+                <el-form-item prop="asesor" label="Asesor">
+                  <el-select v-model="form.id_asesor" filterable style="width: 90%;">
+                    <el-option v-for="a in asesores" :key="a.id" :label="a.descripcion" :value="a.id" />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </el-collapse-item>
+          <el-collapse-item name="1" title="INFORMACIÓN DEL SOLICITANTE">
             <el-row :gutter="4">
               <el-col :xs="24" :sm="24" :md="5" :lg="5" :xl="5">
                 <el-form-item prop="id_identificacion" label="Tipo de Documento">
@@ -36,32 +54,131 @@
             </el-row>
           </el-collapse-item>
           <el-collapse-item v-if="solicitante_existe" name="2" title="INFORMACIÓN DE LA SOLICITUD">
-            <el-row>
-              <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
+            <el-row :gutter="4">
+              <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
                 <el-form-item label="Fecha Recepcion">
-                  <el-date-picker v-model="form.fecha_recepcion" readonly />
+                  <el-date-picker v-model="form.fecha_recepcion" readonly style="width: 90%;"/>
                 </el-form-item>
               </el-col>
-              <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
-                <el-form-item label="Valor Solcitado">
+              <el-col :xs="24" :sm="24" :md="5" :lg="5" :xl="5">
+                <el-form-item label="Valor Solicitado">
                   <el-input
-                    v-currency= "{
-                      currency: 'COP',
-                      locale: es,
-                      distractionFree: true,
-                      min: null,
-                      max: null,
-                      validateOnInput: false
-                    }"
+                    v-currency="{locale, currency}"
                     v-model="form.valor_solicitado" />
                 </el-form-item>
               </el-col>
-              <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
+              <el-col :xs="24" :sm="24" :md="5" :lg="5" :xl="5">
                 <el-form-item label="Tipo de Cuota">
                   <el-select v-model="form.tipo_cuota" filterable>
                     <el-option v-for="t in tipos_cuota" :key="t.id" :label="t.descripcion" :value="t.id" />
                   </el-select>
                 </el-form-item>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="5" :lg="5" :xl="5">
+                <el-form-item label="Línea de Crédito">
+                  <el-select v-model="form.linea" filterable>
+                    <el-option v-for="l in lineas" :key="l.id" :label="l.descripcion" :value="l.id" />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="5" :lg="5" :xl="5">
+                <el-form-item label="Tipo de Garantía">
+                  <el-select v-model="form.garantia" filterable>
+                    <el-option v-for="g in tipos_garantia" :key="g.id" :label="g.descripcion" :value="g.id" />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row :gutter="4">
+              <el-col :xs="24" :sm="24" :md="7" :lg="7" :xl="7">
+                <el-form-item label="Descripción Garantía">
+                  <el-input v-model="form.descripcion_garantia" />
+                </el-form-item>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="5" :lg="5" :xl="5">
+                <el-form-item label="Respaldo">
+                  <el-select v-model="form.respaldo" filterable>
+                    <el-option v-for="r in tipos_respaldo" :key="r.id" :label="r.descripcion" :value="r.id" />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
+                <el-form-item label="Amortización Capital">
+                  <el-input v-model="form.amortizacion" />
+                </el-form-item>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
+                <el-form-item label="Amortización Interés">
+                  <el-input v-model="form.pago_interes" />
+                </el-form-item>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
+                <el-form-item label="Plazo (En Días)">
+                  <el-input v-model="form.plazo" />
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row :gutter="4">
+              <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
+                <el-form-item label="Destino del Prestamo">
+                  <el-input v-model="form.destino" />
+                </el-form-item>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
+                <el-form-item label="Observaciones">
+                  <el-input v-model="form.observacion" />
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </el-collapse-item>
+          <el-collapse-item v-if="solicitante_existe" name="3" title="CODEUDORES">
+            <el-row>
+              <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
+                <span>Tipo de Documento</span>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
+                <span>Número de Documento</span>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
+                <span>Nombre Completo</span>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
+                <span>Es Conyuge</span>
+              </el-col>
+            </el-row>
+            <el-row v-for="c in form.codeudores" :key="c.consecutivo" :gutter="4">
+              <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
+                <el-form-item>
+                  <el-select v-model="c.id_identificacion" filterable>
+                    <el-option v-for="t in tipo_documento" :key="t.id_identificacion" :label="t.descripcion_identificacion" :value="t.id_identificacion" />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
+                <el-form-item>
+                  <el-input v-model="c.id_persona" @blur="buscarCodeudor(c)" />
+                </el-form-item>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="10" :lg="10" :xl="10">
+                <el-form-item>
+                  <el-input v-model="c.nombre" readonly />
+                </el-form-item>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
+                <el-form-item>
+                  <el-checkbox v-model="c.es_conyuge" />
+                </el-form-item>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="1" :lg="1" :xl="1">
+                <el-button :disabled="c.id_identificacion == null || c.id_persona == null" size="mini" type="success" icon="el-icon-edit" circle title="Actualizar Información del Codeudor" @click="actualizarPersona(c.id_identificacion, c.id_persona)"/>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="1" :lg="1" :xl="1">
+                <el-button size="mini" type="danger" circle icon="el-icon-minus" title="Quitar Codeudor" @click="onRemoveCodeudor(c.consecutivo)" />
+              </el-col>
+            </el-row>
+            <el-row :gutter="24">
+              <el-col :span="22">
+                <el-button style="display: table-cell;" type="primary" size="mini" circle icon="el-icon-plus" title="Adicionar Nuevo Codeudor" @click="onAddCodeudor()" />
               </el-col>
             </el-row>
           </el-collapse-item>
@@ -69,7 +186,10 @@
       </el-form>
       <el-dialog
         :visible.sync="dialogPersonaVisible"
-        class="pdialog">
+        :close="dialogoCerrado()"
+        destroy-on-close
+        class="pdialog"
+        show-close>
         <PersonaComponent :id_identificacion="id_identificacion" :id_persona="id_persona" />
         <el-button type="primary" @click="dialogPersonaVisible = false" >Cerrar</el-button>
       </el-dialog>
@@ -78,7 +198,10 @@
 </template>
 <script>
 import PersonaComponent from '@/components/Persona'
-import { obtenerListaTipoIdentificacion } from '@/api/tipos'
+import { obtenerListaOficinas, obtenerListaAsesores,
+  obtenerListaTipoIdentificacion, obtenerListaTipoCuota,
+  obtenerListaLineaCredito, obtenerListaTipoGarantia,
+  obtenerListaTipoRespaldo } from '@/api/tipos'
 import { obtenerPersona } from '@/api/persona'
 
 export default {
@@ -87,11 +210,19 @@ export default {
   },
   data() {
     return {
-      activeNames: ['1', '2', '3'],
+      locale: 'en',
+      currency: 'USD',
+      activeNames: ['0', '1', '2', '3'],
       dialogPersonaVisible: false,
       solicitanteNoValido: true,
+      solicitante_existe: false,
+      oficinas: [],
+      asesores: [],
       tipo_documento: [],
       tipos_cuota: [],
+      lineas: [],
+      tipos_garantia: [],
+      tipos_respaldo: [],
       id_identificacion: null,
       id_persona: null,
       nombre: null,
@@ -142,17 +273,56 @@ export default {
         numero_riesgo: null,
         fecha_analisis: null,
         codeudores: []
+      },
+      codeudor: {
+        id_identificacion: null,
+        id_persona: null,
+        nombre: null,
+        es_conyuge: null
       }
     }
   },
   beforeMount() {
     obtenerListaTipoIdentificacion().then(response => {
       this.tipo_documento = response.data
+      obtenerListaTipoCuota().then(response => {
+        this.tipos_cuota = response.data
+        obtenerListaLineaCredito().then(response => {
+          this.lineas = response.data
+          obtenerListaTipoGarantia().then(response => {
+            this.tipos_garantia = response.data
+            obtenerListaTipoRespaldo().then(response => {
+              this.tipos_respaldo = response.data
+              obtenerListaOficinas().then(response => {
+                this.oficinas = response.data
+                obtenerListaAsesores().then(response => {
+                  this.asesores = response.data
+                }).catch(error => {
+                  console.log('Error Consultando Asesores: ' + error)
+                })
+              }).catch(error => {
+                console.log('Error Consultando Centros de costo: ' + error)
+              })
+            }).catch(error => {
+              console.log('Error Consultando Tipos Respaldo: ' + error)
+            })
+          }).catch(error => {
+            console.log('Error Consultando Tipos Garantia: ' + error)
+          })
+        }).catch(error => {
+          console.log('Error Consultando Lineas de Credito :' + error)
+        })
+      }).catch(error => {
+        console.log('Error consultando tipo cuota:' + error)
+      })
     }).catch(error => {
       console.log('Error consultando tipo identificación:' + error)
     })
   },
   methods: {
+    dialogoCerrado() {
+      console.log('Se cerro el dialogo de persona')
+    },
     buscarPersona() {
       const loading = this.$loading({
         lock: true,
@@ -173,6 +343,24 @@ export default {
         loading.close()
         this.$alert('Persona No Existe', 'Buscando Persona')
         this.actualizarPersona(this.form.id_identificacion, this.form.id_persona)
+      })
+    },
+    buscarCodeudor(c) {
+      const loading = this.$loading({
+        lock: true,
+        text: 'Cargando...',
+        background: 'rgba(0, 0, 0, 0.7)'
+      })
+      obtenerPersona(c.id_identificacion, c.id_persona).then(response => {
+        loading.close()
+        if (response.status === 200) {
+          c.nombre = response.data.a.nombre + ' ' + response.data.a.primer_apellido + ' ' + response.data.a.segundo_apellido
+        }
+      }).catch(() => {
+        c.nombre = null
+        loading.close()
+        this.$alert('Persona No Existe', 'Buscando Persona')
+        this.actualizarPersona(c.id_identificacion, c.id_persona)
       })
     },
     actualizarPersona(id_identificacion, id_persona) {
@@ -216,6 +404,9 @@ export default {
       codeudor.consecutivo = parseInt(csc)
       this.form.codeudores.push(codeudor)
     },
+    onRemoveCodeudor(id) {
+      this.form.codeudores.splice(id - 1, 1)
+    },
     onGuardarSolicitud() {
       this.dialogPersonaVisible = false
       this.form.retefuente = this.form.retefuente ? 1 : 0
@@ -239,10 +430,3 @@ export default {
   }
 }
 </script>
-<style lang="scss" scoped>
-  .pdialog {
-    .el-dialog {
-      width: 80% !important;
-    }
-  }
-</style>

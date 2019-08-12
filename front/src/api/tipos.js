@@ -1,5 +1,19 @@
 import request from '@/utils/request'
 
+export function obtenerListaOficinas() {
+  return request({
+    url: '/ofi/obt',
+    method: 'get'
+  })
+}
+
+export function obtenerListaAsesores() {
+  return request({
+    url: '/ase/obt',
+    method: 'get'
+  })
+}
+
 export function obtenerListaTipoIdentificacion() {
   return request({
     url: '/ti/obt',
@@ -87,6 +101,34 @@ export function obtenerListaTipoParentesco() {
 export function obtenerListaMunicipios() {
   return request({
     url: '/muni/all',
+    method: 'get'
+  })
+}
+
+export function obtenerListaTipoCuota() {
+  return request({
+    url: '/tcc/obt',
+    method: 'get'
+  })
+}
+
+export function obtenerListaLineaCredito() {
+  return request({
+    url: '/tlc/obt',
+    method: 'get'
+  })
+}
+
+export function obtenerListaTipoGarantia() {
+  return request({
+    url: '/tgc/obt',
+    method: 'get'
+  })
+}
+
+export function obtenerListaTipoRespaldo() {
+  return request({
+    url: '/trc/obt',
     method: 'get'
   })
 }
