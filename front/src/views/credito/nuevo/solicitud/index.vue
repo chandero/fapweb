@@ -321,6 +321,8 @@ export default {
   },
   methods: {
     dialogoCerrado() {
+      this.id_identificacion = null
+      this.id_persona = null
       console.log('Se cerro el dialogo de persona')
     },
     buscarPersona() {
