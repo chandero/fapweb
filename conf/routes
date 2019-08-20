@@ -61,6 +61,8 @@ GET     /api/info/conc/:c               controllers.InformeColocacionCausacionCo
 GET     /api/info/extc/:c/:i/:f         controllers.InformeColocacionCausacionController.extracto(c: String, i: Long, f: Long)
 GET     /api/info/expc/:c/:e/:t         controllers.InformeColocacionCausacionController.exportar(c: String, e: Long, t: String)
 
+# Informacion Creditos
+GET     /api/incr/busc/:i/:p            controllers.InformacionCreditoController.buscarCredito(i: Int, p: String)
 # Tipos
 GET     /api/ti/obt                     controllers.TipoIdentificacionController.obtenerListaTipoIdentificacion
 GET     /api/ti/:t                      controllers.TipoIdentificacionController.obtenerListaTipoIdentificacionExterna(t: String)
