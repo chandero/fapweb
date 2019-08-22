@@ -182,6 +182,43 @@
               </el-col>
             </el-row>
           </el-collapse-item>
+          <el-collapse-item v-if="solicitante_existe" name="4" title="INFORMACION CREDITICIA">
+            <el-row>
+              <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
+                <span>Colocación</span>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
+                <span>Valor Inicial</span>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
+                <span>Saldo</span>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
+                <span>Cuota</span>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
+                <span>Fecha Capital</span>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
+                <span>Fecha Interés</span>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
+                <span>Estado</span>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
+                <span>Entidad</span>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
+                <span>Fecha Vencimiento</span>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
+                <span>Descontar</span>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
+                <span>Tipo</span>
+              </el-col>
+            </el-row>
+          </el-collapse-item>
         </el-collapse>
       </el-form>
       <el-dialog
@@ -213,7 +250,7 @@ export default {
     return {
       locale: 'en',
       currency: 'USD',
-      activeNames: ['0', '1', '2', '3'],
+      activeNames: ['0', '1', '2', '3', '4', '5', '6'],
       dialogPersonaVisible: false,
       solicitanteNoValido: true,
       solicitante_existe: false,

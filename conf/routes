@@ -63,6 +63,8 @@ GET     /api/info/expc/:c/:e/:t         controllers.InformeColocacionCausacionCo
 
 # Informacion Creditos
 GET     /api/incr/busc/:i/:p            controllers.InformacionCreditoController.buscarCredito(i: Int, p: String)
+# Colocaciones
+GET     /api/col/busc/:i/:p             controllers.ColocacionController.buscarColocacion(i: Int, p: String)
 # Tipos
 GET     /api/ti/obt                     controllers.TipoIdentificacionController.obtenerListaTipoIdentificacion
 GET     /api/ti/:t                      controllers.TipoIdentificacionController.obtenerListaTipoIdentificacionExterna(t: String)

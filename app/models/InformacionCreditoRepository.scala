@@ -129,41 +129,55 @@ object InformacionCredito {
   }
 }
 
-class InformacionCreditoRepository @Inject()(dbapi: DBApi)(
+class InformacionCreditoRepository @Inject()(dbapi: DBApi, colocacionService: ColocacionRepository, empresaRepository: EmpresaRepository)(
     implicit ec: DatabaseExecutionContext) {
   private val db = dbapi.database("default")
 
   /**
   *  Buscar Información de Créditos Locales
   */
-  def buscarCredito(id_identificacion: Int, id_persona: String): Future[Iterable[InformacionCredito]] = Future[Iterable[InformacionCredito]] {
-    db.withConnection { implicit connection =>
-      var _lista: ListBuffer[InformacionCredito] = new ListBuffer[InformacionCredito]
-      val resultSet = SQL("""SELECT * FROM \"col$colocacion\" WHERE ID_IDENTIFICACION = {id_identificacion} and ID_PERSONA = {id_persona} and ID_ESTADO_COLOCACION IN (0,1,2,3,8,9)""").
-      on(
-        'id_identificacion -> id_identificacion,
-        'id_persona -> id_persona
-      ).as(InformacionCredito._set *)
-      var csc = 1
-      resultSet.map { r =>
-        val ic = new InformacionCredito(entidad, 
+  def buscarCredito(id_identificacion: Int, id_persona: String, empr_id: Long): Future[Future[Iterable[InformacionCredito]]] = Future[Future[Iterable[InformacionCredito]]] {
+        var _lista: ListBuffer[InformacionCredito] = new ListBuffer[InformacionCredito]
+        val empresa = empresaRepository.buscarPorId(empr_id).get
+        val entidad = empresa.empr_descripcion
+        var csc = 1
+        val colocaciones = colocacionService.buscarColocacion(id_identificacion, id_persona)
+        colocaciones.map { creditos =>
+            for (r <- creditos) {
+                    println("recorriendo colocacion: " + r.a.id_colocacion.get)
+                    val valor_inicial = r.a.valor_desembolso
+                    val saldo = r.a.valor_desembolso.get - r.b.abonos_capital.get
+                    val cuota_mensual = r.b.valor_cuota
+                    val vencimiento = r.a.fecha_vencimiento
+                    val id_persona = r.a.id_persona
+                    val id_identificacion = r.a.id_identificacion
+                    val es_descuento = 0
+                    val id_solicitud = None
+                    val id_colocacion = r.a.id_colocacion
+                    val fecha_capital = r.b.fecha_capital
+                    val fecha_interes = r.b.fecha_interes
+                    val estado = r.b.id_estado_colocacion
+                    val ic = new InformacionCredito(Some(entidad), 
                                         valor_inicial, 
-                                        saldo, 
+                                        Some(saldo),
                                         cuota_mensual, 
                                         vencimiento, 
                                         id_persona, 
                                         id_identificacion, 
-                                        es_descuento, 
+                                        Some(es_descuento),
                                         id_solicitud, 
                                         id_colocacion, 
                                         fecha_capital, 
                                         fecha_interes, 
                                         estado, 
                                         Some(csc))
-        csc+=1
-      }
-      _lista.toList
-    }
+                    _lista += ic
+                    csc+=1
+                    println("Lista: " + _lista)
+                  }
+                  // println("Lista Final: " + _lista)
+                  _lista.toList
+        }
   }
 
 }

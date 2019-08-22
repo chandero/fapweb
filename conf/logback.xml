@@ -30,7 +30,7 @@
   <!-- https://hibernate.atlassian.net/browse/HV-1323 -->
   <logger name="org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator" level="ERROR" />
 
-  <root level="WARN">
+  <root level="DEBUG">
     <appender-ref ref="ASYNCSTDOUT" />
   </root>
 

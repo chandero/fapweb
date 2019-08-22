@@ -8,11 +8,12 @@ import dto._
 import play.api.mvc._
 import play.api.libs.json._
 import com.google.inject.Singleton
-import scala.concurrent.{ExecutionContext, Future}
 import pdi.jwt.JwtSession
 import play.api.Configuration
 
 import scala.collection.mutable.ListBuffer
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Success, Failure}
 
 import utilities._
 
@@ -27,8 +28,11 @@ class InformacionCreditoController @Inject()(
 
     def buscarCredito(id_identificacion: Int, id_persona: String) = authenticatedUserAction.async { implicit request: Request[AnyContent] =>
       val usua_id = Utility.extraerUsuario(request)
-      infoService.buscarCredito(id_identificacion, id_persona).map { lista =>
-        Ok(Json.toJson(lista))
+      val empr_id = Utility.extraerEmpresa(request)
+      infoService.buscarCredito(id_identificacion, id_persona, empr_id.get).flatMap { lista =>
+          lista.map {
+            Ok(Json.toJson(lista))
+          }
       }
     }
 }
