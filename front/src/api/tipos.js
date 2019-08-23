@@ -132,3 +132,17 @@ export function obtenerListaTipoRespaldo() {
     method: 'get'
   })
 }
+
+export function obtenerListaTipoEstadoColocacion() {
+  return request({
+    url: '/tesc/obt',
+    method: 'get'
+  })
+}
+
+export function obtenerListaTipoEstadoSolicitud() {
+  return request({
+    url: '/tess/obt',
+    method: 'get'
+  })
+}

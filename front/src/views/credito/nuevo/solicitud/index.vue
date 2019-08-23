@@ -187,35 +187,91 @@
               <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
                 <span>Colocación</span>
               </el-col>
-              <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
+              <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
                 <span>Valor Inicial</span>
               </el-col>
-              <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
+              <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
                 <span>Saldo</span>
               </el-col>
               <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
                 <span>Cuota</span>
               </el-col>
-              <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
-                <span>Fecha Capital</span>
-              </el-col>
-              <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
+              <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
                 <span>Fecha Interés</span>
               </el-col>
               <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
                 <span>Estado</span>
               </el-col>
-              <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
+              <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
                 <span>Entidad</span>
               </el-col>
-              <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
+              <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
                 <span>Fecha Vencimiento</span>
               </el-col>
               <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
                 <span>Descontar</span>
               </el-col>
-              <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
+              <el-col :xs="24" :sm="24" :md="1" :lg="1" :xl="1">
                 <span>Tipo</span>
+              </el-col>
+            </el-row>
+            <el-row v-for="c in form.creditos" :key="c.consecutivo" :gutter="4" class="infocredito">
+              <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
+                <el-form-item>
+                  <el-input v-model="c.id_colocacion" />
+                </el-form-item>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
+                <el-form-item>
+                  <el-input v-currency="{locale, currency}" v-model="c.valor_inicial" style="text-align: right;"/>
+                </el-form-item>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
+                <el-form-item>
+                  <el-input v-currency="{locale, currency}" v-model="c.saldo" />
+                </el-form-item>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
+                <el-form-item>
+                  <el-input v-currency="{locale, currency}" v-model="c.cuota_mensual" />
+                </el-form-item>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
+                <el-form-item>
+                  <el-date-picker v-model="c.fecha_interes" style="width: 100%;" />
+                </el-form-item>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
+                <el-form-item>
+                  <el-select v-model="c.estado">
+                    <el-option v-for="o in tipos_estado_colocacion" :label="o.descripcion" :key="o.id" :value="o.id" />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
+                <el-form-item>
+                  <el-input v-model="c.entidad" />
+                </el-form-item>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
+                <el-form-item>
+                  <el-date-picker v-model="c.vencimiento" style="width: 100%;" />
+                </el-form-item>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
+                <el-form-item>
+                  <el-checkbox v-model="c.descontar" />
+                </el-form-item>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="1" :lg="1" :xl="1">
+                <el-form-item>
+                  <span>{{ c.tipo }}</span>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row :gutter="24">
+              <el-col :span="22">
+                <el-button style="display: table-cell;" type="primary" size="mini" circle icon="el-icon-plus" title="Adicionar Nuevo Credito" @click="onAddCredito()" />
               </el-col>
             </el-row>
           </el-collapse-item>
@@ -238,7 +294,7 @@ import PersonaComponent from '@/components/Persona'
 import { obtenerListaOficinas, obtenerListaAsesores,
   obtenerListaTipoIdentificacion, obtenerListaTipoCuota,
   obtenerListaLineaCredito, obtenerListaTipoGarantia,
-  obtenerListaTipoRespaldo } from '@/api/tipos'
+  obtenerListaTipoRespaldo, obtenerListaTipoEstadoColocacion } from '@/api/tipos'
 import { obtenerPersona } from '@/api/persona'
 import { buscarCredito } from '@/api/infocredito'
 
@@ -261,6 +317,7 @@ export default {
       lineas: [],
       tipos_garantia: [],
       tipos_respaldo: [],
+      tipos_estado_colocacion: [],
       id_identificacion: null,
       id_persona: null,
       nombre: null,
@@ -360,6 +417,9 @@ export default {
                 this.oficinas = response.data
                 obtenerListaAsesores().then(response => {
                   this.asesores = response.data
+                  obtenerListaTipoEstadoColocacion().then(response => {
+                    this.tipos_estado_colocacion = response.data
+                  })
                 }).catch(error => {
                   console.log('Error Consultando Asesores: ' + error)
                 })
@@ -471,6 +531,28 @@ export default {
       const csc = this.form.codeudores.length + 1
       codeudor.consecutivo = parseInt(csc)
       this.form.codeudores.push(codeudor)
+    },
+    onAddCredito() {
+      const credito = {
+        consecutivo: null,
+        cuota_mensual: null,
+        entidad: null,
+        es_descuento: null,
+        estado: null,
+        fecha_capital: null,
+        fecha_interes: null,
+        id_colocacion: null,
+        id_identificacion: this.form.solicitud.a.id_identificacion,
+        id_persona: this.form.solicitud.a.id_persona,
+        id_solicitud: null,
+        saldo: null,
+        tipo: null,
+        valor_inicial: null,
+        vencimiento: null
+      }
+      const csc = this.form.creditos.length + 1
+      credito.consecutivo = parseInt(csc)
+      this.form.creditos.push(credito)
     },
     onRemoveCodeudor(id) {
       this.form.codeudores.splice(id - 1, 1)

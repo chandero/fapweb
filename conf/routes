@@ -85,6 +85,8 @@ GET     /api/tgc/obt                    controllers.TipoGarantiaController.obten
 GET     /api/trc/obt                    controllers.TipoRespaldoController.obtenerLista
 GET     /api/ofi/obt                    controllers.OficinaController.obtenerLista
 GET     /api/ase/obt                    controllers.AsesorController.obtenerLista
+GET     /api/tesc/obt                   controllers.TipoEstadoColocacionController.obtenerLista
+GET     /api/tess/obt                   controllers.TipoEstadoSolicitudController.obtenerLista
 
 
 # Persona

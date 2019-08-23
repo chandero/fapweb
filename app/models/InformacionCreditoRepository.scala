@@ -35,6 +35,7 @@ case class InformacionCredito(entidad: Option[String],
                               fecha_capital: Option[DateTime],
                               fecha_interes: Option[DateTime],
                               estado: Option[Int],
+                              tipo: Option[String],
                               consecutivo: Option[Int])
 
 object InformacionCredito {
@@ -58,6 +59,7 @@ object InformacionCredito {
       "fecha_capital" -> e.fecha_capital,
       "fecha_interes" -> e.fecha_interes,
       "estado" -> e.estado,
+      "tipo" -> e.tipo,
       "consecutivo" -> e.consecutivo
     )
   }
@@ -76,6 +78,7 @@ object InformacionCredito {
       (__ \ "fecha_capital").readNullable[DateTime] and
       (__ \ "fecha_interes").readNullable[DateTime] and
       (__ \ "estado").readNullable[Int] and
+      (__ \ "tipo").readNullable[String] and
       (__ \ "consecutivo").readNullable[Int]
   )(InformacionCredito.apply _)
 
@@ -93,6 +96,7 @@ object InformacionCredito {
     get[Option[DateTime]]("fecha_capital") ~
     get[Option[DateTime]]("fecha_interes") ~
     get[Option[Int]]("estado") ~
+    get[Option[String]]("tipo") ~
     get[Option[Int]]("consecutivo") map {
       case 
           entidad ~
@@ -108,6 +112,7 @@ object InformacionCredito {
           fecha_capital ~
           fecha_interes ~
           estado ~
+          tipo ~
           consecutivo =>
           InformacionCredito(
                 entidad,
@@ -123,6 +128,7 @@ object InformacionCredito {
                 fecha_capital,
                 fecha_interes,
                 estado,
+                tipo,
                 consecutivo
                 )
     }
@@ -136,12 +142,13 @@ class InformacionCreditoRepository @Inject()(dbapi: DBApi, colocacionService: Co
   /**
   *  Buscar Información de Créditos Locales
   */
-  def buscarCredito(id_identificacion: Int, id_persona: String, empr_id: Long): Future[Future[Iterable[InformacionCredito]]] = Future[Future[Iterable[InformacionCredito]]] {
+  def buscarCredito(id_identificacion: Int, id_persona: String, empr_id: Long): Future[Iterable[InformacionCredito]] = {
         var _lista: ListBuffer[InformacionCredito] = new ListBuffer[InformacionCredito]
         val empresa = empresaRepository.buscarPorId(empr_id).get
         val entidad = empresa.empr_descripcion
         var csc = 1
         val colocaciones = colocacionService.buscarColocacion(id_identificacion, id_persona)
+        println("Colocaciones: " + colocaciones)
         colocaciones.map { creditos =>
             for (r <- creditos) {
                     println("recorriendo colocacion: " + r.a.id_colocacion.get)
@@ -157,6 +164,7 @@ class InformacionCreditoRepository @Inject()(dbapi: DBApi, colocacionService: Co
                     val fecha_capital = r.b.fecha_capital
                     val fecha_interes = r.b.fecha_interes
                     val estado = r.b.id_estado_colocacion
+                    val tipo = r.b.tipo
                     val ic = new InformacionCredito(Some(entidad), 
                                         valor_inicial, 
                                         Some(saldo),
@@ -169,11 +177,11 @@ class InformacionCreditoRepository @Inject()(dbapi: DBApi, colocacionService: Co
                                         id_colocacion, 
                                         fecha_capital, 
                                         fecha_interes, 
-                                        estado, 
+                                        estado,
+                                        tipo,
                                         Some(csc))
                     _lista += ic
                     csc+=1
-                    println("Lista: " + _lista)
                   }
                   // println("Lista Final: " + _lista)
                   _lista.toList

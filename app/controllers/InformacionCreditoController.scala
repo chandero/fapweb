@@ -29,10 +29,8 @@ class InformacionCreditoController @Inject()(
     def buscarCredito(id_identificacion: Int, id_persona: String) = authenticatedUserAction.async { implicit request: Request[AnyContent] =>
       val usua_id = Utility.extraerUsuario(request)
       val empr_id = Utility.extraerEmpresa(request)
-      infoService.buscarCredito(id_identificacion, id_persona, empr_id.get).flatMap { lista =>
-          lista.map {
-            Ok(Json.toJson(lista))
-          }
+      infoService.buscarCredito(id_identificacion, id_persona, empr_id.get).map { lista =>
+        Ok(Json.toJson(lista))
       }
     }
 }
