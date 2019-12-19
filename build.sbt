@@ -33,7 +33,8 @@ libraryDependencies ++= Seq(
   "net.sf.jasperreports" % "jasperreports" % "6.7.0",
   "net.sf.jasperreports" % "jasperreports-functions" % "6.7.0",
   "net.sf.jasperreports" % "jasperreports-chart-themes" % "6.7.0",
-  "com.norbitltd" %% "spoiwo" % "1.4.1"  
+  "com.norbitltd" %% "spoiwo" % "1.4.1",
+  "com.lihaoyi" %% "requests" % "0.1.8"
 )
 
 // Play framework hooks for development

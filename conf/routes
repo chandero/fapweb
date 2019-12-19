@@ -63,6 +63,8 @@ GET     /api/info/expc/:c/:e/:t         controllers.InformeColocacionCausacionCo
 
 # Informacion Creditos
 GET     /api/incr/busc/:i/:p            controllers.InformacionCreditoController.buscarCredito(i: Int, p: String)
+GET     /api/inmu/busc/:i               controllers.BienRaizController.buscar(i: String)
+GET     /api/vehi/busc/:i               controllers.VehiculoController.buscar(i: Int)
 # Colocaciones
 GET     /api/col/busc/:i/:p             controllers.ColocacionController.buscarColocacion(i: Int, p: String)
 # Tipos
@@ -95,6 +97,12 @@ POST    /api/pers/gdr                   controllers.PersonaController.guardar()
 
 # Solicitud
 POST   /api/soex/                       controllers.SolicitudExternaController.crear()
+
+
+# Http
+GET    /api/http/status                 controllers.HttpClientController.status
+GET    /api/http/gtbi/:f/:p/:d          controllers.HttpClientController.gettransactionbyid(f: String, p: String, d:String)
+GET    /api/http/st/:f                  controllers.HttpClientController.setdocumentbyjson(f: Int)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

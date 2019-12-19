@@ -1,4 +1,10 @@
 //覆盖一些element-ui样式
+body {
+  font-size: 12px !important;
+}
+.el-form-item__label {
+  font-size: 12px;
+}
 
 .el-breadcrumb__inner,
 .el-breadcrumb__inner a {

@@ -182,7 +182,7 @@
               </el-col>
             </el-row>
           </el-collapse-item>
-          <el-collapse-item v-if="solicitante_existe" name="4" title="INFORMACION CREDITICIA">
+          <el-collapse-item v-if="solicitante_existe" name="4" title="INFORMACIÓN CREDITICIA">
             <el-row>
               <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
                 <span>Colocación</span>
@@ -258,7 +258,7 @@
                   <el-date-picker v-model="c.vencimiento" style="width: 100%;" />
                 </el-form-item>
               </el-col>
-              <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
+              <el-col :xs="24" :sm="24" :md="1" :lg="1" :xl="1">
                 <el-form-item>
                   <el-checkbox v-model="c.descontar" />
                 </el-form-item>
@@ -268,10 +268,169 @@
                   <span>{{ c.tipo }}</span>
                 </el-form-item>
               </el-col>
+              <el-col :xs="24" :sm="24" :md="1" :lg="1" :xl="1">
+                <el-button :disabled="c.local" size="mini" type="danger" circle icon="el-icon-minus" title="Quitar Credito" @click="onRemoveCredito(c.consecutivo)" />
+              </el-col>
             </el-row>
             <el-row :gutter="24">
               <el-col :span="22">
                 <el-button style="display: table-cell;" type="primary" size="mini" circle icon="el-icon-plus" title="Adicionar Nuevo Credito" @click="onAddCredito()" />
+              </el-col>
+            </el-row>
+          </el-collapse-item>
+          <el-collapse-item v-if="solicitante_existe" name="5" title="INFORMACIÓN DE INMUEBLES">
+            <el-card v-for="i in form.inmuebles" :key="i.consecutivo">
+              <el-row :gutter="4" >
+                <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
+                  <el-form-item label="Escritura Pública No.">
+                    <el-input v-model="i.escritura" />
+                  </el-form-item>
+                </el-col>
+                <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
+                  <el-form-item label="Fecha Escritura">
+                    <el-date-picker v-model="i.fecha_escritura" style="width: 100%;" />
+                  </el-form-item>
+                </el-col>
+                <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
+                  <el-form-item label="Matrícula Inmobiliaria">
+                    <el-input v-model="i.matricula" />
+                  </el-form-item>
+                </el-col>
+                <el-col :xs="24" :sm="24" :md="7" :lg="7" :xl="7">
+                  <el-form-item label="Dirección">
+                    <el-input v-model="i.direccion" />
+                  </el-form-item>
+                </el-col>
+                <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
+                  <el-form-item label="Barrio">
+                    <el-input v-model="i.barrio" />
+                  </el-form-item>
+                </el-col>
+                <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
+                  <el-form-item label="Ciudad">
+                    <el-input v-model="i.matricula" />
+                  </el-form-item>
+                </el-col>
+              </el-row>
+              <el-row :gutter="4">
+                <el-col :xs="24" :sm="24" :md="7" :lg="7" :xl="7">
+                  <el-form-item label="Descripción del Inmueble">
+                    <el-input v-model="i.descripcion_bien" />
+                  </el-form-item>
+                </el-col>
+                <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
+                  <el-form-item label="Valor Comercial">
+                    <el-input v-currency="{locale, currency}" v-model="i.valor_comercial" />
+                  </el-form-item>
+                </el-col>
+                <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
+                  <el-form-item label="Notaría">
+                    <el-input v-model="i.notaria" />
+                  </el-form-item>
+                </el-col>
+                <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
+                  <el-form-item label="Está Hipotecada">
+                    <el-checkbox v-model="i.es_hipoteca" />
+                  </el-form-item>
+                </el-col>
+                <el-col v-if="i.es_hipoteca" :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
+                  <el-form-item label="A Favor De">
+                    <el-input v-model="i.afavorde" />
+                  </el-form-item>
+                </el-col>
+                <el-row :gutter="4">
+                  <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
+                    <el-form-item>
+                      <el-radio-group v-model="i.radiogroup">
+                        <el-radio label="Es Informativo" />
+                        <el-radio label="Es Garantía Real" />
+                        <el-radio label="Es Garantía Personal" />
+                      </el-radio-group>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :xs="24" :sm="24" :md="1" :lg="1" :xl="1">
+                    <el-button size="mini" type="danger" circle icon="el-icon-minus" title="Quitar Inmueble" @click="onRemoveInmueble(i.consecutivo)" />
+                  </el-col>
+                </el-row>
+              </el-row>
+            </el-card>
+            <el-row :gutter="24">
+              <el-col :span="22">
+                <el-button style="display: table-cell;" type="primary" size="mini" circle icon="el-icon-plus" title="Adicionar Nuevo Inmueble" @click="onAddInmueble()" />
+              </el-col>
+            </el-row>
+          </el-collapse-item>
+          <el-collapse-item v-if="solicitante_existe" name="6" title="INFORMACIÓN DE VEHICULOS">
+            <el-row :gutter="4">
+              <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
+                <el-form-item>
+                  <span>Descripción del Vehículo</span>
+                </el-form-item>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
+                <el-form-item>
+                  <span>Marca</span>
+                </el-form-item>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
+                <el-form-item>
+                  <span>Modelo</span>
+                </el-form-item>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
+                <el-form-item>
+                  <span>Placa</span>
+                </el-form-item>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
+                <el-form-item>
+                  <span>Valor Comercial</span>
+                </el-form-item>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
+                <el-form-item>
+                  <span>Está Pignorado</span>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row v-for="v in form.vehiculos" :key="v.consecutivo" :gutter="4">
+              <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
+                <el-form-item>
+                  <el-input v-model="v.descripcion" />
+                </el-form-item>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
+                <el-form-item>
+                  <el-input v-model="v.marca" />
+                </el-form-item>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
+                <el-form-item>
+                  <el-input v-model="v.modelo" />
+                </el-form-item>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
+                <el-form-item>
+                  <el-input v-model="v.placa" />
+                </el-form-item>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
+                <el-form-item>
+                  <el-input v-currency="{locale, currency}" v-model="v.valor_comercial" />
+                </el-form-item>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
+                <el-form-item>
+                  <el-checkbox v-model="v.pignorado" />
+                </el-form-item>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="1" :lg="1" :xl="1">
+                <el-button size="mini" type="danger" circle icon="el-icon-minus" title="Quitar Vehículo" @click="onRemoveVehiculo(v.consecutivo)" />
+              </el-col>
+            </el-row>
+            <el-row :gutter="24">
+              <el-col :span="22">
+                <el-button style="display: table-cell;" type="primary" size="mini" circle icon="el-icon-plus" title="Adicionar Nuevo Inmueble" @click="onAddVehiculo()" />
               </el-col>
             </el-row>
           </el-collapse-item>
@@ -323,6 +482,7 @@ export default {
       nombre: null,
       es_bloqueo: false,
       codeudorNoValido: true,
+      radiogroup: null,
       form: {
         solicitud: {
           a: {
@@ -398,6 +558,40 @@ export default {
         fecha_capital: null,
         fecha_interes: null,
         estado: null,
+        local: null,
+        consecutivo: null
+      },
+      inmueble: {
+        descripcion_bien: null,
+        barrio: null,
+        direccion: null,
+        ciudad: null,
+        valor_comercial: null,
+        es_hipoteca: null,
+        afavorde: null,
+        id_identificacion: null,
+        id_persona: null,
+        escritura: null,
+        notaria: null,
+        matricula: null,
+        fecha_escritura: null,
+        id_solicitud: null,
+        es_informacion: null,
+        es_garantiareal: null,
+        es_garantiapersonal: null,
+        consecutivo: null,
+        radiogroup: null
+      },
+      vehiculo: {
+        id_vehiculo: null,
+        numero_placa: null,
+        descripcion: null,
+        pignorado: null,
+        valor_comercial: null,
+        id_identificacion: null,
+        id_persona: null,
+        marca: null,
+        modelo: null,
         consecutivo: null
       }
     }
@@ -463,6 +657,9 @@ export default {
           this.solicitante_existe = true
           buscarCredito(this.form.solicitud.a.id_identificacion, this.form.solicitud.a.id_persona).then(response => {
             this.form.creditos = response.data
+            this.form.creditos.forEach(c => {
+              c.local = true
+            })
           })
         }
       }).catch(() => {
@@ -554,8 +751,140 @@ export default {
       credito.consecutivo = parseInt(csc)
       this.form.creditos.push(credito)
     },
+    onAddInmueble() {
+      const inmueble = {
+        descripcion_bien: null,
+        barrio: null,
+        direccion: null,
+        ciudad: null,
+        valor_comercial: null,
+        es_hipoteca: null,
+        afavorde: null,
+        id_identificacion: null,
+        id_persona: null,
+        escritura: null,
+        notaria: null,
+        matricula: null,
+        fecha_escritura: null,
+        id_solicitud: null,
+        es_informacion: null,
+        es_garantiareal: null,
+        es_garantiapersonal: null,
+        consecutivo: null,
+        radiogroup: null
+      }
+      const csc = this.form.inmuebles.length + 1
+      inmueble.consecutivo = parseInt(csc)
+      this.form.inmuebles.push(inmueble)
+    },
+    onAddVehiculo() {
+      const vehiculo = {
+        id_vehiculo: null,
+        numero_placa: null,
+        descripcion: null,
+        pignorado: null,
+        valor_comercial: null,
+        id_identificacion: null,
+        id_persona: null,
+        marca: null,
+        modelo: null,
+        consecutivo: null
+      }
+      const csc = this.form.vehiculos.length + 1
+      vehiculo.consecutivo = parseInt(csc)
+      this.form.vehiculos.push(vehiculo)
+    },
     onRemoveCodeudor(id) {
-      this.form.codeudores.splice(id - 1, 1)
+      this.$confirm('Seguro de Borrar el Codeudor. Continuar?', 'Advertencia', {
+        confirmButtonText: 'Sí',
+        cancelButtonText: 'No',
+        type: 'warning'
+      }).then(() => {
+        this.form.codeudores.splice(id - 1, 1)
+        var i = 1
+        this.form.codeudores.forEach(d => {
+          d.consecutivo = i
+          i++
+        })
+        this.$message({
+          type: 'success',
+          message: 'Borrado Finalizado'
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: 'Borrado Cancelado'
+        })
+      })
+    },
+    onRemoveCredito(id) {
+      this.$confirm('Seguro de Borrar el Crédito. Continuar?', 'Advertencia', {
+        confirmButtonText: 'Sí',
+        cancelButtonText: 'No',
+        type: 'warning'
+      }).then(() => {
+        this.form.creditos.splice(id - 1, 1)
+        var i = 1
+        this.form.creditos.forEach(d => {
+          d.consecutivo = i
+          i++
+        })
+        this.$message({
+          type: 'success',
+          message: 'Borrado Finalizado'
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: 'Borrado Cancelado'
+        })
+      })
+    },
+    onRemoveInmueble(id) {
+      this.$confirm('Seguro de Borrar el Inmueble. Continuar?', 'Advertencia', {
+        confirmButtonText: 'Sí',
+        cancelButtonText: 'No',
+        type: 'warning'
+      }).then(() => {
+        this.form.inmuebles.splice(id - 1, 1)
+        var i = 1
+        this.form.inmuebles.forEach(d => {
+          d.consecutivo = i
+          i++
+        })
+        this.$message({
+          type: 'success',
+          message: 'Borrado Finalizado'
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: 'Borrado Cancelado'
+        })
+      })
+    },
+    onRemoveVehiculo(id) {
+      this.$confirm('Seguro de Borrar el Vehiculo. Continuar?', 'Advertencia', {
+        confirmButtonText: 'Sí',
+        cancelButtonText: 'No',
+        type: 'warning'
+      }).then(() => {
+        this.form.vehiculos.splice(id - 1, 1)
+        var i = 1
+        this.form.vehiculos.forEach(d => {
+          d.consecutivo = i
+          i++
+        })
+        this.$message({
+          type: 'success',
+          message: 'Borrado Finalizado'
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: 'Borrado Cancelado'
+        })
+      })
     },
     onGuardarSolicitud() {
       this.dialogPersonaVisible = false
