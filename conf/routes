@@ -99,6 +99,10 @@ POST    /api/pers/gdr                   controllers.PersonaController.guardar()
 POST   /api/soex/                       controllers.SolicitudExternaController.crear()
 
 
+# Factura
+GET    /api/fact/bpn/:n                 controllers.FacturaController.buscarPorNumero(n: Long)
+GET    /api/fact/epn/:n                 controllers.FacturaController.enviarFactura(n: Long)
+
 # Http
 GET    /api/http/status                 controllers.HttpClientController.status
 GET    /api/http/gtbi/:f/:p/:d          controllers.HttpClientController.gettransactionbyid(f: String, p: String, d:String)

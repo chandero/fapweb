@@ -20,7 +20,7 @@ import http._
 
 
 @Singleton
-class HttpClientController  @Inject()(cc: ControllerComponents, authenticatedUserAction: AuthenticatedUserAction, conf: Configuration)(implicit ec: ExecutionContext) extends AbstractController(cc) {
+class HttpClientController  @Inject()(service: FacturaRepository, cc: ControllerComponents, authenticatedUserAction: AuthenticatedUserAction, conf: Configuration)(implicit ec: ExecutionContext) extends AbstractController(cc) {
     def status() = Action { 
         println("Estoy en el metodo status")
         var url = conf.get[String]("urlFacturacion") + "/Status"
@@ -45,16 +45,19 @@ class HttpClientController  @Inject()(cc: ControllerComponents, authenticatedUse
         Ok(result.text)
     }
 
-    def setdocumentbyjson(f: Int) = Action {
+    def setdocumentbyjson(f: Long) = Action.async { implicit request =>
         println("Estoy en el metodo setdocumentbyjson")
         var url = conf.get[String]("urlFacturacion") + "/SetDocumentbyjson"
         var http = new HttpClient()
         println("Cree el cliente http")
         var params = collection.immutable.Map[String, String]()
-        var result = http.doGet(url, params)
-        println("Envie el Get")
-        println("Result: "+ result)
-        Ok(result.text)
+        service.enviarFactura(f).map { rootInterface =>
+            var result = http.doPost(url, Json.stringify(Json.toJson(rootInterface)))
+            println("Envie el Post")
+            println("Result: "+ result)
+            Ok(result.text)
+        }        
+        
     }    
 
 }

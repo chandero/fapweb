@@ -2,6 +2,7 @@ package models
 
 import javax.inject.Inject
 import java.util.Calendar
+import java.text.SimpleDateFormat
 
 import play.api.libs.json._
 import play.api.libs.json.JodaReads
@@ -11,14 +12,40 @@ import play.api.libs.functional.syntax._
 import play.api.db.DBApi
 
 import anorm._
-import anorm.SqlParser.{get, str}
+import anorm.SqlParser.{get, str, date, int}
 import anorm.JodaParameterMetaData._
 
 import scala.util.{Failure, Success}
 import scala.concurrent.{Await, Future}
+import scala.collection.mutable.ListBuffer
 
 import org.joda.time.DateTime
 import org.joda.time.LocalDate
+
+case class FacturaItem(
+  fait_id: Option[Long],
+  fact_numero: Option[Long],
+  fait_detalle: Option[String],
+  fait_cantidad: Option[Int],
+  fait_valorunitario: Option[BigDecimal],
+  fait_tasaiva: Option[BigDecimal],
+  fait_valoriva: Option[BigDecimal],
+  fait_total: Option[BigDecimal]
+)
+
+case class Factura(
+  fact_numero: Option[Long],
+  fact_fecha: Option[DateTime],
+  fact_descripcion: Option[String],
+  tipo_comprobante: Option[String],
+  id_comprobante: Option[Int],
+  fecha_comprobante: Option[DateTime],
+  id_identificacion: Option[Int],
+  id_persona: Option[String],
+  id_empleado: Option[String],
+  fact_estado: Option[Int],
+  items: Option[Seq[FacturaItem]]
+)
 
 case class _AutorizacionFactura (
   AutFechaFinal: Option[String],
@@ -39,7 +66,7 @@ case class _CompradorFactura (
   CompradorDVIdentificacion: Option[String],
   CompradorDepartamento: Option[String],
   CompradorDireccion: Option[String],
-  CompradorEnviarCorreo: Boolean,
+  CompradorEnviarCorreo: Option[Boolean],
   CompradorIdentificacion: Option[String],
 //  CompradorImpuesto: Option[String],
   CompradorNombreCompleto: Option[String],
@@ -60,8 +87,8 @@ case class _CompradorFactura (
 case class _EmisorData (
   EmiDVIdentificacion: Option[String],
   EmiIdentificacion: Option[String],
-  EmiTipoIdentificacion: Int,
-  EmiTipoPersona: Int
+  EmiTipoIdentificacion: Option[Int],
+  EmiTipoPersona: Option[Int]
 )
 
 case class _EncabezadoData (
@@ -129,10 +156,10 @@ case class _LsDetalleCargos (
 case class _LsDetalleImpuesto (
   BaseImponible: Option[String],
   CodigoImpuesto: Option[String],
-  EsRetencionImpuesto: Boolean,
+  EsRetencionImpuesto: Option[Boolean],
   NombreImpuesto: Option[String],
   Porcentaje: Option[String],
-  Secuencia: Int,
+  Secuencia: Option[Int],
   ValorImpuesto: Option[String]
 )
 
@@ -145,7 +172,7 @@ case class _LsFormaPago (
 case class _LsImpuestos (
   BaseImponible: Option[String],
   CodigoImpuesto: Option[String],
-  EsRetencionImpuesto: Boolean,
+  EsRetencionImpuesto: Option[Boolean],
   NombreImpuesto: Option[String],
   Porcentaje: Option[String],
   ValorImpuesto: Option[String]
@@ -268,7 +295,7 @@ object _CompradorFactura {
     (__ \ "CompradorTipoIdentificacion").readNullable[String] and
     (__ \ "CompradorTipoPersona").readNullable[String] and
     (__ \ "CompradorTipoRegimen").readNullable[String]            
-  )(_CompradorFactura.apply _)
+  )(_CompradorFactura.apply _) 
 }
 
 object _EmisorData {
@@ -279,10 +306,10 @@ object _EmisorData {
 
   implicit val Writes = new Writes[_EmisorData] {
     def writes(r: _EmisorData) = Json.obj(
-      "EmiDVIdentificacion" -> r.FacCodOperacion,
-      "EmiIdentificacion" -> r.FacFechaContingencia,
-      "EmiTipoIdentificacion" -> r.FacFechaFin,
-      "EmiTipoPersona" -> r.FacFechaHoraFactura
+      "EmiDVIdentificacion" -> r.EmiDVIdentificacion,
+      "EmiIdentificacion" -> r.EmiIdentificacion,
+      "EmiTipoIdentificacion" -> r.EmiTipoIdentificacion,
+      "EmiTipoPersona" -> r.EmiTipoPersona
     )
   }
 
@@ -391,7 +418,8 @@ object _LsCargos {
       "FacCargoRazon" -> r.FacCargoRazon,
       "FacCargoSecuencia" -> r.FacCargoSecuencia,
       "FacCargoTipo" -> r.FacCargoTipo,
-      "FacCargoTotal" -> r.FacCargoTotal                            
+      "FacCargoTotal" -> r.FacCargoTotal,
+      "FacCodDescuento" -> r.FacCodDescuento
     )
   }
 
@@ -401,7 +429,8 @@ object _LsCargos {
     (__ \ "FacCargoRazon").readNullable[String] and
     (__ \ "FacCargoSecuencia").readNullable[String] and
     (__ \ "FacCargoTipo").readNullable[String] and
-    (__ \ "FacCargoTotal").readNullable[String]
+    (__ \ "FacCargoTotal").readNullable[String] and
+    (__ \ "FacCodDescuento").readNullable[String]
   )(_LsCargos.apply _)
 }
 
@@ -430,7 +459,7 @@ object _LsDetalle {
   implicit val Reads: Reads[_LsDetalle] = (
     (__ \ "Cantidad").readNullable[String] and
     (__ \ "Codificacion").readNullable[String] and
-    (__ \ "Codigo").readNullable[Boolean] and
+    (__ \ "Codigo").readNullable[String] and
     (__ \ "CodigoEstandar").readNullable[String] and
     (__ \ "Descripcion").readNullable[String] and
     (__ \ "DetFacConsecutivo").readNullable[Int] and
@@ -463,11 +492,11 @@ object _LsDetalleCargos {
   implicit val Reads: Reads[_LsDetalleCargos] = (
     (__ \ "DetSecuencia").readNullable[String] and
     (__ \ "FacCargoBase").readNullable[String] and
-    (__ \ "FacCargoPorc").readNullable[Boolean] and
+    (__ \ "FacCargoPorc").readNullable[String] and
     (__ \ "FacCargoRazon").readNullable[String] and
     (__ \ "FacCargoSecuencia").readNullable[String] and
-    (__ \ "FacCargoTipo").readNullable[Int] and
-    (__ \ "FacCargoTotal").readNullable[String] and
+    (__ \ "FacCargoTipo").readNullable[String] and
+    (__ \ "FacCargoTotal").readNullable[String]
   )(_LsDetalleCargos.apply _)
 }
 
@@ -496,7 +525,7 @@ object _LsDetalleImpuesto {
     (__ \ "NombreImpuesto").readNullable[String] and
     (__ \ "Porcentaje").readNullable[String] and
     (__ \ "Secuencia").readNullable[Int] and
-    (__ \ "ValorImpuesto").readNullable[String] and
+    (__ \ "ValorImpuesto").readNullable[String]
   )(_LsDetalleImpuesto.apply _)
 }
 
@@ -517,7 +546,7 @@ object _LsFormaPago {
   implicit val Reads: Reads[_LsFormaPago] = (
     (__ \ "FacFormaPago").readNullable[String] and
     (__ \ "FacMetodoPago").readNullable[String] and
-    (__ \ "FacVencimientoFac").readNullable[Boolean]
+    (__ \ "FacVencimientoFac").readNullable[String]
   )(_LsFormaPago.apply _)
 }
 
@@ -607,15 +636,358 @@ object _RootInterface {
     (__ \ "CompradorFactura").readNullable[_CompradorFactura] and
     (__ \ "EmisorData").readNullable[_EmisorData] and
     (__ \ "EncabezadoData").readNullable[_EncabezadoData] and
-    (__ \ "InfoMonetarioData").readNullable[_InfoMonetarioData] and
-    (__ \ "LsDetalle").readNullable[Seq[_LsDetalle]] and
+    (__ \ "InfoMonetarioData").readNullable[_InfoMonetarioData] and    
+    (__ \ "LsDetalle").readNullable[Seq[_LsDetalle]] and    
     (__ \ "LsDetalleCargos").readNullable[Seq[_LsDetalleCargos]] and
     (__ \ "LsDetalleImpuesto").readNullable[Seq[_LsDetalleImpuesto]] and
-    (__ \ "ReferenciaFactura").readNullable[_ReferenciaFactura] and
+    (__ \ "_LsImpuestos").readNullable[Seq[_LsImpuestos]] and
+    (__ \ "ReferenciaFactura").readNullable[String] and
     (__ \ "SoftwareSeguridad").readNullable[_SoftwareSeguridad] and
     (__ \ "lsAnticipos").readNullable[Seq[_LsAnticipos]] and
     (__ \ "lsCargos").readNullable[Seq[_LsCargos]] and
     (__ \ "lsFormaPago").readNullable[Seq[_LsFormaPago]] and
     (__ \ "lsNotas").readNullable[Seq[String]]
   )(_RootInterface.apply _)
+}
+
+
+
+object FacturaItem {
+  implicit val yourJodaDateReads =
+  JodaReads.jodaDateReads("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+implicit val yourJodaDateWrites =
+  JodaWrites.jodaDateWrites("yyyy-MM-dd'T'HH:mm:ss.SSSZ'")
+
+  implicit val Writes = new Writes[FacturaItem] {
+    def writes(r: FacturaItem) = Json.obj(
+      "fait_id" -> r.fait_id,
+      "fact_numero" -> r.fact_numero,
+      "fait_detalle" -> r.fait_detalle,
+      "fait_cantidad" -> r.fait_cantidad,
+      "fait_valorunitario" -> r.fait_valorunitario,
+      "fait_tasaiva" -> r.fait_tasaiva,
+      "fait_valoriva" -> r.fait_valoriva,
+      "fait_total" -> r.fait_total
+    )
+  }
+
+  implicit val Reads: Reads[FacturaItem] = (
+    (__ \ "fait_id").readNullable[Long] and
+    (__ \ "fact_numero").readNullable[Long] and
+    (__ \ "fait_detalle").readNullable[String] and
+    (__ \ "fait_cantidad").readNullable[Int] and
+    (__ \ "fait_valorunitario").readNullable[BigDecimal] and
+    (__ \ "fait_tasaiva").readNullable[BigDecimal] and
+    (__ \ "fait_valoriva").readNullable[BigDecimal] and
+    (__ \ "fait_total").readNullable[BigDecimal]
+  )(FacturaItem.apply _)
+
+  val _set = {
+    get[Option[Long]]("fait_id") ~
+    get[Option[Long]]("fact_numero") ~
+    get[Option[String]]("fait_detalle") ~
+    get[Option[Int]]("fait_cantidad") ~
+    get[Option[BigDecimal]]("fait_valorunitario") ~
+    get[Option[BigDecimal]]("fait_tasaiva") ~
+    get[Option[BigDecimal]]("fait_valoriva") ~
+    get[Option[BigDecimal]]("fait_total") map {
+      case fait_id ~
+           fact_numero ~
+           fait_detalle ~ 
+           fait_cantidad ~ 
+           fait_valorunitario ~ 
+           fait_tasaiva ~ 
+           fait_valoriva ~ 
+           fait_total =>
+        FacturaItem(fait_id,
+                fact_numero,
+                fait_detalle,
+                fait_cantidad,
+                fait_valorunitario,
+                fait_tasaiva,
+                fait_valoriva,
+                fait_total)
+    }    
+  }
+
+}
+
+object Factura {
+  implicit val yourJodaDateReads =
+    JodaReads.jodaDateReads("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+  implicit val yourJodaDateWrites =
+    JodaWrites.jodaDateWrites("yyyy-MM-dd'T'HH:mm:ss.SSSZ'")
+
+  implicit val Writes = new Writes[Factura] {
+    def writes(r: Factura) = Json.obj(
+      "fact_numero" -> r.fact_numero,
+      "fact_fecha" -> r.fact_fecha,
+      "fact_descripcion" -> r.fact_descripcion,
+      "tipo_comprobante" -> r.tipo_comprobante,
+      "id_comprobante" -> r.id_comprobante,
+      "fecha_comprobante" -> r.fecha_comprobante,
+      "id_identificacion" -> r.id_identificacion,
+      "id_persona" -> r.id_persona,
+      "id_empleado" -> r.id_empleado,
+      "fact_estado" -> r.fact_estado,
+      "items" -> r.items
+    )
+  }
+
+  implicit val Reads: Reads[Factura] = (
+    (__ \ "fact_numero").readNullable[Long] and
+    (__ \ "fact_fecha").readNullable[DateTime] and
+    (__ \ "fact_descripcion").readNullable[String] and
+    (__ \ "tipo_comprobante").readNullable[String] and
+    (__ \ "id_comprobante").readNullable[Int] and
+    (__ \ "fecha_comprobante").readNullable[DateTime] and
+    (__ \ "id_identificacion").readNullable[Int] and
+    (__ \ "id_persona").readNullable[String] and
+    (__ \ "id_empleado").readNullable[String] and
+    (__ \ "fact_estado").readNullable[Int] and
+    (__ \ "items").readNullable[Seq[FacturaItem]]
+  )(Factura.apply _)
+
+  val _set = {
+    get[Option[Long]]("fact_numero") ~
+      get[Option[DateTime]]("fact_fecha") ~
+      get[Option[String]]("fact_descripcion") ~
+      get[Option[String]]("tipo_comprobante") ~
+      get[Option[Int]]("id_comprobante") ~
+      get[Option[DateTime]]("fecha_comprobante") ~
+      get[Option[Int]]("id_identificacion") ~
+      get[Option[String]]("id_persona") ~
+      get[Option[String]]("id_empleado") ~
+      get[Option[Int]]("fact_estado") map {
+      case fact_numero ~ 
+           fact_fecha ~ 
+           fact_descripcion ~ 
+           tipo_comprobante ~ 
+           id_comprobante ~ 
+           fecha_comprobante ~ 
+           id_identificacion ~ 
+           id_persona ~ 
+           id_empleado ~
+           fact_estado =>
+        Factura(fact_numero,
+                fact_fecha,
+                fact_descripcion,
+                tipo_comprobante,
+                id_comprobante,
+                fecha_comprobante,
+                id_identificacion,
+                id_persona,
+                id_empleado,
+                fact_estado,
+                None)
+    }    
+  }
+}
+
+class FacturaRepository @Inject()(dbapi: DBApi, personaService: PersonaRepository)(
+    implicit ec: DatabaseExecutionContext) {
+  private val db = dbapi.database("default")
+
+  /**
+    Recuperar una Factura usando su FACT_NUMERO
+    @param fact_numero: Long
+    */
+    def buscarPorNumero(fact_numero: Long): Future[Option[Factura]] = Future[Option[Factura]] {
+      db.withConnection { implicit connection =>
+        val f = SQL("SELECT * FROM FACTURA WHERE FACT_NUMERO = {fact_numero} AND FACT_ESTADO <> 9")
+          .on(
+            'fact_numero -> fact_numero
+          ).as(Factura._set.singleOpt)
+        f match {
+          case Some(f) => 
+                val fis = SQL("SELECT * FROM FACTURA_ITEM WHERE FACT_NUMERO = {fact_numero}").on('fact_numero -> f.fact_numero).as(FacturaItem._set *)
+                var factura = f.copy(items = Some(fis))
+                Some(factura)
+          case None => None
+        }
+      }
+    }
+
+  /**
+    Recuperar una Factura usando su FACT_NUMERO
+    @param fact_numero: Long
+    */
+    def buscarPorNumeroDirecto(fact_numero: Long): Factura = {
+      db.withConnection { implicit connection =>
+        println("Buscando Factura No.:" + fact_numero)
+        val f = SQL("SELECT * FROM FACTURA WHERE FACT_NUMERO = {fact_numero} AND FACT_ESTADO <> 9")
+          .on(
+            'fact_numero -> fact_numero
+          ).as(Factura._set.singleOpt)
+        println("Factura Encontrada: " + f)
+        f match {
+          case Some(f) => 
+                println("Buscando Items")
+                val fis = SQL("SELECT * FROM FACTURA_ITEM WHERE FACT_NUMERO = {fact_numero}").on('fact_numero -> f.fact_numero).as(FacturaItem._set *)
+                var factura = f.copy(items = Some(fis))
+                factura
+          case None => var factura = new Factura(None, None, None, None, None, None, None, None, None, None, None)
+                factura 
+        }
+      }
+    }    
+
+    def enviarFactura(fact_numero: Long): Future[_RootInterface] = Future[_RootInterface] {
+      db.withConnection { implicit connection =>
+        var _rootInterface = new _RootInterface(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None)
+        val f = buscarPorNumeroDirecto(fact_numero) /* SQL("""SELECT * FROM FACTURA f 
+                            WHERE f.FACT_NUMERO = {fact_numero}""").on('fact_numero -> fact_numero).as(Factura._set.singleOpt) */
+        println("Factura: " + f)
+        val persona = personaService.obtenerDirecto(f.id_identificacion.get, f.id_persona.get)
+                          val _parseAutorizacion = int("faau_id") ~ 
+                                                   date("faau_fechafinal") ~ 
+                                                   date("faau_fechainicio") ~ 
+                                                   str("faau_numautorizacion") ~
+                                                   str("faau_prefijo").? ~
+                                                   str("faau_secuenciafinal") ~
+                                                   str("faau_secuenciainicial") map { case a ~ b ~ c ~ d ~ e ~ f ~ g => (a,b,c,d,e,f,g)}
+                          val direccion = persona.direcciones(0)
+                          val cod_municipio = direccion.cod_municipio.get
+                          val depa_id = cod_municipio.toString.substring(0,2)
+                          println("cod_municipio: " + cod_municipio)
+                          println("depa_id :" + depa_id)
+                          val autorizacion = SQL("""SELECT * FROM FAC_AUTORIZACION""").as(_parseAutorizacion.single)
+                          println("Autorizacion")
+                          val _parseDepartamento = str("depa_id") ~ str("depa_nombre") map { case a ~ b => (a,b) }
+                          val departamento = SQL("""SELECT * FROM DEPARTAMENTO WHERE DEPA_ID = {depa_id}""").on('depa_id -> depa_id).as(_parseDepartamento.singleOpt)
+                          println("Departamento: " + departamento)
+                          val _parseTipoIde = int("fati_id") map { case a => (a) }
+                          val tipoiden = SQL("""SELECT FATI_ID FROM FAC_TIPO_IDENTIFICACION WHERE FATI_RELACION = {fati_relacion}""").on('fati_relacion -> f.id_identificacion).as(_parseTipoIde.single)
+                          println("Tipo Identificacion: " + tipoiden)
+                          val _parseTipoPer = int("fatp_id") map { case a => (a) }
+                          val tipoper = SQL("""SELECT FATP_ID FROM FAC_TIPO_PERSONA WHERE FATP_RELACION CONTAINING {fati_relacion}""").on('fati_relacion -> persona.a.get.id_tipo_persona).as(_parseTipoPer.single)
+                          println("Tipo Persona")
+                          val _parseSoftwareSeguridad = str("clave_tecnica") ~ str("guid_empresa") ~ str("guid_origen") ~ str("hash_seguridad") map { case a ~ b ~ c ~ d => (a,b,c,d) }
+                          val _sSeguridad = SQL("SELECT * FROM FAC_SOFTWARE_SEGURIDAD").as(_parseSoftwareSeguridad.single)
+                          println("Seguridad")
+                          val sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+                          val sdd = new SimpleDateFormat("yyyy-MM-dd")
+                          val prefijo = autorizacion._5 match {
+                            case Some(p) => p
+                            case None => ""
+                          }
+
+                          val _autorizacionData = new _AutorizacionFactura(Some(sdd.format(autorizacion._2)), 
+                                                                           Some(sdd.format(autorizacion._3)), 
+                                                                           Some(autorizacion._4),
+                                                                           Some(prefijo),
+                                                                           Some(autorizacion._6),
+                                                                           Some(autorizacion._7))
+
+                          val _encabezadoData = new _EncabezadoData(Some("05"), None, None, Some(sdf.format(f.fact_fecha.get.toDate)), None, None, Some("01"), None)
+
+                          var _sendemail = persona.d.get.email.exists(_.trim.nonEmpty)
+                          val _compradorData = new _CompradorFactura(persona.a.get.primer_apellido, 
+                                                                     direccion.municipio, 
+                                                                     Some(direccion.cod_municipio.get.toString), 
+                                                                     Some(depa_id.toString), 
+                                                                     persona.d.get.email,
+                                                                     None,
+                                                                     Some(departamento.get._2),
+                                                                     direccion.direccion,
+                                                                     Some(_sendemail),
+                                                                     f.id_persona,
+                                                                     Some(persona.a.get.nombre.get.concat(" ".concat(persona.a.get.primer_apellido.get.concat(" ".concat(persona.a.get.segundo_apellido.get))))),
+                                                                     Some("COLOMBIA"),
+                                                                     None,
+                                                                     Some("CO"),
+                                                                     persona.a.get.nombre,
+                                                                     None,
+                                                                     direccion.barrio,
+                                                                     None,
+                                                                     direccion.telefono1,
+                                                                     Some(tipoiden.toString),
+                                                                     Some(tipoper.toString),
+                                                                     Some("04")
+                                                                     )
+                          val _emisorData = new _EmisorData(Some("5"), 
+                                                            Some("804015942"), 
+                                                            Some(31), 
+                                                            Some(1))
+                          var _listDetalleData = new ListBuffer[_LsDetalle]()
+                          var _listDetalleImpuestoData = new ListBuffer[_LsDetalleImpuesto]()
+                          var _totalFactura = BigDecimal(0)
+                          var i = 1
+                          println("Items:" + f.items)
+                          f.items.foreach { items =>
+                             items.foreach { item =>
+                             val _detalleData = new _LsDetalle(Some("1"),
+                                                              Some("999"),
+                                                              Some("CARTERA"),
+                                                              Some("CARTERA"),
+                                                              item.fait_detalle,
+                                                              Some(i),
+                                                              Some(item.fait_valorunitario.get.toString),
+                                                              Some(item.fait_valorunitario.get.toString),
+                                                              Some(item.fait_valorunitario.get.toString),
+                                                              None,
+                                                              Some("ZZ")  
+                                                              )
+
+                             val _detalleImpuestoData = new _LsDetalleImpuesto(Some(item.fait_valorunitario.get.toString),
+                                                                          Some("01"),
+                                                                          Some(false),
+                                                                          None,
+                                                                          Some("0.0"),
+                                                                          Some(i),
+                                                                          Some("0.0"))
+                                                             
+                              i += 1
+                              _totalFactura = _totalFactura + item.fait_valorunitario.get
+                              _listDetalleData += _detalleData                                
+                             _listDetalleImpuestoData += _detalleImpuestoData
+                            }
+                          }
+                          
+                          val _infoMonetarioData = new _InfoMonetarioData(Some("COP"), 
+                                                                          Some("0"), 
+                                                                          Some(_totalFactura.toString), 
+                                                                          Some(_totalFactura.toString), 
+                                                                          Some("0"), 
+                                                                          Some("0"),
+                                                                          Some(_totalFactura.toString),
+                                                                          Some(_totalFactura.toString)
+                                                                          )
+
+                          val _softwareSeguridadData = new _SoftwareSeguridad(Some(_sSeguridad._1),
+                                                                              Some(prefijo + f.fact_numero.get.toString),
+                                                                              Some(_sSeguridad._2),
+                                                                              Some(_sSeguridad._3),
+                                                                              Some(_sSeguridad._4),
+                                                                              Some(prefijo + f.fact_numero.get.toString),
+                                                                              Some("FAC")
+                                                                              )
+
+                          val _formaPagoData = new _LsFormaPago(Some("10"),
+                                                                Some("1"),
+                                                                None)
+                          val _listFormaPagoData = new ListBuffer[_LsFormaPago]()
+                          _listFormaPagoData += _formaPagoData
+                          _rootInterface = new _RootInterface(
+                            Some(_autorizacionData),
+                            Some(_compradorData),
+                            Some(_emisorData),
+                            Some(_encabezadoData),
+                            Some(_infoMonetarioData),
+                            Some(_listDetalleData),
+                            None,
+                            Some(_listDetalleImpuestoData),
+                            None,
+                            None,
+                            Some(_softwareSeguridadData),
+                            None,
+                            None,
+                            Some(_listFormaPagoData),
+                            None
+                          )
+                          println(_rootInterface)
+                          _rootInterface
+
+      }
+    }
 }
