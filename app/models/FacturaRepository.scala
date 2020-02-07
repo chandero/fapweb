@@ -178,6 +178,11 @@ case class _LsImpuestos (
   ValorImpuesto: Option[String]
 )
 
+case class _LsNota (
+   DescripcionCabecera: Option[String],
+   Consecutivo: Option[Int]
+)
+
 case class _SoftwareSeguridad (
   ClaveTecnica: Option[String],
   CodigoErp: Option[String],
@@ -203,7 +208,7 @@ case class _RootInterface (
   lsAnticipos: Option[Seq[_LsAnticipos]],
   lsCargos: Option[Seq[_LsCargos]],
   lsFormaPago: Option[Seq[_LsFormaPago]],
-  lsNotas: Option[Seq[String]]
+  lsNotas: Option[Seq[_LsNota]]
 )
 
 object _AutorizacionFactura {
@@ -550,6 +555,27 @@ object _LsFormaPago {
   )(_LsFormaPago.apply _)
 }
 
+object _LsNota {
+
+  implicit val yourJodaDateReads =
+    JodaReads.jodaDateReads("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+  implicit val yourJodaDateWrites =
+    JodaWrites.jodaDateWrites("yyyy-MM-dd'T'HH:mm:ss.SSSZ'")
+
+  implicit val Writes = new Writes[_LsNota] {
+    def writes(r: _LsNota) = Json.obj(
+      "DescripcionCabecera" -> r.DescripcionCabecera,
+      "Consecutivo" -> r.Consecutivo
+    )
+  }
+
+  implicit val Reads: Reads[_LsNota] = (
+    (__ \ "DescripcionCabecera").readNullable[String] and
+    (__ \ "Consecutivo").readNullable[Int]
+  )(_LsNota.apply _)
+
+}
+
 object _LsImpuestos {
   implicit val yourJodaDateReads =
     JodaReads.jodaDateReads("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
@@ -576,6 +602,7 @@ object _LsImpuestos {
     (__ \ "ValorImpuesto").readNullable[String]
   )(_LsImpuestos.apply _)
 }
+
 
 object _SoftwareSeguridad {
   implicit val yourJodaDateReads =
@@ -640,13 +667,13 @@ object _RootInterface {
     (__ \ "LsDetalle").readNullable[Seq[_LsDetalle]] and    
     (__ \ "LsDetalleCargos").readNullable[Seq[_LsDetalleCargos]] and
     (__ \ "LsDetalleImpuesto").readNullable[Seq[_LsDetalleImpuesto]] and
-    (__ \ "_LsImpuestos").readNullable[Seq[_LsImpuestos]] and
+    (__ \ "LsImpuestos").readNullable[Seq[_LsImpuestos]] and
     (__ \ "ReferenciaFactura").readNullable[String] and
     (__ \ "SoftwareSeguridad").readNullable[_SoftwareSeguridad] and
     (__ \ "lsAnticipos").readNullable[Seq[_LsAnticipos]] and
     (__ \ "lsCargos").readNullable[Seq[_LsCargos]] and
     (__ \ "lsFormaPago").readNullable[Seq[_LsFormaPago]] and
-    (__ \ "lsNotas").readNullable[Seq[String]]
+    (__ \ "lsNotas").readNullable[Seq[_LsNota]]
   )(_RootInterface.apply _)
 }
 
@@ -905,7 +932,10 @@ class FacturaRepository @Inject()(dbapi: DBApi, personaService: PersonaRepositor
                                                                      Some(tipoper.toString),
                                                                      Some("04")
                                                                      )
-                          val _emisorData = new _EmisorData(Some("5"), 
+                          val _emisorData = new _EmisorData(
+                                                            //Some("7"),
+                                                            //Some("901180226"),
+                                                            Some("5"), 
                                                             Some("804015942"), 
                                                             Some(31), 
                                                             Some(1))
@@ -966,6 +996,23 @@ class FacturaRepository @Inject()(dbapi: DBApi, personaService: PersonaRepositor
                           val _formaPagoData = new _LsFormaPago(Some("10"),
                                                                 Some("1"),
                                                                 None)
+
+                          var _listNotasData = new ListBuffer[_LsNota]()
+                          _listNotasData += new _LsNota(Some("OFICINAS"),Some(1))
+                          _listNotasData += new _LsNota(Some(" "),Some(2))
+                          _listNotasData += new _LsNota(Some("PRINCIPAL BUCARAMANGA"),Some(3))
+                          _listNotasData += new _LsNota(Some("Carrera 20 No. 36-06 Edificio Sagrada Familia Of. 407"),Some(4))
+                          _listNotasData += new _LsNota(Some("Teléfonos: 6701000 - 3162854212"),Some(5))
+                          _listNotasData += new _LsNota(Some("Bucaramanga"),Some(6))
+                          _listNotasData += new _LsNota(Some(" "),Some(7))
+                          _listNotasData += new _LsNota(Some("SUCURSAL FLORIDABLANCA"),Some(8))
+                          _listNotasData += new _LsNota(Some("Carrera 8 No. 43-03 Lagos II"),Some(9))
+                          _listNotasData += new _LsNota(Some("Teléfonos: 6750757 - 3173836208"),Some(10))
+                          _listNotasData += new _LsNota(Some("Floridablanca"),Some(11))
+                          _listNotasData += new _LsNota(Some(" "),Some(12))
+                          _listNotasData += new _LsNota(Some("Email: fap@fundacionapoyo.com"),Some(13))
+                          _listNotasData += new _LsNota(Some("www.fundacionapoyo.com"),Some(14))
+                          
                           val _listFormaPagoData = new ListBuffer[_LsFormaPago]()
                           _listFormaPagoData += _formaPagoData
                           _rootInterface = new _RootInterface(
@@ -983,7 +1030,7 @@ class FacturaRepository @Inject()(dbapi: DBApi, personaService: PersonaRepositor
                             None,
                             None,
                             Some(_listFormaPagoData),
-                            None
+                            Some(_listNotasData)
                           )
                           println(_rootInterface)
                           _rootInterface

@@ -841,7 +841,7 @@ export default {
       })
     },
     onRemoveInmueble(id) {
-      this.$confirm('Seguro de Borrar el Inmueble. Continuar?', 'Advertencia', {
+      this.$confirm('Seguro de Borrar el Inmueble. Continuar?', 'Advertencia!', {
         confirmButtonText: 'Sí',
         cancelButtonText: 'No',
         type: 'warning'

@@ -12,6 +12,7 @@ import com.google.inject.Singleton
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.collection
+import scala.util.{Failure, Success}
 
 import pdi.jwt.JwtSession
 
@@ -20,44 +21,49 @@ import http._
 
 
 @Singleton
-class HttpClientController  @Inject()(service: FacturaRepository, cc: ControllerComponents, authenticatedUserAction: AuthenticatedUserAction, conf: Configuration)(implicit ec: ExecutionContext) extends AbstractController(cc) {
-    def status() = Action { 
+class HttpClientController  @Inject()(service: FacturaRepository, http: HttpClient, cc: ControllerComponents, authenticatedUserAction: AuthenticatedUserAction, conf: Configuration)(implicit ec: ExecutionContext) extends AbstractController(cc) {
+    def status() = Action.async { 
         println("Estoy en el metodo status")
         var url = conf.get[String]("urlFacturacion") + "/Status"
-        var http = new HttpClient()
         println("Cree el cliente http")
         var params = collection.immutable.Map[String, String]()
-        var result = http.doGet(url, params)
-        println("Envie el Get")
-        println("Result: "+ result)
-        Ok(result.text)
+        http.doGet(url, params).map { response =>
+            println("Result: "+ response)
+            val contentType = response.headers
+                                .get("Content-Type")
+                                .flatMap(_.headOption)
+                                .getOrElse("application/html")
+            Ok.chunked(response.bodyAsSource).as(contentType)
+        }
     }
 
-    def gettransactionbyid(f: String, p: String, d: String) = Action {
+    def gettransactionbyid(f: String, p: String, d: String) = Action.async {
         println("Estoy en el metodo gettransactionbyid")
         var url = conf.get[String]("urlFacturacion") + "/GetTransaccionbyIdentificacionJson/"+ f + "/" + p + "/" + d
-        var http = new HttpClient()
         println("Cree el cliente http")
         var params = collection.immutable.Map[String, String]()
-        var result = http.doGet(url, params)
-        println("Envie el Get")
-        println("Result: "+ result)
-        Ok(result.text)
+        http.doGet(url, params).map { response =>
+            println("Result: "+ response)
+            val contentType = response.headers
+                                .get("Content-Type")
+                                .flatMap(_.headOption)
+                                .getOrElse("application/html")
+            Ok.chunked(response.bodyAsSource).as(contentType)
+        }
     }
 
     def setdocumentbyjson(f: Long) = Action.async { implicit request =>
         println("Estoy en el metodo setdocumentbyjson")
-        var url = conf.get[String]("urlFacturacion") + "/SetDocumentbyjson"
-        var http = new HttpClient()
-        println("Cree el cliente http")
-        var params = collection.immutable.Map[String, String]()
-        service.enviarFactura(f).map { rootInterface =>
-            var result = http.doPost(url, Json.stringify(Json.toJson(rootInterface)))
-            println("Envie el Post")
-            println("Result: "+ result)
-            Ok(result.text)
-        }        
-        
+       
+        http.enviarDocumento(f).flatMap { response =>
+//            response.flatMap { response =>
+                println("Result: "+ response)
+                val contentType = response.headers
+                                .get("Content-Type")
+                                .flatMap(_.headOption)
+                                .getOrElse("application/html")
+                Future.successful(Ok.chunked(response.bodyAsSource).as(contentType))
+        }
     }    
 
 }
