@@ -1,7 +1,7 @@
 <template >
   <el-container>
     <el-header>
-      <span>Mayor y Balance</span>
+      <span>Caja Diario</span>
     </el-header>
     <el-main>
       <el-form v-model="form" label-width="120px">
@@ -26,12 +26,19 @@
         </el-form-item>
       </el-form>
     </el-main>
+    <el-dialog :visible.sync="dialogVisible" width="30%">
+      <span slot="title"><el-icon-info/>Información</span>
+      <span>El Libro Caja Diario Fué Generado, puede verificarlo por la página de consulta</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">Cerrar</el-button>
+      </span>
+    </el-dialog>
   </el-container>
 </template>
 <script>
 import { mapGetters } from 'vuex'
 
-import { genLibroMayor } from '@/api/informe'
+import { genLibroCajaDiario } from '@/api/informe'
 
 export default {
   data() {
@@ -40,7 +47,8 @@ export default {
         periodo: null,
         anho: new Date().getFullYear(),
         definitivo: false
-      }
+      },
+      dialogVisible: false
     }
   },
   computed: {
@@ -50,7 +58,13 @@ export default {
   },
   methods: {
     generar() {
-      genLibroMayor(this.form.periodo, this.form.anho, this.form.definitivo).then(response => {
+      genLibroCajaDiario(this.form.periodo, this.form.anho, this.form.definitivo).then(response => {
+        console.log('resultado: "' + response.data + '"')
+        if (response.data === true) {
+          this.dialogVisible = true
+        } else {
+          this.dialogVisible = false
+        }
         console.log('data: ' + JSON.stringify(response))
       })
     }

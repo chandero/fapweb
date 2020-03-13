@@ -36,6 +36,7 @@
   "dependencies": {
     "@nelsonomuto/axios-request-timeout": "^1.0.4",
     "axios": "0.18.0",
+    "browser-env": "^3.3.0",
     "clipboard": "1.7.1",
     "codemirror": "5.39.2",
     "driver.js": "0.8.1",

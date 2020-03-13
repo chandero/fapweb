@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.3.1.final using JasperReports Library version 6.3.1  -->
-<!-- 2019-03-28T15:57:04 -->
+<!-- 2020-02-19T10:10:50 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="libromayorybalance" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Key" uuid="12a193e5-c42b-453a-b4bc-fbcd612719d8">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
 	<parameter name="EMPRESA" class="java.lang.String">
@@ -29,19 +29,19 @@
 		<variableExpression><![CDATA[1L]]></variableExpression>
 		<initialValueExpression><![CDATA[$P{PAGINA_LIBRO}]]></initialValueExpression>
 	</variable>
-	<variable name="TOTAL_ANTERIOR" class="java.math.BigDecimal" incrementType="Report" calculation="Sum">
+	<variable name="TOTAL_ANTERIOR" class="java.math.BigDecimal" calculation="Sum">
 		<variableExpression><![CDATA[$F{anterior}]]></variableExpression>
 		<initialValueExpression><![CDATA[0]]></initialValueExpression>
 	</variable>
-	<variable name="TOTAL_DEBITO" class="java.math.BigDecimal" resetType="None" incrementType="Report" calculation="Sum">
+	<variable name="TOTAL_DEBITO" class="java.math.BigDecimal" calculation="Sum">
 		<variableExpression><![CDATA[$F{debito}]]></variableExpression>
 		<initialValueExpression><![CDATA[0]]></initialValueExpression>
 	</variable>
-	<variable name="TOTAL_CREDITO" class="java.math.BigDecimal" resetType="None" incrementType="Report" calculation="Sum">
+	<variable name="TOTAL_CREDITO" class="java.math.BigDecimal" calculation="Sum">
 		<variableExpression><![CDATA[$F{credito}]]></variableExpression>
 		<initialValueExpression><![CDATA[0]]></initialValueExpression>
 	</variable>
-	<variable name="TOTAL_ACTUAL" class="java.math.BigDecimal" resetType="None" incrementType="Report" calculation="Sum">
+	<variable name="TOTAL_ACTUAL" class="java.math.BigDecimal" calculation="Sum">
 		<variableExpression><![CDATA[$F{actual}]]></variableExpression>
 		<initialValueExpression><![CDATA[0]]></initialValueExpression>
 	</variable>
@@ -100,7 +100,7 @@
 		</band>
 	</pageHeader>
 	<columnHeader>
-		<band height="22" splitType="Stretch">
+		<band height="28" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 			<staticText>
 				<reportElement x="0" y="0" width="50" height="20" uuid="9a144010-8ba1-43dd-8d97-c93ca6311fe0"/>
@@ -117,7 +117,7 @@
 				<text><![CDATA[NOMBRE]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="273" y="0" width="70" height="20" uuid="0198cfd8-a119-4573-8f0b-d04fcf10c526"/>
+				<reportElement x="273" y="0" width="70" height="28" uuid="0198cfd8-a119-4573-8f0b-d04fcf10c526"/>
 				<textElement textAlignment="Center">
 					<font size="9"/>
 				</textElement>
@@ -142,7 +142,7 @@
 				<text><![CDATA[CREDITO]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="500" y="0" width="70" height="20" uuid="029b5624-4f32-4b3d-af39-5737633c52bb"/>
+				<reportElement x="510" y="0" width="60" height="28" uuid="029b5624-4f32-4b3d-af39-5737633c52bb"/>
 				<textElement textAlignment="Center">
 					<font size="9"/>
 				</textElement>
@@ -209,30 +209,54 @@
 			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 			<textField evaluationTime="Master">
 				<reportElement x="494" y="0" width="76" height="13" uuid="d8830dcc-c89c-4024-b3dc-e026a32c5b6a"/>
-				<textElement textAlignment="Right"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
 				<textFieldExpression><![CDATA[msg("Página {0} de {1}", $V{MASTER_CURRENT_PAGE}, $V{MASTER_TOTAL_PAGES})]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="40" y="13" width="440" height="14" uuid="f879a187-0dee-4de4-ad57-0ba2067e5f45"/>
+				<reportElement x="40" y="18" width="530" height="11" uuid="f879a187-0dee-4de4-ad57-0ba2067e5f45">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font size="8"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{ARCHIVO}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="0" y="13" width="40" height="14" uuid="eaa5c3aa-6b65-464f-9df2-08a1e351aaaa"/>
+				<reportElement x="0" y="18" width="40" height="11" uuid="eaa5c3aa-6b65-464f-9df2-08a1e351aaaa">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font size="8"/>
+				</textElement>
 				<text><![CDATA[Archivo:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="0" y="-1" width="180" height="14" uuid="4b836d13-6f6c-429d-a990-dcb773255a0f">
+				<reportElement x="0" y="7" width="180" height="11" uuid="4b836d13-6f6c-429d-a990-dcb773255a0f">
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 				</reportElement>
-				<textElement textAlignment="Left"/>
+				<textElement textAlignment="Left">
+					<font size="8"/>
+				</textElement>
 				<textFieldExpression><![CDATA[CONCATENATE("Generado:", DATEFORMAT(NOW( ),"YYYY/MM/dd HH:MM" ))]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="0" y="27" width="40" height="14" uuid="13ce0e6b-7205-4ea6-96e4-ae0b2e6640b0"/>
+				<reportElement x="0" y="32" width="40" height="11" uuid="13ce0e6b-7205-4ea6-96e4-ae0b2e6640b0">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font size="8"/>
+				</textElement>
 				<text><![CDATA[Usuario:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="40" y="27" width="140" height="14" uuid="3613627b-818a-4432-ab52-9352ca38da23"/>
+				<reportElement x="40" y="32" width="140" height="11" uuid="3613627b-818a-4432-ab52-9352ca38da23">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font size="8"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{USUARIO}]]></textFieldExpression>
 			</textField>
 		</band>
@@ -252,23 +276,23 @@
 					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 				</reportElement>
 				<textElement textAlignment="Right">
-					<font size="9"/>
+					<font size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{TOTAL_ANTERIOR}]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Master" pattern="#,##0.00;(#,##0.00)">
-				<reportElement x="349" y="1" width="70" height="13" uuid="f7b06218-2168-4608-a971-f30ab02bc684">
+				<reportElement x="349" y="0" width="70" height="13" uuid="f7b06218-2168-4608-a971-f30ab02bc684">
 					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 				</reportElement>
 				<textElement textAlignment="Right">
-					<font size="9"/>
+					<font size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{TOTAL_DEBITO}]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Master" pattern="#,##0.00;(#,##0.00)">
 				<reportElement x="425" y="0" width="70" height="13" uuid="c5817516-6e4e-462f-a9e1-014f9ecab44f"/>
 				<textElement textAlignment="Right">
-					<font size="9"/>
+					<font size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{TOTAL_CREDITO}]]></textFieldExpression>
 			</textField>
@@ -278,7 +302,7 @@
 					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
 				</reportElement>
 				<textElement textAlignment="Right">
-					<font size="9"/>
+					<font size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{TOTAL_ACTUAL}]]></textFieldExpression>
 			</textField>

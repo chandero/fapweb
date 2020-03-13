@@ -54,6 +54,11 @@ POST    /api/calc/t                     controllers.CalculoController.tabla
 GET     /api/info/genlm/:p/:a           controllers.LibroMayorController.generar(p:Int, a:Int)
 GET     /api/info/conlm/:a              controllers.LibroMayorController.consultar(a:Int)
 GET     /api/info/verlm/:a/:p/:c        controllers.LibroMayorController.ver(a:Int, p:Int, c:Int)
+
+GET     /api/info/genlcd/:p/:a           controllers.LibroCajaDiarioController.generar(p:Int, a:Int)
+GET     /api/info/conlcd/:a              controllers.LibroCajaDiarioController.consultar(a:Int)
+GET     /api/info/verlcd/:a/:p/:c        controllers.LibroCajaDiarioController.ver(a:Int, p:Int, c:Int)
+
 POST    /api/info/gcbp                  controllers.InformeAsociadoBuenPagoController.generar
 GET     /api/info/ccbp                  controllers.InformeAsociadoBuenPagoController.consultar
 GET     /api/info/ecbp                  controllers.InformeAsociadoBuenPagoController.exportar

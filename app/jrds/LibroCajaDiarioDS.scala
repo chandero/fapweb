@@ -8,7 +8,7 @@ import models.LibroCajaDiario
 
 import java.util.{ HashMap, Map }
 
-class LibroCajaDiarioDS(listData: ListBuffer[LibroCajaDiario]) extends JRDataSource {
+class LibroCajaDiarioDS(listData: Seq[LibroCajaDiario]) extends JRDataSource {
 
     var i = -1
 
@@ -19,11 +19,14 @@ class LibroCajaDiarioDS(listData: ListBuffer[LibroCajaDiario]) extends JRDataSou
 
     override def getFieldValue(jrField: JRField): AnyRef = {
         jrField.getName match {
-          case "dia" => listData(i).dia
-          case "codigo" ⇒ listData(i).codigo.get.substring(0,4)
-          case "nombre" ⇒ listData(i).nombre.get
-          case "debito" ⇒ listData(i).debito.get.bigDecimal
-          case "credito" ⇒ listData(i).credito.get.bigDecimal
+          case "DIA" => listData(i).dia match {
+                          case Some(dia) => Int.box(dia)
+                          case None => Int.box(0)
+                        }
+          case "CODIGO" ⇒ listData(i).codigo.get
+          case "NOMBRE" ⇒ listData(i).nombre.get
+          case "DEBITO" ⇒ listData(i).debito.get.bigDecimal
+          case "CREDITO" ⇒ listData(i).credito.get.bigDecimal
           case _ ⇒ None
         }
       }

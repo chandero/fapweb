@@ -190,6 +190,8 @@ class LibroMayorRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutio
         var base = ""
         val anho_actual:Int = Calendar.getInstance.get(Calendar.YEAR)
         anho match {
+          case 2019 =>  //println("en 2019") 
+                        base = "db2019"  
           case 2018 =>  //println("en 2018") 
                         base = "db2018"
           case 2017 =>  //println("en 2017")
@@ -200,11 +202,14 @@ class LibroMayorRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutio
                     base = "default"
         }
         val db = dbapi.database(base)
+        val dbdefault = dbapi.database("default")
         var _listData = ListBuffer[LibroMayor]()
         db.withConnection {
             implicit connection =>
             val id_agencia = play.Play.application.configuration.getString("id_agencia")
-            val empresa: (String, String) = SQL("""SELECT EMPR_DESCRIPCION, EMPR_IDENTIFICACION FROM EMPRESA""").as(SqlParser.str(1) ~ SqlParser.str(2) map (SqlParser.flatten) single)
+            val empresa: (String, String) = dbdefault.withConnection { implicit connection =>
+              SQL("""SELECT EMPR_DESCRIPCION, EMPR_IDENTIFICACION FROM EMPRESA""").as(SqlParser.str(1) ~ SqlParser.str(2) map (SqlParser.flatten) single)
+            }
             val anterior = """SELECT "con$puc".CODIGO, SUM("con$saldoscuenta".DEBITO) AS DEBITO, SUM("con$saldoscuenta".CREDITO) AS CREDITO
                               FROM "con$puc"
                               LEFT JOIN "con$saldoscuenta" ON ("con$puc".CODIGO = "con$saldoscuenta".CODIGO)
@@ -229,10 +234,12 @@ class LibroMayorRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutio
                         'nivel -> 3,
                         'codigo -> "800000000000000000"
                     ).as(Puc._set *)
-            val usuario = SQL("""SELECT NOMBRE || ' ' || PRIMER_APELLIDO || ' ' || SEGUNDO_APELLIDO AS nombre FROM \"gen$empleado\" WHERE ID = {usua_id}""").
-            on(
-              'usua_id -> usua_id
-            ).as(SqlParser.scalar[String].single)
+            val usuario = dbdefault.withConnection { implicit connection =>
+               SQL("""SELECT NOMBRE || ' ' || PRIMER_APELLIDO || ' ' || SEGUNDO_APELLIDO AS nombre FROM \"gen$empleado\" WHERE ID = {usua_id}""").
+              on(
+                'usua_id -> usua_id
+              ).as(SqlParser.scalar[String].single)
+            }
             puc.map { p =>
                         val s_ant = SQL(anterior).on(
                                    'codigo -> p.codigo,
@@ -294,13 +301,21 @@ class LibroMayorRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutio
                 println("ruta: " + template)
                 val jasperReport: JasperReport = JRLoader.loadObject(jasperFile).asInstanceOf[JasperReport]
 
-                var consecutivo = SQL("""SELECT COUNT(*) AS LIRE_CONSECUTIVO FROM CON$HISTORIALIBROREGISTRADO WHERE LIRE_ID = 1""").as(SqlParser.scalar[scala.Long].single)
+                var consecutivo = dbdefault.withConnection { implicit connection =>
+                  SQL("""SELECT COUNT(*) AS LIRE_CONSECUTIVO FROM CON$HISTORIALIBROREGISTRADO WHERE LIRE_ID = 1 AND LIRE_PERIODO = {periodo} and LIRE_ANHO = {anho}""").
+                  on(
+                    'periodo -> periodo,
+                    'anho -> anho
+                  ).as(SqlParser.scalar[scala.Long].single)
+                }
                 consecutivo += 1
                 println("linea 01")
-                val pagina_libro = SQL("""SELECT a.LIRE_PAGINA FROM CON$LIBROREGISTRADO a WHERE a.LIRE_ID = {lire_id}""").
-                on(
-                  'lire_id -> 1
-                ).as(SqlParser.scalar[Int].single)
+                val pagina_libro = dbdefault.withConnection { implicit connection => 
+                  SQL("""SELECT a.LIRE_PAGINA FROM CON$LIBROREGISTRADO a WHERE a.LIRE_ID = {lire_id}""").
+                  on(
+                    'lire_id -> 1
+                  ).as(SqlParser.scalar[Int].single)
+                }
                 println("linea 02")
                 println("pagina libro: " + pagina_libro)
                 val nombre = "FAP999_"+anho+"%02d".format(periodo)+"_MAYORYBALANCE_"+ consecutivo +".pdf"
@@ -327,7 +342,8 @@ class LibroMayorRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutio
                   pagina = listener.getPagina()
                   println("linea 03")
                   println("paginas: " + (pagina + 1))
-                  SQL("""INSERT INTO CON$HISTORIALIBROREGISTRADO VALUES ({lire_id}, {lire_anho}, {lire_periodo}, {lire_consecutivo}, {lire_fecha}, {lire_hora}, {id})""").
+                  dbdefault.withConnection { implicit connection => 
+                    SQL("""INSERT INTO CON$HISTORIALIBROREGISTRADO VALUES ({lire_id}, {lire_anho}, {lire_periodo}, {lire_consecutivo}, {lire_fecha}, {lire_hora}, {id})""").
                       on(
                         'lire_id -> 1,
                         'lire_anho -> anho,
@@ -337,12 +353,12 @@ class LibroMayorRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutio
                         'lire_hora -> new DateTime(),
                         'id -> usua_id
                     ).executeUpdate()
-                  SQL("""UPDATE CON$LIBROREGISTRADO SET LIRE_PAGINA = {lire_pagina} WHERE LIRE_ID = {id}""").
-                  on(
-                    'id -> 1,
-                    'lire_pagina -> (pagina_libro + pagina)
-                  ).executeUpdate()
-
+                    SQL("""UPDATE CON$LIBROREGISTRADO SET LIRE_PAGINA = {lire_pagina} WHERE LIRE_ID = {id}""").
+                    on(
+                      'id -> 1,
+                      'lire_pagina -> (pagina_libro + pagina)
+                    ).executeUpdate()
+                  }
                   val destino = play.Play.application.configuration.getString("reporte_ruta")
                   JasperExportManager.exportReportToPdfFile(jasperPrint, destino + nombre)
 

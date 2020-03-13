@@ -456,6 +456,7 @@ import { obtenerListaOficinas, obtenerListaAsesores,
   obtenerListaTipoRespaldo, obtenerListaTipoEstadoColocacion } from '@/api/tipos'
 import { obtenerPersona } from '@/api/persona'
 import { buscarCredito } from '@/api/infocredito'
+import { guardarSolicitud } from '@/api/solicitud'
 
 export default {
   components: {

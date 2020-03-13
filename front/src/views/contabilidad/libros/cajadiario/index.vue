@@ -1,7 +1,5 @@
-<template >
-  <el-container>
-    <el-header>
-      <span>Caja Diario</span>
-    </el-header>
-  </el-container>
+<template>
+  <div style="padding:30px;">
+    <router-view />
+  </div>
 </template>

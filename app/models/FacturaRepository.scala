@@ -61,7 +61,7 @@ case class _CompradorFactura (
   CompradorCiudad: Option[String],
   CompradorCodCiudad: Option[String],
   CompradorCodDepartamento: Option[String],
-//  CompradorCodPostal: Option[String],
+  CompradorCodPostal: Option[String],
   CompradorCorreoElectronico: Option[String],
   CompradorDVIdentificacion: Option[String],
   CompradorDepartamento: Option[String],
@@ -71,7 +71,7 @@ case class _CompradorFactura (
 //  CompradorImpuesto: Option[String],
   CompradorNombreCompleto: Option[String],
   CompradorNombrePais: Option[String],
-  CompradorNotaCont: Option[String],
+//  CompradorNotaCont: Option[String],
   CompradorPais: Option[String],
   CompradorPrimerNombre: Option[String],
   CompradorRazonSocial: Option[String],
@@ -250,7 +250,7 @@ object _CompradorFactura {
       "CompradorCiudad" -> r.CompradorCiudad,
       "CompradorCodCiudad" -> r.CompradorCodCiudad,
       "CompradorCodDepartamento" -> r.CompradorCodDepartamento,
-//      "CompradorCodPostal" -> r.CompradorCodPostal,
+      "CompradorCodPostal" -> r.CompradorCodPostal,
       "CompradorCorreoElectronico" -> r.CompradorCorreoElectronico,
       "CompradorDVIdentificacion" -> r.CompradorDVIdentificacion,
       "CompradorDepartamento" -> r.CompradorDepartamento,
@@ -260,7 +260,7 @@ object _CompradorFactura {
 //      "CompradorImpuesto" -> r.CompradorImpuesto,
       "CompradorNombreCompleto" -> r.CompradorNombreCompleto,
       "CompradorNombrePais" -> r.CompradorNombrePais,
-      "CompradorNotaCont" -> r.CompradorNotaCont,
+//      "CompradorNotaCont" -> r.CompradorNotaCont,
       "CompradorPais" -> r.CompradorPais,
       "CompradorPrimerNombre" -> r.CompradorPrimerNombre,
       "CompradorRazonSocial" -> r.CompradorRazonSocial,
@@ -279,7 +279,7 @@ object _CompradorFactura {
     (__ \ "CompradorCiudad").readNullable[String] and
     (__ \ "CompradorCodCiudad").readNullable[String] and
     (__ \ "CompradorCodDepartamento").readNullable[String] and
-//    (__ \ "CompradorCodPostal").readNullable[String] and
+    (__ \ "CompradorCodPostal").readNullable[String] and
     (__ \ "CompradorCorreoElectronico").readNullable[String] and
     (__ \ "CompradorDVIdentificacion").readNullable[String] and
     (__ \ "CompradorDepartamento").readNullable[String] and
@@ -289,7 +289,7 @@ object _CompradorFactura {
 //    (__ \ "CompradorImpuesto").readNullable[String] and
     (__ \ "CompradorNombreCompleto").readNullable[String] and
     (__ \ "CompradorNombrePais").readNullable[String] and
-    (__ \ "CompradorNotaCont").readNullable[String] and
+//    (__ \ "CompradorNotaCont").readNullable[String] and
     (__ \ "CompradorPais").readNullable[String] and
     (__ \ "CompradorPrimerNombre").readNullable[String] and
     (__ \ "CompradorRazonSocial").readNullable[String] and
@@ -912,7 +912,8 @@ class FacturaRepository @Inject()(dbapi: DBApi, personaService: PersonaRepositor
                           val _compradorData = new _CompradorFactura(persona.a.get.primer_apellido, 
                                                                      direccion.municipio, 
                                                                      Some(direccion.cod_municipio.get.toString), 
-                                                                     Some(depa_id.toString), 
+                                                                     Some(depa_id.toString),
+                                                                     Some(depa_id.toString+"0001"),
                                                                      persona.d.get.email,
                                                                      None,
                                                                      Some(departamento.get._2),
@@ -921,7 +922,6 @@ class FacturaRepository @Inject()(dbapi: DBApi, personaService: PersonaRepositor
                                                                      f.id_persona,
                                                                      Some(persona.a.get.nombre.get.concat(" ".concat(persona.a.get.primer_apellido.get.concat(" ".concat(persona.a.get.segundo_apellido.get))))),
                                                                      Some("COLOMBIA"),
-                                                                     None,
                                                                      Some("CO"),
                                                                      persona.a.get.nombre,
                                                                      None,
