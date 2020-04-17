@@ -1197,6 +1197,63 @@ class PersonaRepository @Inject()(dbapi: DBApi)(
       }
     }
 
+    def obtenerPorApellidosyNombres(primer_apellido: String, segundo_apellido: String, nombre: String): Future[Iterable[Persona_a]] = Future {
+      db.withConnection { implicit connection =>
+        var separador = " "
+        var query = """SELECT * FROM \"gen$persona\" p WHERE"""
+        if (primer_apellido != "") {
+          query += separador + "PRIMER_APELLIDO LIKE {primer_apellido}"
+          separador = " AND "
+          
+        }
+        if (segundo_apellido != "") {
+          query += separador + "SEGUNDO_APELLIDO LIKE {segundo_apellido}"
+          separador = " AND "
+        }
+        if (nombre != "") {
+          query += separador + "NOMBRE LIKE {nombre}"
+        } 
+        query += " ORDER BY PRIMER_APELLIDO, SEGUNDO_APELLIDO, NOMBRE"
+        if (primer_apellido != "" && segundo_apellido != "" && nombre != "") {
+          SQL(query).on(
+            'primer_apellido -> primer_apellido,
+            'segundo_apellido -> segundo_apellido ,
+            'nombre -> nombre
+          ).as(Persona_a._set *)
+        } else if (primer_apellido != "" && segundo_apellido != "") {
+          SQL(query).on(
+            'primer_apellido -> primer_apellido,
+            'segundo_apellido -> segundo_apellido
+          ).as(Persona_a._set *)
+        } else if (primer_apellido != "" && nombre != "") {
+          SQL(query).on(
+            'primer_apellido -> primer_apellido,
+            'nombre -> nombre
+          ).as(Persona_a._set *)
+        } else if (primer_apellido != "") {
+          SQL(query).on(
+            'primer_apellido -> primer_apellido
+          ).as(Persona_a._set *)
+        } else if (segundo_apellido != "" && nombre != "") {
+          SQL(query).on(
+            'segundo_apellido -> segundo_apellido,
+            'nombre -> nombre
+          ).as(Persona_a._set *)
+        } else if (segundo_apellido != "") {
+          SQL(query).on(
+            'segundo_apellido -> segundo_apellido
+          ).as(Persona_a._set *)
+        } else if (nombre != "") {
+          SQL(query).on(
+            'nombre -> nombre
+          ).as(Persona_a._set *)
+        } else {
+          query = """SELECT * FROM \"gen$persona\" p ORDER BY PRIMER_APELLIDO, SEGUNDO_APELLIDO, NOMBRE"""
+          SQL(query).as(Persona_a._set *)          
+        }
+      }      
+    }
+
     def guardar(p: Persona): Future[Boolean] = {
       db.withConnection { implicit connection =>
         var a = p.a.get

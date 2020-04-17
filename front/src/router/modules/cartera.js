@@ -34,6 +34,12 @@ const carteraRouter = {
           ]
         }
       ]
+    },
+    {
+      path: 'controlcobro',
+      component: () => import('@/views/cartera/controlcobro/index'), // Parent router-view
+      name: 'ControlCobro',
+      meta: { title: 'ControlCobro', roles: ['admin', 'cartera', 'revisor'] }
     }
   ]
 }

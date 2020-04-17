@@ -491,8 +491,8 @@ object Credito {
             abonos_capital, // 6.2
             fecha_capital, // 6.3
             fecha_interes, // 6.4
-            id_estado_colocacion
-          ), // 6.5
+            id_estado_colocacion // 6.5
+          ),
           (
             id_ente_aprobador, // 7.1
             id_empleado, // 7.2

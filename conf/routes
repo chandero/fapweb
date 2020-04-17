@@ -72,6 +72,13 @@ GET     /api/inmu/busc/:i               controllers.BienRaizController.buscar(i:
 GET     /api/vehi/busc/:i               controllers.VehiculoController.buscar(i: Int)
 # Colocaciones
 GET     /api/col/busc/:i/:p             controllers.ColocacionController.buscarColocacion(i: Int, p: String)
+
+# Control Cobro
+GET     /api/coco/bpd/:i/:p             controllers.ControlCobroController.obtenerCreditosPorDocumento(i: Int, p: String)
+GET     /api/coco/bpe/:e/:i/:f/:a       controllers.ControlCobroController.obtenerCreditosPorEstado(e: Int, i: Int, f: Int, a: Int)
+GET     /api/coco/bdp/:i/:p             controllers.ControlCobroController.obtenerDireccion(i: Int, p: String)
+
+
 # Tipos
 GET     /api/ti/obt                     controllers.TipoIdentificacionController.obtenerListaTipoIdentificacion
 GET     /api/ti/:t                      controllers.TipoIdentificacionController.obtenerListaTipoIdentificacionExterna(t: String)
@@ -99,6 +106,7 @@ GET     /api/tess/obt                   controllers.TipoEstadoSolicitudControlle
 # Persona
 GET     /api/pers/ver/:i/:p             controllers.PersonaController.obtener(i:Int , p:String)
 POST    /api/pers/gdr                   controllers.PersonaController.guardar()
+POST    /api/pers/opn                   controllers.PersonaController.obtenerPorApellidosyNombres
 
 # Solicitud
 POST   /api/soex/                       controllers.SolicitudExternaController.crear()

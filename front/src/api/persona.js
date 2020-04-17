@@ -21,3 +21,16 @@ export function guardarPersona(p) {
     data: data.p
   })
 }
+
+export function obtenerPersonaPorApellidosYNombre(primer_apellido, segundo_apellido, nombre) {
+  const data = {
+    primer_apellido,
+    segundo_apellido,
+    nombre
+  }
+  return request({
+    url: 'pers/opn',
+    method: 'post',
+    data: data
+  })
+}

@@ -32,6 +32,18 @@ class PersonaController @Inject()(
                 }
               }
         }
+
+        def obtenerPorApellidosyNombres() = authenticatedUserAction.async {
+            implicit request: Request[AnyContent] =>
+              val usua_id = Utility.extraerUsuario(request)
+              val json = request.body.asJson.get
+              val primer_apellido = (json \ "primer_apellido").as[String]
+              val segundo_apellido = (json \ "segundo_apellido").as[String]
+              val nombre = (json \ "nombre").as[String]
+              pService.obtenerPorApellidosyNombres(primer_apellido, segundo_apellido, nombre).map { p =>
+                Ok(Json.toJson(p))
+              }
+        }
         
         def guardar() = authenticatedUserAction.async {
           implicit request: Request[AnyContent] =>
