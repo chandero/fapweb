@@ -49,7 +49,7 @@ import net.sf.jasperreports.engine.util.JRLoader
 import jrds.LibroMayorDS
 import listeners.JrListener
 
-case class Puc(codigo: Option[String], id_agencia: Option[Int], nombre: Option[String], saldo_inicial: Option[BigDecimal], descripcion_agencia: Option[String])
+case class PucLibro(codigo: Option[String], id_agencia: Option[Int], nombre: Option[String], saldo_inicial: Option[BigDecimal], descripcion_agencia: Option[String])
 case class LibroMayor(codigo: Option[String], nombre: Option[String], saldo_inicial: Option[BigDecimal], debito: Option[BigDecimal], credito: Option[BigDecimal], saldo_final: Option[BigDecimal])
 case class Saldo(codigo: Option[String], debito: Option[BigDecimal], credito: Option[BigDecimal])
 case class LMRelacion(lire_anho: Option[Int], lire_periodo: Option[Int], lire_consecutivo: Option[Int], lire_fecha: Option[DateTime], lire_hora: Option[DateTime])
@@ -97,7 +97,7 @@ object LMRelacion {
   }  
 }
 
-object Puc {
+object PucLibro {
   implicit val yourJodaDateReads = JodaReads.jodaDateReads("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
   implicit val yourJodaDateWrites = JodaWrites.jodaDateWrites("yyyy-MM-dd'T'HH:mm:ss.SSSZ'")
 
@@ -111,7 +111,7 @@ object Puc {
            id_agencia ~ 
            nombre ~ 
            saldo_inicial ~
-           descripcion_agencia => Puc(
+           descripcion_agencia => PucLibro(
              codigo,
              id_agencia,
              nombre,
@@ -233,7 +233,7 @@ class LibroMayorRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutio
                      ORDER BY "con$puc".CODIGO """).on(
                         'nivel -> 3,
                         'codigo -> "800000000000000000"
-                    ).as(Puc._set *)
+                    ).as(PucLibro._set *)
             val usuario = dbdefault.withConnection { implicit connection =>
                SQL("""SELECT NOMBRE || ' ' || PRIMER_APELLIDO || ' ' || SEGUNDO_APELLIDO AS nombre FROM \"gen$empleado\" WHERE ID = {usua_id}""").
               on(

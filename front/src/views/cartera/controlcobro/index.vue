@@ -87,8 +87,13 @@
         </el-col>
       </el-row>
       <el-row>
+        <el-col :span="24">
+          <div style="text-align: center;"><h3>Colocaciones</h3></div>
+        </el-col>
+      </el-row>
+      <el-row>
         <el-col>
-          <el-table v-loading="loading" :data="dataColocacion" :row-class-name="tableRowClassName" style="width: 100%; font-size: 12px;" max-height="350">
+          <el-table v-loading="loading" :data="dataColocacion" :row-class-name="tableRowClassName" highlight-current-row style="width: 100%; font-size: 12px;" max-height="350" @current-change="handleCurrentChange" >
             <el-table-column sortable label="Colocación" prop="id_colocacion" width="110">
               <template slot-scope="scope">
                 <span style="margin-left: 10px">{{ scope.row.id_colocacion }}</span>
@@ -142,19 +147,64 @@
             <el-table-column
               fixed="right"
               label="Ver"
-              width="120">
+              width="140">
               <template slot-scope="scope">
-                <el-button type="primary" icon="el-icon-service" circle title="Dirección y Teléfono" @click="buscarDireccion(scope.row.id_identificacion, scope.row.id_persona)" />
-                <el-button type="success" icon="el-icon-s-custom" circle title="Codeudores"/>
+                <el-button type="primary" icon="el-icon-service" size="mini" circle title="Dirección y Teléfono" @click="buscarDireccion(scope.row.id_identificacion, scope.row.id_persona)" />
+                <el-button type="success" icon="el-icon-s-custom" size="mini" circle title="Codeudores"/>
+                <el-button type="warning" icon="el-icon-document" size="mini" circle title="Extracto" @click="buscarExtracto(scope.row.id_colocacion)" />
               </template>
             </el-table-column>
           </el-table>
         </el-col>
       </el-row>
+      <el-row>
+        <el-col :span="24">
+          <div style="text-align: center;"><h3>Observaciones y Compromisos</h3></div>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col>
+          <el-table v-loading="loading" :data="dataControlCobro" stripe style="width: 100%; font-size: 12px;" max-height="350" >
+            <el-table-column sortable label="Fecha" prop="fecha_observacion" width="110">
+              <template slot-scope="scope">
+                <span style="margin-left: 10px">{{ scope.row.fecha_observacion | moment('YYYY-MM-DD') }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column sortable label="Observación" prop="observacion" width="450">
+              <template slot-scope="scope">
+                <span style="margin-left: 10px">{{ scope.row.observacion }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="Compromiso" prop="fecha_compromiso" align="right" width="110">
+              <template slot-scope="scope">
+                <span style="margin-left: 10px">{{ scope.row.fecha_compromiso | moment('YYYY-MM-DD') }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="Reportó" prop="empleado" align="right" width="250">
+              <template slot-scope="scope">
+                <span style="margin-left: 10px">{{ scope.row.empleado }}</span>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="24">
+          <el-button type="primary" @click="showControlCobroDlg=true">Agregar</el-button>
+        </el-col>
+      </el-row>
     </el-main>
+    <!-- Dialogo Extracto Colocacion -->
+    <el-dialog :visible.sync="showExtractoDlg" :title="'Extracto de Colocación : ' + extracto_colocacion" :show-close="false" :destroy-on-close="true" width="90%">
+      <extracto-colocacion :colocacion="extracto_colocacion" :datos="extracto_data" @cerrarExtractoEvent="cerrarExtractoEvento" />
+    </el-dialog>
     <!-- Dialogo Buscar por Apellidos y Nombre -->
     <el-dialog :visible.sync="showBuscarPersonaDlg" title="Buscar Por Apellidos y Nombre" width="80%">
       <buscar-por-nombre @selectPersonEvent="setDatosPersonaDesdeElEvento" />
+    </el-dialog>
+    <!-- Dialogo Control Cobro -->
+    <el-dialog :visible.sync="showControlCobroDlg" title="Agregar Observación" width="80%">
+      <control-cobro :agencia="colocacion.id_agencia" :colocacion="colocacion.id_colocacion" :controlcobro="controlcobro" @savedEvent="validarAgregarControlCobro"/>
     </el-dialog>
     <!-- Dialogo de Direcciones-->
     <el-dialog :visible.sync="dialogDireccionVisible" title="Direcciones" width="100%">
@@ -232,13 +282,18 @@
 </template>
 <script>
 import BuscarPersonaComponent from '@/components/BuscarPersonaNombre'
+import ControlCobroComponent from '@/components/ControlCobro'
+import ExtractoColocacionComponent from '@/components/ExtractoColocacion'
+import { obtenerExtractoColocacion } from '@/api/extractocolocacion'
 import { obtenerListaTipoIdentificacion, obtenerListaTipoEstadoColocacion, obtenerListaTipoDireccion, obtenerListaMunicipios, obtenerListaAsesores } from '@/api/tipos'
-import { buscarCreditoPorEstado, buscarCreditoPorDocumento, buscarDireccionPersona } from '@/api/controlcobro'
+import { buscarCreditoPorEstado, buscarCreditoPorDocumento, buscarDireccionPersona, buscarControlCobro } from '@/api/controlcobro'
 import { obtenerPersona } from '@/api/persona'
 
 export default {
   components: {
-    'buscar-por-nombre': BuscarPersonaComponent
+    'buscar-por-nombre': BuscarPersonaComponent,
+    'control-cobro': ControlCobroComponent,
+    'extracto-colocacion': ExtractoColocacionComponent
   },
   data() {
     return {
@@ -247,19 +302,35 @@ export default {
       dias_fin: null,
       id_identificacion: null,
       id_persona: null,
+      colocacion: {
+        id_agencia: 1,
+        id_colocacion: '00000000000'
+      },
+      controlcobro: {
+        fecha_observacion: new Date(),
+        es_compromiso: false,
+        fecha_compromiso: null,
+        observacion: null,
+        es_observacion: false
+      },
       nombre: null,
       ases_id: -1,
       tipo_documento: null,
       tipos_estado_colocacion: null,
       dataColocacion: null,
       dataDireccion: null,
+      dataControlCobro: null,
       loading: false,
       direcciones: null,
       tiposdireccion: [],
       municipios: [],
       asesores: [],
+      extracto_colocacion: null,
+      extracto_data: [],
       dialogDireccionVisible: false,
-      showBuscarPersonaDlg: false
+      showBuscarPersonaDlg: false,
+      showControlCobroDlg: false,
+      showExtractoDlg: false
     }
   },
   beforeMount() {
@@ -292,6 +363,12 @@ export default {
     })
   },
   methods: {
+    handleCurrentChange(colocacion) {
+      this.colocacion = colocacion
+      buscarControlCobro(this.colocacion.id_colocacion).then(response => {
+        this.dataControlCobro = response.data
+      })
+    },
     tableRowClassName({ row, rowIndex }) {
       if (row.estado === 'JURIDICO') {
         return 'warning-row'
@@ -300,8 +377,23 @@ export default {
       }
       return ''
     },
+    buscarExtracto(id_colocacion) {
+      this.extracto_colocacion = id_colocacion
+      obtenerExtractoColocacion(id_colocacion).then(response => {
+        this.extracto_data = response.data
+        this.showExtractoDlg = true
+      }).catch(error => {
+        console.log('Error buscando extracto colocación: ' + error)
+      })
+    },
+    cerrarExtractoEvento() {
+      this.extracto_data = []
+      this.extracto_colocacion = null
+      this.showExtractoDlg = false
+    },
     buscarPorEstado() {
       this.loading = true
+      this.limpiarTablas()
       buscarCreditoPorEstado(this.id_estado_colocacion, this.dias_ini, this.dias_fin, this.ases_id).then(response => {
         this.dataColocacion = response.data
         this.loading = false
@@ -315,8 +407,30 @@ export default {
       this.showBuscarPersonaDlg = false
       this.buscarPersona()
     },
+    validarAgregarControlCobro(data) {
+      this.showControlCobroDlg = false
+      this.controlcobro = {
+        fecha_observacion: new Date(),
+        es_compromiso: false,
+        fecha_compromiso: null,
+        observacion: null,
+        es_observacion: false
+      }
+      console.log('resultado del dialogo: ' + data)
+      if (data === true) {
+        buscarControlCobro(this.colocacion.id_colocacion).then(response => {
+          this.dataControlCobro = response.data
+        })
+        this.$notify({
+          title: 'Exito!',
+          message: 'Observación Ha Sido Guardada',
+          type: 'success'
+        })
+      }
+    },
     buscarPorDocumento() {
       this.loading = true
+      this.limpiarTablas()
       buscarCreditoPorDocumento(this.id_identificacion, this.id_persona).then(response => {
         this.dataColocacion = response.data
         this.loading = false
@@ -350,6 +464,11 @@ export default {
       }).catch(() => {
         this.dialogDireccionVisible = false
       })
+    },
+    limpiarTablas() {
+      this.dataColocacion = null
+      this.dataControlCobro = null
+      this.dataDireccion = null
     }
   }
 }

@@ -77,6 +77,8 @@ GET     /api/col/busc/:i/:p             controllers.ColocacionController.buscarC
 GET     /api/coco/bpd/:i/:p             controllers.ControlCobroController.obtenerCreditosPorDocumento(i: Int, p: String)
 GET     /api/coco/bpe/:e/:i/:f/:a       controllers.ControlCobroController.obtenerCreditosPorEstado(e: Int, i: Int, f: Int, a: Int)
 GET     /api/coco/bdp/:i/:p             controllers.ControlCobroController.obtenerDireccion(i: Int, p: String)
+GET     /api/coco/bcc/:i                controllers.ControlCobroController.obtenerControlCobro(i: String)
+POST    /api/coco/ccs                   controllers.ControlCobroController.agregar
 
 
 # Tipos
@@ -115,6 +117,13 @@ POST   /api/soex/                       controllers.SolicitudExternaController.c
 # Factura
 GET    /api/fact/bpn/:n                 controllers.FacturaController.buscarPorNumero(n: Long)
 GET    /api/fact/epn/:n                 controllers.FacturaController.enviarFactura(n: Long)
+
+# Extracto
+GET    /api/exco/oec/:i                 controllers.ExtractoColocacionController.obtener(i: String)
+GET    /api/exco/oed/:i/:c/:f           controllers.ExtractoColocacionDetalladoController.obtener(i: String, c: Int, f: Long)
+
+# Puc
+GET    /api/puc/ocn/:c                  controllers.PucController.obtenerNombre(c: String)
 
 # Http
 GET    /api/http/status                 controllers.HttpClientController.status

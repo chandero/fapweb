@@ -46,5 +46,27 @@ class ControlCobroController @Inject()(
         }
     }
 
+    def obtenerControlCobro(id_colocacion: String) = authenticatedUserAction.async {
+        implicit request: Request[AnyContent] =>
+        cService.obtenerControlCobro(id_colocacion).map { c =>
+          Ok(Json.toJson(c))
+        }
+    }
 
+    def agregar = authenticatedUserAction.async {
+        implicit request: Request[AnyContent] =>
+        val json = request.body.asJson.get
+        val cc = json.as[ControlCobro]
+        val usua_id = Utility.extraerUsuario(request) match {
+            case Some(u) => u
+            case None => 0
+        }
+        cService.agregar(cc, usua_id).map { result =>
+          if (result) {
+              Ok
+          } else {
+              NotAcceptable
+          }
+        }
+    }
 }

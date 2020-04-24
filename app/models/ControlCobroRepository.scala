@@ -23,7 +23,8 @@ import scala.collection.mutable
 
 import utilities.Funcion
 
-case class ControlCobro(
+case class ControlCobroVista(
+    id_agencia: Option[Int],
     id_colocacion: Option[String],
     nombre: Option[String],
     saldo: Option[BigDecimal],
@@ -50,14 +51,27 @@ case class Compromiso(
     id_empleado: Option[String]
 )
 
-object ControlCobro {
+case class ControlCobro (
+    id_agencia: Option[Long],
+    id_colocacion: Option[String],
+    fecha_observacion: Option[DateTime],
+    observacion: Option[String],
+    es_observacion: Option[Int],
+    es_compromiso: Option[Int],
+    fecha_compromiso: Option[DateTime],
+    id_usuario: Option[String],
+    empleado: Option[String]
+)
+
+object ControlCobroVista {
   implicit val yourJodaDateReads =
     JodaReads.jodaDateReads("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
   implicit val yourJodaDateWrites =
     JodaWrites.jodaDateWrites("yyyy-MM-dd'T'HH:mm:ss.SSSZ'")
     
-  implicit val write = new Writes[ControlCobro] {
-    def writes(e: ControlCobro) = Json.obj(
+  implicit val write = new Writes[ControlCobroVista] {
+    def writes(e: ControlCobroVista) = Json.obj(
+        "id_agencia" -> e.id_agencia,
         "id_colocacion" -> e.id_colocacion,
         "nombre" -> e.nombre,
         "saldo" -> e.saldo,
@@ -74,7 +88,8 @@ object ControlCobro {
     )
   }
 
-  implicit val rReads: Reads[ControlCobro] = (
+  implicit val rReads: Reads[ControlCobroVista] = (
+    (__ \ "id_agencia").readNullable[Int] and
     (__ \ "id_colocacion").readNullable[String] and
     (__ \ "nombre").readNullable[String] and
     (__ \ "saldo").readNullable[BigDecimal] and
@@ -88,7 +103,7 @@ object ControlCobro {
     (__ \ "tipo_cuota").readNullable[String] and
     (__ \ "tiene_compromiso").readNullable[String] and
     (__ \ "centro_costo").readNullable[String]
-  )(ControlCobro.apply _)    
+  )(ControlCobroVista.apply _)
 }
 
 object Compromiso {
@@ -106,7 +121,7 @@ object Compromiso {
         "comp_fecha" -> e.comp_fecha,
         "comp_fechacompromiso" -> e.comp_fechacompromiso,
         "comp_repetircada" -> e.comp_repetircada,
-        "id_empleado" -> e.id_empleado
+        "id_empleado" -> e.id_empleado,
     )
   }
 
@@ -122,13 +137,80 @@ object Compromiso {
   )(Compromiso.apply _) 
 }
 
-class ControlCobroRepository @Inject()(dbapi: DBApi, _f: Funcion)(
+object ControlCobro {
+  implicit val yourJodaDateReads =
+    JodaReads.jodaDateReads("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+  implicit val yourJodaDateWrites =
+    JodaWrites.jodaDateWrites("yyyy-MM-dd'T'HH:mm:ss.SSSZ'")
+
+  implicit val write = new Writes[ControlCobro] {
+    def writes(e: ControlCobro) = Json.obj(
+        "id_agencia" -> e.id_agencia,
+        "id_colocacion" -> e.id_colocacion,
+        "fecha_observacion" -> e.fecha_observacion,
+        "observacion" -> e.observacion,
+        "es_observacion" -> e.es_observacion,
+        "es_compromiso" -> e.es_compromiso,
+        "fecha_compromiso" -> e.fecha_compromiso,
+        "id_usuario" -> e.id_usuario,
+        "empleado" -> e.empleado
+    )
+  }
+
+  implicit val rReads: Reads[ControlCobro] = (
+    (__ \ "id_agencia").readNullable[Long] and
+    (__ \ "id_colocacion").readNullable[String] and
+    (__ \ "fecha_observacion").readNullable[DateTime] and
+    (__ \ "observacion").readNullable[String] and
+    (__ \ "es_observacion").readNullable[Int] and
+    (__ \ "es_compromiso").readNullable[Int] and
+    (__ \ "fecha_compromiso").readNullable[DateTime] and
+    (__ \ "id_usuario").readNullable[String] and
+    (__ \ "empleado").readNullable[String]
+  )(ControlCobro.apply _) 
+
+  val _set = {
+    get[Option[Long]]("id_agencia") ~
+    get[Option[String]]("id_colocacion") ~
+    get[Option[DateTime]]("fecha_observacion") ~
+    get[Option[String]]("observacion") ~
+    get[Option[Int]]("es_observacion") ~
+    get[Option[Int]]("es_compromiso") ~
+    get[Option[DateTime]]("fecha_compromiso") ~
+    get[Option[String]]("id_usuario") ~
+    get[Option[String]]("empleado") map {
+      case 
+        id_agencia ~
+        id_colocacion ~
+        fecha_observacion ~
+        observacion ~
+        es_observacion ~
+        es_compromiso ~
+        fecha_compromiso ~
+        id_usuario ~
+        empleado => ControlCobro(
+          id_agencia,
+          id_colocacion,
+          fecha_observacion,
+          observacion,
+          es_observacion,
+          es_compromiso,
+          fecha_compromiso,
+          id_usuario,
+          empleado      
+        )
+    }
+  }
+
+}
+
+class ControlCobroRepository @Inject()(dbapi: DBApi, _f: Funcion, _uService: UsuarioRepository)(
     implicit ec: DatabaseExecutionContext
 ) {
   private val db = dbapi.database("default")
 
-  def obtenerCreditos(estado: Int, dias_ini: Int, dias_fin: Int, ases_id: Int): Future[Iterable[ControlCobro]] = Future[Iterable[ControlCobro]] {
-      var _lista = new mutable.ListBuffer[ControlCobro]()      
+  def obtenerCreditos(estado: Int, dias_ini: Int, dias_fin: Int, ases_id: Int): Future[Iterable[ControlCobroVista]] = Future[Iterable[ControlCobroVista]] {
+      var _lista = new mutable.ListBuffer[ControlCobroVista]()      
       val creditos = db.withConnection { implicit connection =>
             var query = """SELECT a.ID_AGENCIA, a.ID_COLOCACION, a.ID_IDENTIFICACION, a.ID_PERSONA, a.ID_CLASIFICACION, a.ID_LINEA, a.ID_INVERSION, a.ID_RESPALDO, a.ID_GARANTIA, a.ID_CATEGORIA, a.ID_EVALUACION, a.FECHA_DESEMBOLSO, a.VALOR_DESEMBOLSO, a.PLAZO_COLOCACION, a.FECHA_VENCIMIENTO, a.TIPO_INTERES, a.ID_INTERES, a.TASA_INTERES_CORRIENTE, a.TASA_INTERES_MORA, a.PUNTOS_INTERES, a.ID_TIPO_CUOTA, a.AMORTIZA_CAPITAL, a.AMORTIZA_INTERES, a.PERIODO_GRACIA, a.DIAS_PRORROGADOS, a.VALOR_CUOTA, a.ABONOS_CAPITAL, a.FECHA_CAPITAL, a.FECHA_INTERES, a.ID_ESTADO_COLOCACION, a.ID_ENTE_APROBADOR, a.ID_EMPLEADO, a.NOTA_CONTABLE, a.NUMERO_CUENTA, a.ES_ANORMAL, a.DIAS_PAGO, a.RECIPROCIDAD, a.FECHA_SALDADO, 'D' AS tipo FROM \"col$colocacion\" a
               LEFT JOIN COLOCACIONASESOR r ON r.ID_COLOCACION = a.ID_COLOCACION
@@ -187,7 +269,8 @@ class ControlCobroRepository @Inject()(dbapi: DBApi, _f: Funcion)(
         estado match {
         case -1 =>
           if (dias_mora >= dias_ini && dias_mora <= dias_fin) {
-            var _cc = new ControlCobro(
+            var _cc = new ControlCobroVista(
+                                        c._1._1,
                                         c._1._2, 
                                         nombre, 
                                         Some(deuda), 
@@ -205,7 +288,8 @@ class ControlCobroRepository @Inject()(dbapi: DBApi, _f: Funcion)(
           }
         case estCol =>
             if (dias_mora >= dias_ini && dias_mora <= dias_fin) {
-              var _cc = new ControlCobro(
+              var _cc = new ControlCobroVista(
+                                        c._1._1,
                                         c._1._2, 
                                         nombre, 
                                         Some(deuda), 
@@ -226,8 +310,8 @@ class ControlCobroRepository @Inject()(dbapi: DBApi, _f: Funcion)(
       _lista.toList
     }
 
-  def obtenerCreditos(id_identificacion: Int, id_persona: String): Future[Iterable[ControlCobro]] = Future[Iterable[ControlCobro]] {
-      var _lista = new mutable.ListBuffer[ControlCobro]()      
+  def obtenerCreditos(id_identificacion: Int, id_persona: String): Future[Iterable[ControlCobroVista]] = Future[Iterable[ControlCobroVista]] {
+      var _lista = new mutable.ListBuffer[ControlCobroVista]()      
       val creditos = db.withConnection { implicit connection =>
             SQL("""SELECT a.ID_AGENCIA, a.ID_COLOCACION, a.ID_IDENTIFICACION, a.ID_PERSONA, a.ID_CLASIFICACION, a.ID_LINEA, a.ID_INVERSION, a.ID_RESPALDO, a.ID_GARANTIA, a.ID_CATEGORIA, a.ID_EVALUACION, a.FECHA_DESEMBOLSO, a.VALOR_DESEMBOLSO, a.PLAZO_COLOCACION, a.FECHA_VENCIMIENTO, a.TIPO_INTERES, a.ID_INTERES, a.TASA_INTERES_CORRIENTE, a.TASA_INTERES_MORA, a.PUNTOS_INTERES, a.ID_TIPO_CUOTA, a.AMORTIZA_CAPITAL, a.AMORTIZA_INTERES, a.PERIODO_GRACIA, a.DIAS_PRORROGADOS, a.VALOR_CUOTA, a.ABONOS_CAPITAL, a.FECHA_CAPITAL, a.FECHA_INTERES, a.ID_ESTADO_COLOCACION, a.ID_ENTE_APROBADOR, a.ID_EMPLEADO, a.NOTA_CONTABLE, a.NUMERO_CUENTA, a.ES_ANORMAL, a.DIAS_PAGO, a.RECIPROCIDAD, a.FECHA_SALDADO, 'D' AS tipo FROM \"col$colocacion\" a
              WHERE a.ID_IDENTIFICACION = {id_identificacion} and a.ID_PERSONA = {id_persona} and a.ID_ESTADO_COLOCACION IN (0,1,2,3,8,9)
@@ -281,7 +365,8 @@ class ControlCobroRepository @Inject()(dbapi: DBApi, _f: Funcion)(
           dias_mora = _f.obtenerDiasMora(c._1._2.get)
           if (dias_mora < -1) { dias_mora += 2 }
         }
-        var _cc = new ControlCobro(
+        var _cc = new ControlCobroVista(
+                                        c._1._1,
                                         c._1._2, 
                                         nombre, 
                                         Some(deuda), 
@@ -314,5 +399,49 @@ class ControlCobroRepository @Inject()(dbapi: DBApi, _f: Funcion)(
           .as(Direccion._set *)
     }
     direcciones
+  }
+
+  def obtenerControlCobro(id_colocacion: String): Future[Iterable[ControlCobro]] = Future[Iterable[ControlCobro]] {
+    val lista = db.withConnection { implicit connection =>
+      SQL("""SELECT c.ID_AGENCIA,c.ID_COLOCACION,c.FECHA_OBSERVACION,c.OBSERVACION, c.ES_OBSERVACION,c.ES_COMPROMISO, c.FECHA_COMPROMISO, c.ID_USUARIO, e.NOMBRE || ' ' || e.PRIMER_APELLIDO || ' ' || e.SEGUNDO_APELLIDO AS EMPLEADO from "col$controlcobro" c
+             INNER JOIN "gen$empleado" e ON (e.ID_EMPLEADO = c.ID_USUARIO)
+             WHERE c.ID_COLOCACION = {id_colocacion} ORDER BY FECHA_OBSERVACION DESC""").
+             on(
+               'id_colocacion -> id_colocacion
+             ).as(ControlCobro._set *)
+    }
+    lista
+  }
+
+  def agregar(cc: ControlCobro, usua_id: Long): Future[Boolean] = {
+    _uService.buscarPorId(usua_id).map { empleado =>
+      var id_empleado:Option[String] = None
+      empleado match {
+        case Some(e) => id_empleado = e.id_empleado
+        case None => None
+      }
+      db.withConnection { implicit connection =>
+        SQL("""INSERT INTO "col$controlcobro" VALUES (
+          {id_agencia}, 
+          {id_colocacion}, 
+          {fecha_observacion}, 
+          {observacion}, 
+          {es_observacion}, 
+          {es_compromiso}, 
+          {fecha_compromiso}, 
+          {id_empleado}
+        )""").
+        on(
+        'id_agencia -> cc.id_agencia,
+        'id_colocacion -> cc.id_colocacion,
+        'fecha_observacion -> cc.fecha_observacion,
+        'observacion -> cc.observacion,
+        'es_observacion -> cc.es_observacion,
+        'es_compromiso -> cc.es_compromiso,
+        'fecha_compromiso -> cc.fecha_compromiso,
+        'id_empleado -> id_empleado
+       ).executeUpdate() > 0
+      }
+    }
   }
 }

@@ -11,6 +11,8 @@ import play.api.libs.json.JodaWrites
 import play.api.libs.functional.syntax._
 
 import scala.util.control.Breaks._
+import scala.math.pow
+import scala.math.BigDecimal
 
 import anorm._
 import anorm.SqlParser.{get, str, int, date}
@@ -246,5 +248,24 @@ class Funcion @Inject()(dbapi: DBApi){
 
     val _response = new DateTime(_anho, _mes, _dia, 0, 0)
     _response
+  }
+
+
+  def tasaNominalVencida(tasa_efectiva: Double, amortizacion: Int): Double = {
+    var _amortiza = amortizacion
+    if (_amortiza < 30) {_amortiza = 30}
+    var _factor = _amortiza / 30
+    _factor = 12 / _factor
+    var _potencia = pow(1+(tasa_efectiva/100),(1/_factor))
+    _potencia = ((_potencia-1)*_factor*100)
+    round2(_potencia)
+  }
+
+  def round2(valor: Double) = {
+    (valor * 100).round / 100.toDouble
+  }
+
+  def round0(valor: Double) = {
+    (valor).round
   }
 }

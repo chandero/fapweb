@@ -23,7 +23,14 @@ import org.joda.time.LocalDate
 
 import utilities._
 
-case class Tabla(cuot_num:Int, cuot_saldo:BigDecimal, cuot_capital:BigDecimal, cuot_interes:BigDecimal, cuot_otros:BigDecimal)
+case class Tabla(
+                  cuot_num: Int, 
+                  cuot_fecha: DateTime, 
+                  cuot_saldo: BigDecimal, 
+                  cuot_capital: BigDecimal, 
+                  cuot_interes: BigDecimal, 
+                  cuot_otros: BigDecimal
+                )
 
 case class ADescontar(id_descuento: Long,
                       codigo: String,
@@ -56,6 +63,7 @@ object Tabla {
     implicit val tablaWrites = new Writes[Tabla] {
      def writes(tabla: Tabla) = Json.obj(
          "cuot_num" -> tabla.cuot_num,
+         "cuot_fecha" -> tabla.cuot_fecha,
          "cuot_saldo" -> tabla.cuot_saldo,
          "cuot_capital" -> tabla.cuot_capital,
          "cuot_interes" -> tabla.cuot_interes,
@@ -64,12 +72,32 @@ object Tabla {
     }
     implicit val tablaReads: Reads[Tabla] = (
        (__ \ "cuot_num").read[Int] and
+       (__ \ "cuot_fecha").read[DateTime] and
        (__ \ "cuot_saldo").read[BigDecimal] and
        (__ \ "cuot_capital").read[BigDecimal] and
        (__ \ "cuot_interes").read[BigDecimal] and
        (__ \ "cuot_otros").read[BigDecimal]
     )(Tabla.apply _)
-    
+
+    val _set = {
+        get[Int]("cuota_numero") ~
+        get[DateTime]("fecha_a_pagar") ~
+        get[BigDecimal]("capital_a_pagar") ~
+        get[BigDecimal]("interes_a_pagar") map {
+            case 
+                cuot_num ~
+                cuot_fecha ~
+                cuot_capital ~
+                cuot_interes => Tabla(
+                    cuot_num,
+                    cuot_fecha,
+                    0,
+                    cuot_capital,
+                    cuot_interes,
+                    0
+                )
+        }
+    }
 }
 
 object ADescontar {
@@ -218,7 +246,7 @@ object Adicion {
     )(Adicion.apply _)   
 }
 
-class CalculoRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutionContext) {
+class CalculoRepository @Inject()(dbapi: DBApi, _globalesCol: GlobalesCol, _funcion: Funcion)(implicit ec: DatabaseExecutionContext) {
     private val db = dbapi.database("default")
 
     /**
@@ -226,15 +254,14 @@ class CalculoRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutionCo
     */
     private val simple = {
         get[Int]("tabla.cout_num") ~ 
+        get[DateTime]("tabla.cout_fecha") ~
         get[BigDecimal]("tabla.cuot_saldo") ~
         get[BigDecimal]("tabla.cuot_capital") ~
         get[BigDecimal]("tabla.cuot_interes") ~
         get[BigDecimal]("tabla.cuot_otros") map {
-           case cuot_num ~ cuot_saldo ~ cuot_capital ~ cuot_interes ~ cuot_otros => Tabla(cuot_num, cuot_saldo, cuot_capital, cuot_interes, cuot_otros)
+           case cuot_num ~ cuot_fecha ~ cuot_saldo ~ cuot_capital ~ cuot_interes ~ cuot_otros => Tabla(cuot_num, cuot_fecha, cuot_saldo, cuot_capital, cuot_interes, cuot_otros)
         }
     }
-
-
 
     /**
         Procesar calculo de la tabla
@@ -245,10 +272,12 @@ class CalculoRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutionCo
                     Leer la tasa a aplicar en base a la línea
                      */
                      var list = new  ListBuffer[Tabla]
+                     var _listResult = new ListBuffer[Tabla]
                      var _dsDescuento = new ListBuffer[Tabla]
                      var amortizacion:Int = 0
                      var cuot_saldo:BigDecimal = valor
                      val plazo = plazo_mes * 30
+                     var cuot_fecha:DateTime = new DateTime()
                      if (linea == 3){
                          amortizacion = plazo
                      } else {
@@ -265,20 +294,31 @@ class CalculoRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutionCo
                      val cuota = Conversion.cuotafija(valor, plazo, tasae, amortizacion)
                      println("cuota:"+cuota)
 
-                     var i = 0;
+                     var i = 0
                      for (i <- 1 to (plazo/amortizacion)){
                         println("tasan:"+tasan)
                         var cuot_interes:BigDecimal = Conversion.round((cuot_saldo * (tasan/100)*(amortizacion)/360).doubleValue,0)
-                        println("interes:"+cuot_interes)
+                        println("interes: " + cuot_interes)
                         var cuot_capital = cuota - cuot_interes
                         var cuot_otros:BigDecimal = 0
-                       
-                        val tabla = new Tabla(i,cuot_saldo, cuot_capital, cuot_interes, cuot_otros)
+                        val tabla = new Tabla(i, cuot_fecha, cuot_saldo, cuot_capital, cuot_interes, cuot_otros)
+                        cuot_fecha = _funcion.calculoFecha(cuot_fecha, 30)
                         list += tabla
                         cuot_saldo = cuot_saldo - cuot_capital
                         println(tabla)
                      }
-                     list.toList
+                     val _descuentoColocacion = new ListBuffer[DescuentoColocacion]()
+                     val _descuento = SQL("""SELECT * FROM "col$descuentos" WHERE ES_ACTIVO = 1""").as(Descuento._set *)
+                     _descuento.foreach( d => {
+                         val _dc = new DescuentoColocacion(d.id_descuento, d.descripcion_descuento, true)
+                         _descuentoColocacion += _dc
+                     })
+                     val _adescontar = _globalesCol.CalcularDescuentoPorCuota(list, _descuentoColocacion.toList, valor, amortizacion, valor)
+                     for( i <- 1 to list.length){
+                        _listResult += new Tabla(list(i).cuot_num, list(i).cuot_fecha, list(i).cuot_saldo, list(i).cuot_capital, list(i).cuot_interes, _adescontar(i).valor)
+                     }
+                     
+                     _listResult.toList
                 }
      }
 }

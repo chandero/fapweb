@@ -34,3 +34,24 @@ export function buscarCreditoPorEstado(es, fi, ff, ases_id) {
     method: 'get'
   })
 }
+
+export function buscarControlCobro(id) {
+  const data = {
+    id
+  }
+  return request({
+    url: '/coco/bcc/' + data.id,
+    method: 'get'
+  })
+}
+
+export function agregarControlCobro(cc) {
+  const data = {
+    cc
+  }
+  return request({
+    url: '/coco/ccs',
+    method: 'post',
+    data: data.cc
+  })
+}
