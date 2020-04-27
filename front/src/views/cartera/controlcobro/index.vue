@@ -317,9 +317,9 @@ export default {
       ases_id: -1,
       tipo_documento: null,
       tipos_estado_colocacion: null,
-      dataColocacion: null,
-      dataDireccion: null,
-      dataControlCobro: null,
+      dataColocacion: [],
+      dataDireccion: [],
+      dataControlCobro: [],
       loading: false,
       direcciones: null,
       tiposdireccion: [],
@@ -330,7 +330,8 @@ export default {
       dialogDireccionVisible: false,
       showBuscarPersonaDlg: false,
       showControlCobroDlg: false,
-      showExtractoDlg: false
+      showExtractoDlg: false,
+      loader: null
     }
   },
   beforeMount() {
@@ -378,11 +379,14 @@ export default {
       return ''
     },
     buscarExtracto(id_colocacion) {
+      this.mostrarLoader()
       this.extracto_colocacion = id_colocacion
       obtenerExtractoColocacion(id_colocacion).then(response => {
         this.extracto_data = response.data
         this.showExtractoDlg = true
+        this.ocultarLoader()
       }).catch(error => {
+        this.ocultarLoader()
         console.log('Error buscando extracto colocación: ' + error)
       })
     },
@@ -444,6 +448,7 @@ export default {
         text: 'Cargando...',
         background: 'rgba(0, 0, 0, 0.7)'
       })
+      this.limpiarTablas()
       obtenerPersona(this.id_identificacion, this.id_persona).then(response => {
         loading.close()
         if (response.status === 200) {
@@ -466,9 +471,25 @@ export default {
       })
     },
     limpiarTablas() {
-      this.dataColocacion = null
-      this.dataControlCobro = null
-      this.dataDireccion = null
+      this.dataColocacion = []
+      this.dataControlCobro = []
+      this.dataDireccion = []
+      this.colocacion = {
+        id_agencia: 1,
+        id_colocacion: '00000000000'
+      }
+    },
+    mostrarLoader() {
+      this.loader = this.$loading({
+        lock: true,
+        text: 'Cargando',
+        background: 'rgba(0, 0, 0, 0.7)'
+      })
+    },
+    ocultarLoader() {
+      if (this.loader) {
+        this.loader.close()
+      }
     }
   }
 }

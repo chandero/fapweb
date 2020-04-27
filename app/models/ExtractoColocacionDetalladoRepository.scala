@@ -29,6 +29,7 @@ case class ExtractoColocacionDetallado(
     fecha_extracto: Option[DateTime],
     hora_extracto: Option[DateTime],
     codigo_puc: Option[String],
+    codigo_nombre: Option[String],
     fecha_inicial: Option[DateTime],
     fecha_final: Option[DateTime],
     dias_aplicados: Option[Int],
@@ -51,6 +52,7 @@ object ExtractoColocacionDetallado {
       "fecha_extracto" -> e.fecha_extracto,
       "hora_extracto" -> e.hora_extracto,
       "codigo_puc" -> e.codigo_puc,
+      "codigo_nombre" -> e.codigo_nombre,
       "fecha_inicial" -> e.fecha_inicial,
       "fecha_final" -> e.fecha_final,
       "dias_aplicados" -> e.dias_aplicados,
@@ -67,6 +69,7 @@ object ExtractoColocacionDetallado {
     (__ \ "fecha_extracto").readNullable[DateTime] and
     (__ \ "hora_extracto").readNullable[DateTime] and
     (__ \ "codigo_puc").readNullable[String] and
+    (__ \ "codigo_nombre").readNullable[String] and
     (__ \ "fecha_inicial").readNullable[DateTime] and
     (__ \ "fecha_final").readNullable[DateTime] and
     (__ \ "dias_aplicados").readNullable[Int] and
@@ -82,6 +85,7 @@ object ExtractoColocacionDetallado {
     get[Option[DateTime]]("fecha_extracto") ~
     get[Option[DateTime]]("hora_extracto") ~
     get[Option[String]]("codigo_puc") ~
+    get[Option[String]]("codigo_nombre") ~    
     get[Option[DateTime]]("fecha_inicial")  ~
     get[Option[DateTime]]("fecha_final") ~
     get[Option[Int]]("dias_aplicados") ~
@@ -95,6 +99,7 @@ object ExtractoColocacionDetallado {
         fecha_extracto ~
         hora_extracto ~
         codigo_puc ~
+        codigo_nombre ~
         fecha_inicial  ~
         fecha_final ~
         dias_aplicados ~
@@ -107,6 +112,7 @@ object ExtractoColocacionDetallado {
                 fecha_extracto,
                 hora_extracto,
                 codigo_puc,
+                codigo_nombre,
                 fecha_inicial,
                 fecha_final,
                 dias_aplicados,
@@ -124,14 +130,16 @@ class ExtractoColocacionDetalladoRepository @Inject()(dbapi: DBApi, colocacionSe
 
   def obtener(id_colocacion: String, id_cbte_colocacion: Int, fecha_extracto: Long): Future[Iterable[ExtractoColocacionDetallado]] = Future {
     db.withConnection { implicit connection => 
-      val _fecha_extracto = new DateTime(fecha_extracto)
-      SQL("""SELECT * FROM "col$extractodet" 
+      var _fecha_extracto = Calendar.getInstance()
+      _fecha_extracto.setTimeInMillis(fecha_extracto)
+      SQL("""SELECT e.*, p.NOMBRE AS CODIGO_NOMBRE FROM "col$extractodet" e
+              LEFT JOIN "con$puc" p ON p.CODIGO = e.CODIGO_PUC
               WHERE ID_COLOCACION = {id_colocacion} and ID_CBTE_COLOCACION = {id_cbte_colocacion} and FECHA_EXTRACTO = {fecha_extracto} 
-              ORDER BY CODIGO ASC""").
+              ORDER BY CODIGO_PUC ASC""").
           on(
             'id_colocacion -> id_colocacion,
             'id_cbte_colocacion -> id_cbte_colocacion,
-            'fecha_extracto -> fecha_extracto
+            'fecha_extracto -> _fecha_extracto.getTime()
           ).as(ExtractoColocacionDetallado._set *)
     }
   }

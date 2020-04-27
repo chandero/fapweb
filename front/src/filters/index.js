@@ -40,3 +40,13 @@ export function numberFormatter(num, digits) {
 export function toThousandFilter(num) {
   return (+num || 0).toString().replace(/^-?\d+/g, m => m.replace(/(?=(?!\b)(\d{3})+$)/g, ','))
 }
+
+export function fm_truncate(value, length) {
+  if (!value) return ''
+  value = value.toString()
+  if (value.length > length) {
+    return value.substring(0, length) + '...'
+  } else {
+    return value
+  }
+}

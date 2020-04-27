@@ -22,6 +22,31 @@ import org.joda.time.DateTime
 import org.joda.time.LocalDate
 import scala.collection.mutable
 
+case class ExtractoColocacionAdicional(
+  dias_mora: Option[Int],
+  tipo_abono: Option[Int]
+)
+
+object ExtractoColocacionAdicional {
+  implicit val yourJodaDateReads =
+    JodaReads.jodaDateReads("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+  implicit val yourJodaDateWrites =
+    JodaWrites.jodaDateWrites("yyyy-MM-dd'T'HH:mm:ss.SSSZ'")
+
+  implicit val wWrites = new Writes[ExtractoColocacionAdicional] {
+    def writes(e: ExtractoColocacionAdicional) = Json.obj(
+      "dias_mora" -> e.dias_mora,
+      "tipo_abono" -> e.tipo_abono   
+    )
+  }
+
+  implicit val rReads: Reads[ExtractoColocacionAdicional] = (
+    (__ \ "dias_mora").readNullable[Int] and
+    (__ \ "tipo_abono").readNullable[Int]
+  )(ExtractoColocacionAdicional.apply _)
+
+}
+
 case class ExtractoColocacion(
     id_agencia: Option[Int],
     id_cbte_colocacion: Option[Int],
@@ -44,7 +69,7 @@ case class ExtractoColocacion(
     id_empleado: Option[String],
     interes_pago_hasta: Option[DateTime],
     capital_pago_hasta: Option[DateTime],
-    tipo_abono: Option[Int]
+    adicional: Option[ExtractoColocacionAdicional]
 )
 
 object ExtractoColocacion {
@@ -76,7 +101,7 @@ object ExtractoColocacion {
       "id_empleado" -> e.id_empleado,
       "interes_pago_hasta" -> e.interes_pago_hasta,
       "capital_pago_hasta" -> e.capital_pago_hasta,
-      "tipo_abono" -> e.tipo_abono,      
+      "adicional" -> e.adicional,      
     )
   }
 
@@ -102,7 +127,7 @@ object ExtractoColocacion {
     (__ \ "id_empleado").readNullable[String] and
     (__ \ "interes_pago_hasta").readNullable[DateTime] and
     (__ \ "capital_pago_hasta").readNullable[DateTime] and
-    (__ \ "tipo_abono").readNullable[Int]
+    (__ \ "adicional").readNullable[ExtractoColocacionAdicional]
   )(ExtractoColocacion.apply _)
 
    val _set = {
@@ -149,7 +174,7 @@ object ExtractoColocacion {
         id_empleado ~
         interes_pago_hasta ~
         capital_pago_hasta ~
-        tipo_abono => ExtractoColocacion(
+        tipo_abono => (
             id_agencia,
             id_cbte_colocacion,
             id_colocacion,
@@ -184,12 +209,50 @@ class ExtractoColocacionRepository @Inject()(dbapi: DBApi, colocacionService: Co
   def obtener(id_colocacion: String):Future[Iterable[ExtractoColocacion]] = Future {
     var _list = new ListBuffer[ExtractoColocacion]()
     db.withConnection { implicit connection =>
-      SQL("""SELECT * FROM "col$extracto" WHERE ID_COLOCACION = {id_colocacion}  
+      val _rs = SQL("""SELECT * FROM "col$extracto" WHERE ID_COLOCACION = {id_colocacion}  
              ORDER BY FECHA_EXTRACTO, HORA_EXTRACTO""").
         on(
           'id_colocacion -> id_colocacion
         ).as(ExtractoColocacion._set *)
+      _rs.foreach { r =>
+            val dias = SQL("""SELECT SUM(e.DIAS_APLICADOS) AS DIAS FROM "col$extractodet" e
+                      WHERE e.ID_COLOCACION = {id_colocacion} AND 
+                      e.ID_CBTE_COLOCACION = {id_cbte_colocacion} AND 
+                      e.FECHA_EXTRACTO = {fecha_extracto} AND e.TASA_LIQUIDACION > {tasa_liquidacion}""").
+                      on(
+                        'id_colocacion -> r._3,
+                        'id_cbte_colocacion -> r._2,
+                        'fecha_extracto -> r._4,
+                        'tasa_liquidacion -> r._18
+                      ).
+                      as(SqlParser.scalar[Int].singleOpt)
+            var a = new ExtractoColocacionAdicional(dias, r._22)
+            _list += new ExtractoColocacion(
+                            r._1, 
+                            r._2,
+                            r._3,
+                            r._4,
+                            r._5,
+                            r._6,
+                            r._7,
+                            r._8,
+                            r._9,
+                            r._10,
+                            r._11,
+                            r._12,
+                            r._13,
+                            r._14,
+                            r._15,
+                            r._16,
+                            r._17,
+                            r._18,
+                            r._19,
+                            r._20,
+                            r._21,
+                            Some(a)   
+            ) 
+        }
+      }
+      _list.toList
     }
-  }
-
 }
