@@ -21,7 +21,7 @@ import org.joda.time.DateTime
 import org.joda.time.LocalDate
 import scala.collection.mutable
 
-import utilities.Funcion
+import utilities._
 
 case class ControlCobroVista(
     id_agencia: Option[Int],
@@ -204,7 +204,7 @@ object ControlCobro {
 
 }
 
-class ControlCobroRepository @Inject()(dbapi: DBApi, _f: Funcion, _uService: UsuarioRepository)(
+class ControlCobroRepository @Inject()(dbapi: DBApi, _f: Funcion, _gcol: GlobalesCol, _uService: UsuarioRepository)(
     implicit ec: DatabaseExecutionContext
 ) {
   private val db = dbapi.database("default")
@@ -262,7 +262,7 @@ class ControlCobroRepository @Inject()(dbapi: DBApi, _f: Funcion, _uService: Usu
 
         var dias_mora = 0
         if (deuda > 0) {
-          dias_mora = _f.obtenerDiasMora(c._1._2.get)
+          dias_mora = _gcol.obtenerDiasMora(c._1._2.get)
           if (dias_mora < -1) { dias_mora += 2 }
         }        
         val estCol = c._6._5.get
@@ -362,7 +362,7 @@ class ControlCobroRepository @Inject()(dbapi: DBApi, _f: Funcion, _uService: Usu
 
         var dias_mora = 0
         if (deuda > 0) { 
-          dias_mora = _f.obtenerDiasMora(c._1._2.get)
+          dias_mora = _gcol.obtenerDiasMora(c._1._2.get)
           if (dias_mora < -1) { dias_mora += 2 }
         }
         var _cc = new ControlCobroVista(

@@ -94,6 +94,7 @@
       <el-row>
         <el-col>
           <el-table v-loading="loading" :data="dataColocacion" :row-class-name="tableRowClassName" highlight-current-row style="width: 100%; font-size: 12px;" max-height="350" @current-change="handleCurrentChange" >
+            <el-table-column type="selection" width="55" />
             <el-table-column sortable label="Colocación" prop="id_colocacion" width="110">
               <template slot-scope="scope">
                 <span style="margin-left: 10px">{{ scope.row.id_colocacion }}</span>
@@ -149,9 +150,14 @@
               label="Ver"
               width="140">
               <template slot-scope="scope">
-                <el-button type="primary" icon="el-icon-service" size="mini" circle title="Dirección y Teléfono" @click="buscarDireccion(scope.row.id_identificacion, scope.row.id_persona)" />
-                <el-button type="success" icon="el-icon-s-custom" size="mini" circle title="Codeudores"/>
-                <el-button type="warning" icon="el-icon-document" size="mini" circle title="Extracto" @click="buscarExtracto(scope.row.id_colocacion)" />
+                <el-dropdown :split-button="true" size="mini" type="primary" trigger="click">
+                  Info
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item><el-button type="primary" icon="el-icon-service" size="mini" circle title="Dirección y Teléfono" @click="buscarDireccion(scope.row)">Dirección</el-button></el-dropdown-item>
+                    <el-dropdown-item><el-button type="success" icon="el-icon-s-custom" size="mini" circle title="Garantías" @click="buscarGarantia(scope.row.id_colocacion)">Garantía</el-button></el-dropdown-item>
+                    <el-dropdown-item><el-button type="warning" icon="el-icon-document" size="mini" circle title="Extracto" @click="buscarExtracto(scope.row.id_colocacion)">Extracto</el-button></el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
               </template>
             </el-table-column>
           </el-table>
@@ -194,6 +200,10 @@
         </el-col>
       </el-row>
     </el-main>
+    <!-- Dialogo Garantias Colocacion -->
+    <el-dialog :visible.sync="showGarantiaDlg" :title="'Garantías Colocación: ' + extracto_colocacion" :show-close="false" :destroy-on-close="true" width="90%">
+      <garantias :colocacion="extracto_colocacion" :personal="personal" :real="real" :pignoracion="pignoracion" @cerrarGarantiaEvent="cerrarGarantiaEvento" />
+    </el-dialog>
     <!-- Dialogo Extracto Colocacion -->
     <el-dialog :visible.sync="showExtractoDlg" :title="'Extracto de Colocación : ' + extracto_colocacion" :show-close="false" :destroy-on-close="true" width="90%">
       <extracto-colocacion :colocacion="extracto_colocacion" :datos="extracto_data" @cerrarExtractoEvent="cerrarExtractoEvento" />
@@ -207,75 +217,8 @@
       <control-cobro :agencia="colocacion.id_agencia" :colocacion="colocacion.id_colocacion" :controlcobro="controlcobro" @savedEvent="validarAgregarControlCobro"/>
     </el-dialog>
     <!-- Dialogo de Direcciones-->
-    <el-dialog :visible.sync="dialogDireccionVisible" title="Direcciones" width="100%">
-      <el-row>
-        <el-col :xs="24" :sm="24" :md="1" :lg="1" :xl="1">
-          <span>Id</span>
-        </el-col>
-        <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
-          <span>Tipo Dirección</span>
-        </el-col>
-        <el-col :xs="24" :sm="24" :md="5" :lg="5" :xl="5">
-          <span>Dirección</span>
-        </el-col>
-        <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
-          <span>Barrio</span>
-        </el-col>
-        <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
-          <span>Municipio</span>
-        </el-col>
-        <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
-          <span>Teléfono</span>
-        </el-col>
-        <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
-          <span>Teléfono</span>
-        </el-col>
-        <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
-          <span>Teléfono</span>
-        </el-col>
-        <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
-          <span>Teléfono</span>
-        </el-col>
-      </el-row>
-      <el-form style="font-size: 12px;">
-        <el-row v-for="d in direcciones" :key="d.consecutivo" :gutter="4">
-          <el-col :xs="24" :sm="24" :md="1" :lg="1" :xl="1">
-            <el-form-item><span>{{ d.consecutivo }}</span></el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
-            <el-form-item>
-              <el-select v-model="d.id_direccion" placeholder="Dirección" disabled style="width: 100%;">
-                <el-option v-for="td in tiposdireccion" :key="td.id" :label="td.descripcion" :value="td.id" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
-            <el-form-item><el-input v-model="d.direccion" readonly /></el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="24" :md="3" :lg="3" :xl="3">
-            <el-form-item><el-input v-model="d.barrio" readonly /></el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
-            <el-form-item>
-              <el-select v-model="d.cod_municipio" placeholder="Municipio" disabled style="width: 100%;">
-                <el-option v-for="m in municipios" :key="m.cod_municipio" :label="m.nombre" :value="m.cod_municipio" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
-            <el-form-item><el-input v-model="d.telefono1" readonly style="font-size: 12px;" /></el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
-            <el-form-item><el-input v-model="d.telefono2" readonly style="font-size: 12px;" /></el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
-            <el-form-item><el-input v-model="d.telefono3" readonly style="font-size: 12px;" /></el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
-            <el-form-item><el-input v-model="d.telefono4" readonly style="font-size: 12px;" /></el-form-item>
-          </el-col>
-        </el-row>
-      </el-form>
+    <el-dialog :visible.sync="showDireccionDlg" :show-close="false" :destroy-on-close="true" :title="'Dirección y Teléfono de ' + nombrecompleto" width="90%" append-to-body>
+      <direccion :direcciones="direcciones" @cerrarDireccionEvent="cerrarDireccionEvento"/>
     </el-dialog>
   </el-container>
 
@@ -284,6 +227,9 @@
 import BuscarPersonaComponent from '@/components/BuscarPersonaNombre'
 import ControlCobroComponent from '@/components/ControlCobro'
 import ExtractoColocacionComponent from '@/components/ExtractoColocacion'
+import GarantiaCreditoComponent from '@/components/GarantiaCredito'
+import DireccionPersonaComponent from '@/components/DireccionPersona'
+import { obtenerGarantiaPersonal, obtenerGarantiaReal } from '@/api/credito'
 import { obtenerExtractoColocacion } from '@/api/extractocolocacion'
 import { obtenerListaTipoIdentificacion, obtenerListaTipoEstadoColocacion, obtenerListaTipoDireccion, obtenerListaMunicipios, obtenerListaAsesores } from '@/api/tipos'
 import { buscarCreditoPorEstado, buscarCreditoPorDocumento, buscarDireccionPersona, buscarControlCobro } from '@/api/controlcobro'
@@ -293,7 +239,9 @@ export default {
   components: {
     'buscar-por-nombre': BuscarPersonaComponent,
     'control-cobro': ControlCobroComponent,
-    'extracto-colocacion': ExtractoColocacionComponent
+    'extracto-colocacion': ExtractoColocacionComponent,
+    'garantias': GarantiaCreditoComponent,
+    'direccion': DireccionPersonaComponent
   },
   data() {
     return {
@@ -314,6 +262,7 @@ export default {
         es_observacion: false
       },
       nombre: null,
+      nombrecompleto: '',
       ases_id: -1,
       tipo_documento: null,
       tipos_estado_colocacion: null,
@@ -327,10 +276,14 @@ export default {
       asesores: [],
       extracto_colocacion: null,
       extracto_data: [],
-      dialogDireccionVisible: false,
+      personal: [],
+      real: [],
+      pignoracion: [],
+      showDireccionDlg: false,
       showBuscarPersonaDlg: false,
       showControlCobroDlg: false,
       showExtractoDlg: false,
+      showGarantiaDlg: false,
       loader: null
     }
   },
@@ -380,20 +333,40 @@ export default {
     },
     buscarExtracto(id_colocacion) {
       this.mostrarLoader()
-      this.extracto_colocacion = id_colocacion
       obtenerExtractoColocacion(id_colocacion).then(response => {
+        this.extracto_colocacion = id_colocacion
         this.extracto_data = response.data
         this.showExtractoDlg = true
         this.ocultarLoader()
       }).catch(error => {
         this.ocultarLoader()
-        console.log('Error buscando extracto colocación: ' + error)
+        this.$message.error('Error buscando extracto colocación: ' + error)
       })
     },
     cerrarExtractoEvento() {
       this.extracto_data = []
       this.extracto_colocacion = null
       this.showExtractoDlg = false
+    },
+    buscarGarantia(id_colocacion) {
+      console.log('estoy en garantias')
+      this.extracto_colocacion = id_colocacion
+      obtenerGarantiaPersonal(id_colocacion).then(response => {
+        this.personal = response.data
+        obtenerGarantiaReal(id_colocacion).then(response => {
+          this.real = response.data.filter(d => d.modelo_vehiculo === 0)
+          this.pignoracion = response.data.filter(d => d.modelo_vehiculo !== 0)
+          this.showGarantiaDlg = true
+        }).catch((error) => {
+          this.$message.error('Error obteniendo datos garantia real: ' + error)
+        })
+      }).catch((error) => {
+        this.$message.error('Error obteniendo datos garantia personal: ' + error)
+      })
+    },
+    cerrarGarantiaEvento() {
+      this.extracto_colocacion = null
+      this.showGarantiaDlg = false
     },
     buscarPorEstado() {
       this.loading = true
@@ -420,7 +393,6 @@ export default {
         observacion: null,
         es_observacion: false
       }
-      console.log('resultado del dialogo: ' + data)
       if (data === true) {
         buscarControlCobro(this.colocacion.id_colocacion).then(response => {
           this.dataControlCobro = response.data
@@ -460,15 +432,19 @@ export default {
         this.$alert('Persona No Existe', 'Buscando Persona')
       })
     },
-    buscarDireccion(i, p) {
+    buscarDireccion(persona) {
+      this.nombrecompleto = persona.nombre
       this.direcciones = []
-      buscarDireccionPersona(i, p).then(response => {
+      buscarDireccionPersona(persona.id_identificacion, persona.id_persona).then(response => {
         this.direcciones = response.data
-        console.log('Direcciones :' + this.direcciones)
-        this.dialogDireccionVisible = true
+        this.showDireccionDlg = true
       }).catch(() => {
-        this.dialogDireccionVisible = false
+        this.showDireccionDlg = false
       })
+    },
+    cerrarDireccionEvento() {
+      this.direcciones = []
+      this.showDireccionDlg = false
     },
     limpiarTablas() {
       this.dataColocacion = []

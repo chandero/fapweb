@@ -14,85 +14,10 @@ import scala.util.control.Breaks._
 import scala.math.pow
 import scala.math.BigDecimal
 
-import anorm._
-import anorm.SqlParser.{get, str, int, date}
-import anorm.JodaParameterMetaData._
-
 import org.joda.time.DateTime
 
 class Funcion @Inject()(dbapi: DBApi){
   private val db = dbapi.database("default")
-
-  def obtenerDiasMora(id_colocacion: String): Int = {
-    var dias = 0
-    val _fechaHoy = new DateTime()
-    var _fechaDesembolso = new DateTime()
-    val parser = 
-            int("ID_ESTADO_COLOCACION") ~ 
-            date("FECHA_DESEMBOLSO") ~ 
-            date("FECHA_INTERES") ~ 
-            int("ID_LINEA") ~
-            int("AMORTIZA_INTERES") ~
-            int("DIAS_PAGO") ~
-            str("INTERES") map {
-            case a ~ b ~ c ~ d ~ e ~ f ~ g => (a, b, c, d, e, f, g)
-    }
-    val c = db.withConnection { implicit connection =>
-        SQL("""
-           SELECT 
-                c.ID_ESTADO_COLOCACION,
-                c.FECHA_DESEMBOLSO,
-                c.FECHA_INTERES,
-                c.ID_LINEA,
-                c.AMORTIZA_INTERES,
-                c.DIAS_PAGO,
-                t.INTERES
-           FROM
-                "col$colocacion" c
-                INNER JOIN "col$tiposcuota" t ON (t.ID_TIPOS_CUOTA = c.ID_TIPO_CUOTA)
-           WHERE 
-                c.ID_COLOCACION = {id_colocacion}""").
-           on(
-               'id_colocacion -> id_colocacion
-           ).as(parser.single)
-    }
-
-    var fecha = c._3
-    val tipo = c._7
-    val amortiza = c._5
-
-    var _fecha = new DateTime()
-    if (tipo.equals("V")) {
-      _fecha = calculoFecha(new DateTime(fecha), amortiza)
-    }
-
-    _fecha = _fecha.plusDays(1)
-    _fechaDesembolso = new DateTime(c._2)
-    _fechaDesembolso = _fechaDesembolso.plusDays(c._6)
-    dias = diasEntreFechas(_fecha, _fechaHoy, _fechaDesembolso)
-
-    // validar si aplica periodo de gracia
-    val _parseGracia = str("ID_COLOCACION") ~ date("FECHA_REGISTRO") ~ int("DIAS") map { case a ~ b ~ c => (a,b,c)}
-    val gracia = db.withConnection { implicit connection =>
-      SQL("""SELECT ID_COLOCACION, FECHA_REGISTRO, DIAS FROM COL_PERIODO_GRACIA WHERE ID_COLOCACION = {id_colocacion}""").
-      on(
-        'id_colocacion -> id_colocacion
-      ).as(_parseGracia.singleOpt)
-    }
-
-    gracia match {
-      case Some(g) => {
-                        val _fi = new DateTime(g._2)
-                        val _ff = calculoFecha(new DateTime(g._2), g._3)
-                        if (_fi.getMillis() <= _fechaHoy.getMillis() && _ff.getMillis() >= _fechaHoy.getMillis()) {
-                          dias = 0
-                        }
-                      }
-      case None => None
-    }
-
-    dias
-  }
 
   def diasEntreFechas(_fi: DateTime, _ff: DateTime, _fechaCorte: DateTime) = {
         var _fechaInicial = _fi

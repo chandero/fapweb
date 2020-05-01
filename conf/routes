@@ -122,6 +122,12 @@ GET    /api/fact/epn/:n                 controllers.FacturaController.enviarFact
 GET    /api/exco/oec/:i                 controllers.ExtractoColocacionController.obtener(i: String)
 GET    /api/exco/oed/:i/:c/:f           controllers.ExtractoColocacionDetalladoController.obtener(i: String, c: Int, f: Long)
 
+# Garantia Personal
+GET    /api/gape/ogp/:c                 controllers.GarantiaPersonalController.obtener(c: String)
+
+# Garantia Real
+GET    /api/gare/ogr/:c                 controllers.GarantiaRealController.obtener(c: String)
+
 # Puc
 GET    /api/puc/ocn/:c                  controllers.PucController.obtenerNombre(c: String)
 
