@@ -313,7 +313,7 @@ class CalculoRepository @Inject()(dbapi: DBApi, _globalesCol: GlobalesCol, _func
                          val _dc = new DescuentoColocacion(d.id_descuento, d.descripcion_descuento, true)
                          _descuentoColocacion += _dc
                      })
-                     val _adescontar = _globalesCol.CalcularDescuentoPorCuota(list, _descuentoColocacion.toList, valor, amortizacion, valor)
+                     val _adescontar = _globalesCol.calcularDescuentoPorCuota(list, _descuentoColocacion.toList, valor, amortizacion, valor)
                      for( i <- 1 to list.length){
                         _listResult += new Tabla(list(i).cuot_num, list(i).cuot_fecha, list(i).cuot_saldo, list(i).cuot_capital, list(i).cuot_interes, _adescontar(i).valor)
                      }

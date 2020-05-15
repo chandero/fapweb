@@ -6,7 +6,7 @@ const creditoRouter = {
   redirect: '/credito/nuevo/solicitud',
   name: 'Credito',
   meta: {
-    title: 'Credito',
+    title: 'credito',
     icon: 'nested',
     roles: ['admin', 'credito', 'cartera']
   },

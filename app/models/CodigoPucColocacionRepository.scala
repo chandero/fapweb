@@ -43,7 +43,7 @@ case class CodigoPucColocacion(
     cod_capital_cas: Option[String],
     cod_cxc_cas: Option[String],
     cod_costas_cas: Option[String],
-    cod_contigencia: Option[String],
+    cod_contingencia: Option[String],
     cod_iprov_capital: Option[String],
     cod_eprov_capital: Option[String]
 )
@@ -75,7 +75,7 @@ object CodigoPucColocacion {
       "cod_capital_cas" -> e.cod_capital_cas,
       "cod_cxc_cas" -> e.cod_cxc_cas,
       "cod_costas_cas" -> e.cod_costas_cas,
-      "cod_contigencia" -> e.cod_contigencia,
+      "cod_contingencia" -> e.cod_contingencia,
       "cod_iprov_capital" -> e.cod_iprov_capital,
       "cod_eprov_capital" -> e.cod_eprov_capital
     )
@@ -101,7 +101,7 @@ object CodigoPucColocacion {
       (__ \ "cod_capital_cas").readNullable[String] and
       (__ \ "cod_cxc_cas").readNullable[String] and
       (__ \ "cod_costas_cas").readNullable[String] and
-      (__ \ "cod_contigencia").readNullable[String] and
+      (__ \ "cod_contingencia").readNullable[String] and
       (__ \ "cod_iprov_capital").readNullable[String] and
       (__ \ "cod_eprov_capital").readNullable[String]
   )(CodigoPucColocacion.apply _)
@@ -126,7 +126,7 @@ object CodigoPucColocacion {
       get[Option[String]]("cod_capital_cas") ~
       get[Option[String]]("cod_cxc_cas") ~
       get[Option[String]]("cod_costas_cas") ~
-      get[Option[String]]("cod_contigencia") ~
+      get[Option[String]]("cod_contingencia") ~
       get[Option[String]]("cod_iprov_capital") ~
       get[Option[String]]("cod_eprov_capital") map {
       case id_clasificacion ~
@@ -148,7 +148,7 @@ object CodigoPucColocacion {
             cod_capital_cas ~
             cod_cxc_cas ~
             cod_costas_cas ~
-            cod_contigencia ~
+            cod_contingencia ~
             cod_iprov_capital ~
             cod_eprov_capital =>
         CodigoPucColocacion(
@@ -171,12 +171,55 @@ object CodigoPucColocacion {
             cod_capital_cas,
             cod_cxc_cas,
             cod_costas_cas,
-            cod_contigencia,
+            cod_contingencia,
             cod_iprov_capital,
             cod_eprov_capital
         )
     }
   }    
+}
+
+case class CodigoPucBasico(
+  id_clasificacion: Option[Int],
+  id_garantia: Option[Int],
+  id_categoria: Option[String],
+  dias_iniciales: Option[Int],
+  dias_finales: Option[Int],
+  cod_int_ant: Option[String],
+  cod_int_mes: Option[String],
+  cod_int_mora: Option[String]
+)
+
+object CodigoPucBasico {
+
+    val _set = {
+      get[Option[Int]]("id_clasificacion") ~
+      get[Option[Int]]("id_garantia") ~
+      get[Option[String]]("id_categoria") ~
+      get[Option[Int]]("dias_iniciales") ~
+      get[Option[Int]]("dias_finales") ~
+      get[Option[String]]("cod_int_ant") ~
+      get[Option[String]]("cod_int_mes") ~
+      get[Option[String]]("cod_int_mora") map {
+      case id_clasificacion ~
+            id_garantia ~
+            id_categoria ~
+            dias_iniciales ~
+            dias_finales ~
+            cod_int_ant ~
+            cod_int_mes ~
+            cod_int_mora => CodigoPucBasico(
+                id_clasificacion,
+                id_garantia,
+                id_categoria,
+                dias_iniciales,
+                dias_finales,
+                cod_int_ant,
+                cod_int_mes,
+                cod_int_mora 
+            )
+      }
+    }
 }
 
 class CodigoPucColocacionRepository @Inject()(dbapi: DBApi)(
@@ -198,7 +241,7 @@ class CodigoPucColocacionRepository @Inject()(dbapi: DBApi)(
     }
   }
 
-  def obtenerFacturado(id_clasificacion: Int, id_garantia: Int, id_categoria: String): CodigoPucColocacion = {
+  def obtenerFacturado(id_clasificacion: Int, id_garantia: Int, id_categoria: String): CodigoPucBasico = {
     db.withConnection { implicit connection => 
                         SQL("""SELECT * FROM "col$codigospucfacturado" c WHERE 
                                 c.ID_CLASIFICACION = {id_clasificacion} and 
@@ -208,7 +251,7 @@ class CodigoPucColocacionRepository @Inject()(dbapi: DBApi)(
                                 'id_clasificacion -> id_clasificacion,
                                 'id_garantia -> id_garantia,
                                 'id_categoria -> id_categoria
-                            ).as(CodigoPucColocacion._set.single)
+                            ).as(CodigoPucBasico._set.single)
     }
   }
 

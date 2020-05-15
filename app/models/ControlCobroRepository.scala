@@ -29,6 +29,11 @@ case class ControlCobroVista(
     nombre: Option[String],
     saldo: Option[BigDecimal],
     cuota: Option[BigDecimal],
+    plazo: Option[Int],
+    amortiza_capital: Option[Int],
+    amortiza_interes: Option[Int],
+    tasa_nominal: Option[Double],
+    numero_cuotas: Option[Int], 
     fecha_capital: Option[DateTime],
     fecha_interes: Option[DateTime],
     estado: Option[String],
@@ -76,6 +81,11 @@ object ControlCobroVista {
         "nombre" -> e.nombre,
         "saldo" -> e.saldo,
         "cuota" -> e.cuota,
+        "plazo" -> e.plazo,
+        "amortiza_capital" -> e.amortiza_capital,
+        "amortiza_interes" -> e.amortiza_interes,
+        "tasa_nominal" -> e.tasa_nominal,
+        "numero_cuotas" -> e.numero_cuotas,
         "fecha_capital" -> e.fecha_capital,
         "fecha_interes" -> e.fecha_interes,
         "estado" -> e.estado,
@@ -94,6 +104,11 @@ object ControlCobroVista {
     (__ \ "nombre").readNullable[String] and
     (__ \ "saldo").readNullable[BigDecimal] and
     (__ \ "cuota").readNullable[BigDecimal] and
+    (__ \ "plazo").readNullable[Int] and
+    (__ \ "amortiza_capital").readNullable[Int] and
+    (__ \ "amortiza_interes").readNullable[Int] and
+    (__ \ "tasa_nominal").readNullable[Double] and
+    (__ \ "numero_cuotas").readNullable[Int] and
     (__ \ "fecha_capital").readNullable[DateTime] and
     (__ \ "fecha_interes").readNullable[DateTime] and
     (__ \ "estado").readNullable[String] and
@@ -214,7 +229,7 @@ class ControlCobroRepository @Inject()(dbapi: DBApi, _f: Funcion, _gcol: Globale
       val creditos = db.withConnection { implicit connection =>
             var query = """SELECT a.ID_AGENCIA, a.ID_COLOCACION, a.ID_IDENTIFICACION, a.ID_PERSONA, a.ID_CLASIFICACION, a.ID_LINEA, a.ID_INVERSION, a.ID_RESPALDO, a.ID_GARANTIA, a.ID_CATEGORIA, a.ID_EVALUACION, a.FECHA_DESEMBOLSO, a.VALOR_DESEMBOLSO, a.PLAZO_COLOCACION, a.FECHA_VENCIMIENTO, a.TIPO_INTERES, a.ID_INTERES, a.TASA_INTERES_CORRIENTE, a.TASA_INTERES_MORA, a.PUNTOS_INTERES, a.ID_TIPO_CUOTA, a.AMORTIZA_CAPITAL, a.AMORTIZA_INTERES, a.PERIODO_GRACIA, a.DIAS_PRORROGADOS, a.VALOR_CUOTA, a.ABONOS_CAPITAL, a.FECHA_CAPITAL, a.FECHA_INTERES, a.ID_ESTADO_COLOCACION, a.ID_ENTE_APROBADOR, a.ID_EMPLEADO, a.NOTA_CONTABLE, a.NUMERO_CUENTA, a.ES_ANORMAL, a.DIAS_PAGO, a.RECIPROCIDAD, a.FECHA_SALDADO, 'D' AS tipo FROM \"col$colocacion\" a
               LEFT JOIN COLOCACIONASESOR r ON r.ID_COLOCACION = a.ID_COLOCACION
-              WHERE a.ID_ESTADO_COLOCACION IN (0,1,2,3,8,9)
+              WHERE a.ID_ESTADO_COLOCACION IN (0,1,2,3,7,8,9)
             """
             if (ases_id > 0) {
               query += " and r.ASES_ID = {ases_id}"
@@ -256,9 +271,17 @@ class ControlCobroRepository @Inject()(dbapi: DBApi, _f: Funcion, _gcol: Globale
           ).as(SqlParser.scalar[String].singleOpt)
         }
 
+        val numero_cuotas = db.withConnection { implicit connection => 
+          SQL("""SELECT COUNT(*) FROM "col$tablaliquidacion" t WHERE t.ID_COLOCACION = {id_colocacion} and t.PAGADA = 0""").
+          on(
+            'id_colocacion -> c._1._2.get
+          ).as(SqlParser.scalar[Int].singleOpt)
+        }
+
         var valor = c._3._3.get 
         var abono = c._6._2.get
         var deuda = valor - abono
+        var tasa_nominal = _f.tasaNominalVencida(c._4._3.get, c._5._3.get)
 
         var dias_mora = 0
         if (deuda > 0) {
@@ -274,7 +297,12 @@ class ControlCobroRepository @Inject()(dbapi: DBApi, _f: Funcion, _gcol: Globale
                                         c._1._2, 
                                         nombre, 
                                         Some(deuda), 
-                                        c._6._1, 
+                                        c._6._1,
+                                        c._3._4,
+                                        c._5._2,
+                                        c._5._3,
+                                        Some(tasa_nominal),
+                                        numero_cuotas,
                                         c._6._3, 
                                         c._6._4, 
                                         estadoDesc,
@@ -293,7 +321,12 @@ class ControlCobroRepository @Inject()(dbapi: DBApi, _f: Funcion, _gcol: Globale
                                         c._1._2, 
                                         nombre, 
                                         Some(deuda), 
-                                        c._6._1, 
+                                        c._6._1,
+                                        c._3._4,
+                                        c._5._2,
+                                        c._5._3,
+                                        Some(tasa_nominal),
+                                        numero_cuotas,                                        
                                         c._6._3, 
                                         c._6._4, 
                                         estadoDesc,
@@ -314,10 +347,10 @@ class ControlCobroRepository @Inject()(dbapi: DBApi, _f: Funcion, _gcol: Globale
       var _lista = new mutable.ListBuffer[ControlCobroVista]()      
       val creditos = db.withConnection { implicit connection =>
             SQL("""SELECT a.ID_AGENCIA, a.ID_COLOCACION, a.ID_IDENTIFICACION, a.ID_PERSONA, a.ID_CLASIFICACION, a.ID_LINEA, a.ID_INVERSION, a.ID_RESPALDO, a.ID_GARANTIA, a.ID_CATEGORIA, a.ID_EVALUACION, a.FECHA_DESEMBOLSO, a.VALOR_DESEMBOLSO, a.PLAZO_COLOCACION, a.FECHA_VENCIMIENTO, a.TIPO_INTERES, a.ID_INTERES, a.TASA_INTERES_CORRIENTE, a.TASA_INTERES_MORA, a.PUNTOS_INTERES, a.ID_TIPO_CUOTA, a.AMORTIZA_CAPITAL, a.AMORTIZA_INTERES, a.PERIODO_GRACIA, a.DIAS_PRORROGADOS, a.VALOR_CUOTA, a.ABONOS_CAPITAL, a.FECHA_CAPITAL, a.FECHA_INTERES, a.ID_ESTADO_COLOCACION, a.ID_ENTE_APROBADOR, a.ID_EMPLEADO, a.NOTA_CONTABLE, a.NUMERO_CUENTA, a.ES_ANORMAL, a.DIAS_PAGO, a.RECIPROCIDAD, a.FECHA_SALDADO, 'D' AS tipo FROM \"col$colocacion\" a
-             WHERE a.ID_IDENTIFICACION = {id_identificacion} and a.ID_PERSONA = {id_persona} and a.ID_ESTADO_COLOCACION IN (0,1,2,3,8,9)
+             WHERE a.ID_IDENTIFICACION = {id_identificacion} and a.ID_PERSONA = {id_persona} and a.ID_ESTADO_COLOCACION IN (0,1,2,3,7,8,9)
              UNION ALL
              SELECT a.ID_AGENCIA, a.ID_COLOCACION, a.ID_IDENTIFICACION, a.ID_PERSONA, a.ID_CLASIFICACION, a.ID_LINEA, a.ID_INVERSION, a.ID_RESPALDO, a.ID_GARANTIA, a.ID_CATEGORIA, a.ID_EVALUACION, a.FECHA_DESEMBOLSO, a.VALOR_DESEMBOLSO, a.PLAZO_COLOCACION, a.FECHA_VENCIMIENTO, a.TIPO_INTERES, a.ID_INTERES, a.TASA_INTERES_CORRIENTE, a.TASA_INTERES_MORA, a.PUNTOS_INTERES, a.ID_TIPO_CUOTA, a.AMORTIZA_CAPITAL, a.AMORTIZA_INTERES, a.PERIODO_GRACIA, a.DIAS_PRORROGADOS, a.VALOR_CUOTA, a.ABONOS_CAPITAL, a.FECHA_CAPITAL, a.FECHA_INTERES, a.ID_ESTADO_COLOCACION, a.ID_ENTE_APROBADOR, a.ID_EMPLEADO, a.NOTA_CONTABLE, a.NUMERO_CUENTA, a.ES_ANORMAL, a.DIAS_PAGO, a.RECIPROCIDAD, a.FECHA_SALDADO, 'F' AS tipo FROM \"col$colocacion\" a
-             LEFT JOIN \"col$colgarantias\" g ON g.ID_COLOCACION = a.ID_COLOCACION WHERE g.ID_IDENTIFICACION = {id_identificacion} and g.ID_PERSONA = {id_persona} and a.ID_ESTADO_COLOCACION IN (0,1,2,3,8,9)
+             LEFT JOIN \"col$colgarantias\" g ON g.ID_COLOCACION = a.ID_COLOCACION WHERE g.ID_IDENTIFICACION = {id_identificacion} and g.ID_PERSONA = {id_persona} and a.ID_ESTADO_COLOCACION IN (0,1,2,3,7,8,9)
             """).
             on(
                 'id_identificacion -> id_identificacion,
@@ -355,10 +388,17 @@ class ControlCobroRepository @Inject()(dbapi: DBApi, _f: Funcion, _gcol: Globale
           ).as(SqlParser.scalar[String].singleOpt)
         }
 
+        val numero_cuotas = db.withConnection { implicit connection => 
+          SQL("""SELECT COUNT(*) FROM "col$tablaliquidacion" t WHERE t.ID_COLOCACION = {id_colocacion} and t.PAGADA = 0""").
+          on(
+            'id_colocacion -> c._1._2.get
+          ).as(SqlParser.scalar[Int].singleOpt)
+        }
 
         var valor = c._3._3.get 
         var abono = c._6._2.get
         var deuda = valor - abono
+        var tasa_nominal = _f.tasaNominalVencida(c._4._3.get, c._5._3.get)
 
         var dias_mora = 0
         if (deuda > 0) { 
@@ -370,7 +410,12 @@ class ControlCobroRepository @Inject()(dbapi: DBApi, _f: Funcion, _gcol: Globale
                                         c._1._2, 
                                         nombre, 
                                         Some(deuda), 
-                                        c._6._1, 
+                                        c._6._1,
+                                        c._3._4,
+                                        c._5._2,
+                                        c._5._3,
+                                        Some(tasa_nominal),
+                                        numero_cuotas,                                        
                                         c._6._3, 
                                         c._6._4, 
                                         estadoDesc,

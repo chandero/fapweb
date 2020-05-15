@@ -153,9 +153,10 @@
                 <el-dropdown :split-button="true" size="mini" type="primary" trigger="click">
                   Info
                   <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item><el-button type="primary" icon="el-icon-service" size="mini" circle title="Dirección y Teléfono" @click="buscarDireccion(scope.row)">Dirección</el-button></el-dropdown-item>
-                    <el-dropdown-item><el-button type="success" icon="el-icon-s-custom" size="mini" circle title="Garantías" @click="buscarGarantia(scope.row.id_colocacion)">Garantía</el-button></el-dropdown-item>
-                    <el-dropdown-item><el-button type="warning" icon="el-icon-document" size="mini" circle title="Extracto" @click="buscarExtracto(scope.row.id_colocacion)">Extracto</el-button></el-dropdown-item>
+                    <el-dropdown-item><div @click="buscarDireccion(scope.row)"><i class="el-icon-service" title="Dirección y Teléfono" />Dirección</div></el-dropdown-item>
+                    <el-dropdown-item><div @click="buscarGarantia(scope.row.id_colocacion)"><i class="el-icon-s-custom" title="Garantías" />Garantía</div></el-dropdown-item>
+                    <el-dropdown-item><div @click="buscarExtracto(scope.row.id_colocacion)"><i class="el-icon-document" title="Extracto" />Extracto</div></el-dropdown-item>
+                    <el-dropdown-item v-if="scope.row.saldo !== 0"><div @click="buscarLiquidacion(scope.row)"><i class="el-icon-s-finance" title="Liquidación" />Liquidación</div></el-dropdown-item>
                   </el-dropdown-menu>
                 </el-dropdown>
               </template>
@@ -220,6 +221,10 @@
     <el-dialog :visible.sync="showDireccionDlg" :show-close="false" :destroy-on-close="true" :title="'Dirección y Teléfono de ' + nombrecompleto" width="90%" append-to-body>
       <direccion :direcciones="direcciones" @cerrarDireccionEvent="cerrarDireccionEvento"/>
     </el-dialog>
+    <!-- Dialogo Liquidacion de Prueba Colocacion -->
+    <el-dialog :visible.sync="showLiquidacionDePruebaDlg" :show-close="false" :destroy-on-close="true" title="Liquidación Proyectada" width="90%">
+      <liquidacion-prueba :colocacion="colocacion" @cerrarLiquidacionDePruebaEvent="cerrarLiquidacionDePruebaEvento" />
+    </el-dialog>
   </el-container>
 
 </template>
@@ -229,6 +234,7 @@ import ControlCobroComponent from '@/components/ControlCobro'
 import ExtractoColocacionComponent from '@/components/ExtractoColocacion'
 import GarantiaCreditoComponent from '@/components/GarantiaCredito'
 import DireccionPersonaComponent from '@/components/DireccionPersona'
+import LiquidacionDePruebaComponent from '@/components/LiquidacionDePrueba'
 import { obtenerGarantiaPersonal, obtenerGarantiaReal } from '@/api/credito'
 import { obtenerExtractoColocacion } from '@/api/extractocolocacion'
 import { obtenerListaTipoIdentificacion, obtenerListaTipoEstadoColocacion, obtenerListaTipoDireccion, obtenerListaMunicipios, obtenerListaAsesores } from '@/api/tipos'
@@ -241,7 +247,8 @@ export default {
     'control-cobro': ControlCobroComponent,
     'extracto-colocacion': ExtractoColocacionComponent,
     'garantias': GarantiaCreditoComponent,
-    'direccion': DireccionPersonaComponent
+    'direccion': DireccionPersonaComponent,
+    'liquidacion-prueba': LiquidacionDePruebaComponent
   },
   data() {
     return {
@@ -284,6 +291,7 @@ export default {
       showControlCobroDlg: false,
       showExtractoDlg: false,
       showGarantiaDlg: false,
+      showLiquidacionDePruebaDlg: false,
       loader: null
     }
   },
@@ -342,6 +350,11 @@ export default {
         this.ocultarLoader()
         this.$message.error('Error buscando extracto colocación: ' + error)
       })
+    },
+    buscarLiquidacion(colocacion) {
+      this.extracto_colocacion = colocacion.id_colocacion
+      this.colocacion = colocacion
+      this.showLiquidacionDePruebaDlg = true
     },
     cerrarExtractoEvento() {
       this.extracto_data = []
@@ -445,6 +458,10 @@ export default {
     cerrarDireccionEvento() {
       this.direcciones = []
       this.showDireccionDlg = false
+    },
+    cerrarLiquidacionDePruebaEvento() {
+      this.extracto_colocacion = null
+      this.showLiquidacionDePruebaDlg = false
     },
     limpiarTablas() {
       this.dataColocacion = []

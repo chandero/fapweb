@@ -19,6 +19,10 @@ import org.joda.time.DateTime
 class Funcion @Inject()(dbapi: DBApi){
   private val db = dbapi.database("default")
 
+  def limpiarFecha(_fecha: DateTime) = {
+    new DateTime(_fecha.getYear(), _fecha.getMonthOfYear(), _fecha.getDayOfMonth, 0, 0, 0, 0)
+  }
+
   def diasEntreFechas(_fi: DateTime, _ff: DateTime, _fechaCorte: DateTime) = {
         var _fechaInicial = _fi
         var _fechaFinal = _ff
@@ -171,19 +175,30 @@ class Funcion @Inject()(dbapi: DBApi){
          }
     }
 
-    val _response = new DateTime(_anho, _mes, _dia, 0, 0)
+    val _response = new DateTime(_anho, _mes, _dia, 0, 0, 0, 0)
     _response
   }
 
 
   def tasaNominalVencida(tasa_efectiva: Double, amortizacion: Int): Double = {
     var _amortiza = amortizacion
-    if (_amortiza < 30) {_amortiza = 30}
+    if (_amortiza < 30) { _amortiza = 30 }
     var _factor = _amortiza / 30
     _factor = 12 / _factor
-    var _potencia = pow(1+(tasa_efectiva/100),(1/_factor))
+    val _base = 1+(tasa_efectiva/100)
+    val _exponente = (1/_factor.toDouble)
+    var _potencia = pow(_base,_exponente)
     _potencia = ((_potencia-1)*_factor*100)
-    round2(_potencia)
+    val result = round2(_potencia)
+    result
+  }
+
+  def tasaEfectivaVencida(tasa_nominal: Double, amortizacion: Int): Double = {
+    var _amortiza = amortizacion
+    var _factor = _amortiza / 30
+    var _n = (12/_factor.toDouble)
+    var _potencia = pow(1+(tasa_nominal/100)/_n,_n)
+    round2((_potencia-1)*100)   
   }
 
   def round2(valor: Double) = {

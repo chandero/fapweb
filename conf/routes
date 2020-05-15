@@ -73,6 +73,9 @@ GET     /api/vehi/busc/:i               controllers.VehiculoController.buscar(i:
 # Colocaciones
 GET     /api/col/busc/:i/:p             controllers.ColocacionController.buscarColocacion(i: Int, p: String)
 
+# Creditos
+GET     /api/cred/ldp/:i/:c/:f          controllers.CreditoController.liquidacionDePrueba(i:String, c:Int, f:Long)  
+
 # Control Cobro
 GET     /api/coco/bpd/:i/:p             controllers.ControlCobroController.obtenerCreditosPorDocumento(i: Int, p: String)
 GET     /api/coco/bpe/:e/:i/:f/:a       controllers.ControlCobroController.obtenerCreditosPorEstado(e: Int, i: Int, f: Int, a: Int)

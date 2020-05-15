@@ -15,7 +15,8 @@ import nestedRouter from './modules/nested'
 /* Router Module FaP */
 import contabilidadRouter from './modules/contabilidad'
 import creditoRouter from './modules/credito'
-import carteraRouter from './modules/cartera'
+// import carteraRouter from './modules/cartera'
+import carteraRouter from './modules/cartera2'
 
 /** note: sub-menu only appear when children.length>=1
  *  detail see  https://panjiachen.github.io/vue-element-admin-site/guide/essentials/router-and-nav.html
