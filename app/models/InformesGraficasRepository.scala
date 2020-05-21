@@ -109,6 +109,75 @@ object InformeRecaudoMes {
   }    
 }
 
+case class InformeRecaudoInteresCausado(
+    id_colocacion: Option[String],
+    id_persona: Option[String],
+    nombre: Option[String],
+    fecha_recaudo: Option[DateTime],
+    codigo: Option[String],
+    cuenta: Option[String],
+    fecha_inicial: Option[DateTime],
+    fecha_final: Option[DateTime],
+    interes: Option[BigDecimal],
+    dias: Option[Int]
+)
+
+object InformeRecaudoInteresCausado {
+  implicit val yourJodaDateReads = JodaReads.jodaDateReads("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+  implicit val yourJodaDateWrites = JodaWrites.jodaDateWrites("yyyy-MM-dd'T'HH:mm:ss.SSSZ'")
+  
+  implicit val writes = new Writes[InformeRecaudoInteresCausado] {
+    def writes(e: InformeRecaudoInteresCausado) = Json.obj(
+      "id_colocacion" -> e.id_colocacion,
+      "id_persona" -> e.id_persona,
+      "nombre" -> e.nombre,
+      "fecha_recaudo" -> e.fecha_recaudo,
+      "codigo" -> e.codigo,
+      "cuenta" -> e.cuenta,
+      "fecha_inicial" -> e.fecha_inicial,
+      "fecha_final" -> e.fecha_final,
+      "interes" -> e.interes,
+      "dias" -> e.dias
+    )
+  }
+
+  val _set = {
+    get[Option[String]]("id_colocacion") ~
+    get[Option[String]]("id_persona") ~
+    get[Option[String]]("nombre") ~
+    get[Option[DateTime]]("fecha_recaudo") ~
+    get[Option[String]]("codigo") ~
+    get[Option[String]]("cuenta") ~
+    get[Option[DateTime]]("fecha_inicial") ~
+    get[Option[DateTime]]("fecha_final") ~
+    get[Option[BigDecimal]]("interes") ~
+    get[Option[Int]]("dias") map {
+      case     
+        id_colocacion ~
+        id_persona ~
+        nombre ~
+        fecha_recaudo ~
+        codigo ~
+        cuenta ~
+        fecha_inicial ~
+        fecha_final ~
+        interes ~
+        dias => new InformeRecaudoInteresCausado(
+                id_colocacion,
+                id_persona,
+                nombre,
+                fecha_recaudo,
+                codigo,
+                cuenta,
+                fecha_inicial,
+                fecha_final,
+                interes,
+                dias              
+           )
+    }
+  }    
+}
+
 class InformesGraficasRepository @Inject()(dbapi: DBApi, config: Configuration)(implicit ec: DatabaseExecutionContext) {
     // private val db = dbapi.database("default")
     private val REPORT_DEFINITION_PATH = System.getProperty("user.dir") + "/app/resources/"
@@ -126,5 +195,24 @@ class InformesGraficasRepository @Inject()(dbapi: DBApi, config: Configuration)(
                     'mes -> mes
                 ).as(InformeRecaudoMes._set *)
         }
+    }
+
+    def recaudoInteresCausadoPeriodoGracia(fecha_inicial: Long, fecha_final: Long): Future[Iterable[InformeRecaudoInteresCausado]] = Future[Iterable[InformeRecaudoInteresCausado]] {
+      val fi = new DateTime(fecha_inicial)
+      val ff = new DateTime(fecha_final)
+      db.withConnection { implicit connection =>
+        SQL(""" SELECT d.ID_COLOCACION, c.ID_PERSONA, r.NOMBRE || ' ' || r.PRIMER_APELLIDO || ' ' || r.SEGUNDO_APELLIDO AS NOMBRE, d.FECHA_EXTRACTO AS FECHA_RECAUDO, d.CODIGO_PUC AS CODIGO, p.NOMBRE AS CUENTA, MIN(d.FECHA_INICIAL) AS FECHA_INICIAL, MAX(d.FECHA_FINAL) AS FECHA_FINAL, SUM(d.VALOR_CREDITO) AS INTERES, SUM(d.DIAS_APLICADOS) AS DIAS FROM COL_PERIODO_GRACIA g
+                INNER JOIN "col$extractodet" d ON d.ID_COLOCACION = g.ID_COLOCACION
+                INNER JOIN "con$puc" p ON p.CODIGO = d.CODIGO_PUC
+                INNER JOIN "col$colocacion" c ON c.ID_COLOCACION = d.ID_COLOCACION
+                INNER JOIN "gen$persona" r ON r.ID_IDENTIFICACION = c.ID_IDENTIFICACION AND r.ID_PERSONA = c.ID_PERSONA
+                WHERE d.FECHA_EXTRACTO BETWEEN {fecha_inicial} AND {fecha_final} AND g.ESTADO = 0 AND d.CODIGO_PUC LIKE '1345%' AND g.FECHA_REGISTRO <= d.FECHA_EXTRACTO
+                GROUP BY d.ID_COLOCACION, c.ID_PERSONA, r.NOMBRE, r.PRIMER_APELLIDO, r.SEGUNDO_APELLIDO, d.FECHA_EXTRACTO, d.CODIGO_PUC, p.NOMBRE
+                ORDER BY d.ID_COLOCACION """).
+                on(
+                  'fecha_inicial -> fi,
+                  'fecha_final -> ff
+                ).as(InformeRecaudoInteresCausado._set *)
+      }
     }
 }

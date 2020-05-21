@@ -115,3 +115,25 @@ export function exportarCausacion(id_colocacion, empr_id, token) {
   const url = window.location.protocol + '//' + window.location.host.split('/')[0].split(':')[0] + ':9000/api' + '/info/expc/' + data.id_colocacion + '/' + data.empr_id + '/' + data.token
   window.open(url, '_self', 'location=no, menubar=no')
 }
+
+export function recaudoDiarioMes(anho, mes) {
+  const data = {
+    anho,
+    mes
+  }
+  return request({
+    url: 'ingr/rdm/' + data.anho + '/' + data.mes,
+    method: 'get'
+  })
+}
+
+export function recaudoInteresCausadoPeriodoGracia(fi, ff) {
+  const data = {
+    fi,
+    ff
+  }
+  return request({
+    url: 'ingr/ric/' + data.fi + '/' + data.ff,
+    method: 'get'
+  })
+}

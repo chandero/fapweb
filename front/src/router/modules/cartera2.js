@@ -72,7 +72,7 @@ const cartera2Router = {
     {
       path: 'menu4informe',
       component: () => import('@/views/cartera2/menu4informe/index'), // Parent router-view
-      name: 'menu4informe',
+      name: 'Menu4informe',
       meta: { title: 'menu4informe' },
       redirect: '/cartera2/menu4informe/menu4-1recaudoxmes',
       children: [
@@ -81,6 +81,12 @@ const cartera2Router = {
           component: () => import('@/views/cartera2/menu4informe/menu4-1recaudoxmes'),
           name: 'Menu4-1recaudoxmes',
           meta: { title: 'menu4-1recaudoxmes' }
+        },
+        {
+          path: 'menu4-2recaudointerescausado',
+          component: () => import('@/views/cartera2/menu4informe/menu4-2recaudointerescausado'),
+          name: 'Menu4-2recaudointerescausado',
+          meta: { title: 'menu4-2recaudointerescausado' }
         }
       ]
     }

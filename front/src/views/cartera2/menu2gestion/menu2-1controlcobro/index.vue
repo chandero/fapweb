@@ -3,7 +3,7 @@
     <el-header>
       <el-row>
         <el-col :span="24">
-          <h1>CONTROL DE COBRO</h1>
+          <h1>Control De Cobro</h1>
         </el-col>
       </el-row>
     </el-header>

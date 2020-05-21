@@ -83,6 +83,9 @@ GET     /api/coco/bdp/:i/:p             controllers.ControlCobroController.obten
 GET     /api/coco/bcc/:i                controllers.ControlCobroController.obtenerControlCobro(i: String)
 POST    /api/coco/ccs                   controllers.ControlCobroController.agregar
 
+# Informes Graficas
+GET     /api/ingr/rdm/:a/:m             controllers.InformesGraficasController.recaudoDiarioMes(a: Int, m: Int)
+GET     /api/ingr/ric/:fi/:ff           controllers.InformesGraficasController.recaudoInteresCausadoPeriodoGracia(fi: Long, ff: Long)
 
 # Tipos
 GET     /api/ti/obt                     controllers.TipoIdentificacionController.obtenerListaTipoIdentificacion
