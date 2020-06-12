@@ -23,91 +23,6 @@ import scala.concurrent.{Await, Future}
 
 import models._
 
-case class CuotasLiq(
-    cuotaNumero: Int,
-    codigoPuc: String,
-    codigoNombre: String,
-    fechaInicial: DateTime,
-    fechaFinal: DateTime,
-    dias: Int,
-    tasa: Double,
-    debito: BigDecimal,
-    credito:  BigDecimal,
-    esCapital: Boolean,
-    esCausado: Boolean,
-    esCorriente: Boolean,
-    esVencido: Boolean,
-    esAnticipado: Boolean,
-    esDevuelto: Boolean,
-    esOtros: Boolean,
-    esCajaBanco: Boolean,
-    esCostas: Boolean,
-    idClaseOperacion: String    
-)
-
-case class FechaLiq(
-       fecha_inicial : DateTime,
-       fecha_final   : DateTime,
-       anticipado   : Boolean,
-       causado      : Boolean,
-       corrientes   : Boolean,
-       vencida      : Boolean,
-       devuelto     : Boolean    
-)
-
-object CuotasLiq {
-  implicit val yourJodaDateReads =
-    JodaReads.jodaDateReads("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-  implicit val yourJodaDateWrites =
-    JodaWrites.jodaDateWrites("yyyy-MM-dd'T'HH:mm:ss.SSSZ'")
-
-  implicit val wWrites = new Writes[CuotasLiq] {
-    def writes(e: CuotasLiq) = Json.obj( 
-        "cuotaNumero" -> e.cuotaNumero,
-        "codigoPuc" -> e.codigoPuc,
-        "codigoNombre" -> e.codigoNombre,
-        "fechaInicial" -> e.fechaInicial,
-        "fechaFinal" -> e.fechaFinal,
-        "dias" -> e.dias,
-        "tasa" -> e.tasa,
-        "debito" -> e.debito,
-        "credito" -> e.credito,
-        "esCapital" -> e.esCapital,
-        "esCausado" -> e.esCausado,
-        "esCorriente" -> e.esCorriente,
-        "esVencido" -> e.esVencido,
-        "esAnticipado" -> e.esAnticipado,
-        "esDevuelto" -> e.esDevuelto,
-        "esOtros" -> e.esOtros,
-        "esCajaBanco" -> e.esCajaBanco,
-        "esCostas" -> e.esCostas,
-        "idClaseOperacion" -> e.idClaseOperacion
-    )
-  }
-
-  implicit val rReads: Reads[CuotasLiq] = (
-        (__ \ "cuotaNumero").read[Int] and
-        (__ \ "codigoPuc").read[String] and
-        (__ \ "codigoNombre").read[String] and
-        (__ \ "fechaInicial").read[DateTime] and
-        (__ \ "fechaFinal").read[DateTime] and
-        (__ \ "dias").read[Int] and
-        (__ \ "tasa").read[Double] and
-        (__ \ "debito").read[BigDecimal] and
-        (__ \ "credito").read[BigDecimal] and
-        (__ \ "esCapital").read[Boolean] and
-        (__ \ "esCausado").read[Boolean] and
-        (__ \ "esCorriente").read[Boolean] and
-        (__ \ "esVencido").read[Boolean] and
-        (__ \ "esAnticipado").read[Boolean] and
-        (__ \ "esDevuelto").read[Boolean] and
-        (__ \ "esOtros").read[Boolean] and
-        (__ \ "esCajaBanco").read[Boolean] and
-        (__ \ "esCostas").read[Boolean] and
-        (__ \ "idClaseOperacion").read[String]
-  )(CuotasLiq.apply _)          
-}
-
 class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService: ColocacionRepository, _codigopuccolocacionService: CodigoPucColocacionRepository)(implicit ec: DatabaseExecutionContext) {
     private val db = dbapi.database("default")
 
@@ -1801,6 +1716,35 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                     (_my_cuotas_liq.toList, _m_saldo_actual, _m_capital_hasta, _m_interes_hasta, _m_fecha_prox, _liquidado)
             }
         }
+    }
+
+    def reajustarTablaPeriodoGracia(id_colocacion: String, dias: Int): Boolean = {
+        var _result: Boolean = true
+        var _nueva_fecha = new DateTime()
+        val _tabla = db.withTransaction { implicit connection => 
+            SQL("""SELECT t.* FROM "col$tablaliquidacion" t WHERE t.ID_COLOCACION = {id_colocacion}  AND t.PAGADA = 0""").
+            on(
+                'id_colocacion -> id_colocacion
+            ).as(Tabla._set *)
+        }
+
+        _tabla.foreach { t =>
+            println("fila: " + t.toString)
+            _nueva_fecha = _funcion.calculoFecha(t.cuot_fecha, dias)
+            val _updresult = _result && db.withTransaction { implicit connection =>
+                SQL("""UPDATE "col$tablaliquidacion" 
+                       SET FECHA_A_PAGAR = {nueva_fecha_a_pagar} 
+                       WHERE ID_COLOCACION = {id_colocacion} and CUOTA_NUMERO = {cuota} """).
+                on(
+                    'id_colocacion -> id_colocacion,
+                    'cuota -> t.cuot_num,
+                    'nueva_fecha_a_pagar -> _nueva_fecha
+                ).executeUpdate() > 0
+            }
+            println("actualicé fila en tabla liquidacion: " + _updresult)
+            _result = _result && _updresult
+        }
+        _result
     }
     
     def codigoNombre(codigo: String) = {

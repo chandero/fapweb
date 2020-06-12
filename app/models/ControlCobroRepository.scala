@@ -23,202 +23,6 @@ import scala.collection.mutable
 
 import utilities._
 
-case class ControlCobroVista(
-    id_agencia: Option[Int],
-    id_colocacion: Option[String],
-    nombre: Option[String],
-    saldo: Option[BigDecimal],
-    cuota: Option[BigDecimal],
-    plazo: Option[Int],
-    amortiza_capital: Option[Int],
-    amortiza_interes: Option[Int],
-    tasa_nominal: Option[Double],
-    numero_cuotas: Option[Int], 
-    fecha_capital: Option[DateTime],
-    fecha_interes: Option[DateTime],
-    estado: Option[String],
-    dias_mora: Option[Int],
-    id_identificacion: Option[Int],
-    id_persona: Option[String],
-    tipo_cuota: Option[String],
-    tiene_compromiso: Option[String],
-    centro_costo: Option[String]
-)
-
-case class Compromiso(
-    comp_id: Option[Long],
-    id_colocacion: Option[String],
-    comp_descripcion: Option[String],
-    comp_activo: Option[Int],
-    comp_fecha: Option[DateTime],
-    comp_fechacompromiso: Option[DateTime],
-    comp_repetircada: Option[String],
-    id_empleado: Option[String]
-)
-
-case class ControlCobro (
-    id_agencia: Option[Long],
-    id_colocacion: Option[String],
-    fecha_observacion: Option[DateTime],
-    observacion: Option[String],
-    es_observacion: Option[Int],
-    es_compromiso: Option[Int],
-    fecha_compromiso: Option[DateTime],
-    id_usuario: Option[String],
-    empleado: Option[String]
-)
-
-object ControlCobroVista {
-  implicit val yourJodaDateReads =
-    JodaReads.jodaDateReads("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-  implicit val yourJodaDateWrites =
-    JodaWrites.jodaDateWrites("yyyy-MM-dd'T'HH:mm:ss.SSSZ'")
-    
-  implicit val write = new Writes[ControlCobroVista] {
-    def writes(e: ControlCobroVista) = Json.obj(
-        "id_agencia" -> e.id_agencia,
-        "id_colocacion" -> e.id_colocacion,
-        "nombre" -> e.nombre,
-        "saldo" -> e.saldo,
-        "cuota" -> e.cuota,
-        "plazo" -> e.plazo,
-        "amortiza_capital" -> e.amortiza_capital,
-        "amortiza_interes" -> e.amortiza_interes,
-        "tasa_nominal" -> e.tasa_nominal,
-        "numero_cuotas" -> e.numero_cuotas,
-        "fecha_capital" -> e.fecha_capital,
-        "fecha_interes" -> e.fecha_interes,
-        "estado" -> e.estado,
-        "dias_mora" -> e.dias_mora,
-        "id_identificacion" -> e.id_identificacion,
-        "id_persona" -> e.id_persona,
-        "tipo_cuota" -> e.tipo_cuota,
-        "tiene_compromiso" -> e.tiene_compromiso,
-        "centro_costo" -> e.centro_costo
-    )
-  }
-
-  implicit val rReads: Reads[ControlCobroVista] = (
-    (__ \ "id_agencia").readNullable[Int] and
-    (__ \ "id_colocacion").readNullable[String] and
-    (__ \ "nombre").readNullable[String] and
-    (__ \ "saldo").readNullable[BigDecimal] and
-    (__ \ "cuota").readNullable[BigDecimal] and
-    (__ \ "plazo").readNullable[Int] and
-    (__ \ "amortiza_capital").readNullable[Int] and
-    (__ \ "amortiza_interes").readNullable[Int] and
-    (__ \ "tasa_nominal").readNullable[Double] and
-    (__ \ "numero_cuotas").readNullable[Int] and
-    (__ \ "fecha_capital").readNullable[DateTime] and
-    (__ \ "fecha_interes").readNullable[DateTime] and
-    (__ \ "estado").readNullable[String] and
-    (__ \ "dias_mora").readNullable[Int] and
-    (__ \ "id_identificacion").readNullable[Int] and
-    (__ \ "id_persona").readNullable[String] and
-    (__ \ "tipo_cuota").readNullable[String] and
-    (__ \ "tiene_compromiso").readNullable[String] and
-    (__ \ "centro_costo").readNullable[String]
-  )(ControlCobroVista.apply _)
-}
-
-object Compromiso {
-  implicit val yourJodaDateReads =
-    JodaReads.jodaDateReads("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-  implicit val yourJodaDateWrites =
-    JodaWrites.jodaDateWrites("yyyy-MM-dd'T'HH:mm:ss.SSSZ'")
-
-  implicit val write = new Writes[Compromiso] {
-    def writes(e: Compromiso) = Json.obj(
-        "comp_id" -> e.comp_id,
-        "id_colocacion" -> e.id_colocacion,
-        "comp_descripcion" -> e.comp_descripcion,
-        "comp_activo" -> e.comp_activo,
-        "comp_fecha" -> e.comp_fecha,
-        "comp_fechacompromiso" -> e.comp_fechacompromiso,
-        "comp_repetircada" -> e.comp_repetircada,
-        "id_empleado" -> e.id_empleado,
-    )
-  }
-
-  implicit val rReads: Reads[Compromiso] = (
-    (__ \ "comp_id").readNullable[Long] and
-    (__ \ "id_colocacion").readNullable[String] and
-    (__ \ "comp_descripcion").readNullable[String] and
-    (__ \ "comp_activo").readNullable[Int] and
-    (__ \ "comp_fecha").readNullable[DateTime] and
-    (__ \ "comp_fechacompromiso").readNullable[DateTime] and
-    (__ \ "comp_repetircada").readNullable[String] and
-    (__ \ "id_empleado").readNullable[String]
-  )(Compromiso.apply _) 
-}
-
-object ControlCobro {
-  implicit val yourJodaDateReads =
-    JodaReads.jodaDateReads("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-  implicit val yourJodaDateWrites =
-    JodaWrites.jodaDateWrites("yyyy-MM-dd'T'HH:mm:ss.SSSZ'")
-
-  implicit val write = new Writes[ControlCobro] {
-    def writes(e: ControlCobro) = Json.obj(
-        "id_agencia" -> e.id_agencia,
-        "id_colocacion" -> e.id_colocacion,
-        "fecha_observacion" -> e.fecha_observacion,
-        "observacion" -> e.observacion,
-        "es_observacion" -> e.es_observacion,
-        "es_compromiso" -> e.es_compromiso,
-        "fecha_compromiso" -> e.fecha_compromiso,
-        "id_usuario" -> e.id_usuario,
-        "empleado" -> e.empleado
-    )
-  }
-
-  implicit val rReads: Reads[ControlCobro] = (
-    (__ \ "id_agencia").readNullable[Long] and
-    (__ \ "id_colocacion").readNullable[String] and
-    (__ \ "fecha_observacion").readNullable[DateTime] and
-    (__ \ "observacion").readNullable[String] and
-    (__ \ "es_observacion").readNullable[Int] and
-    (__ \ "es_compromiso").readNullable[Int] and
-    (__ \ "fecha_compromiso").readNullable[DateTime] and
-    (__ \ "id_usuario").readNullable[String] and
-    (__ \ "empleado").readNullable[String]
-  )(ControlCobro.apply _) 
-
-  val _set = {
-    get[Option[Long]]("id_agencia") ~
-    get[Option[String]]("id_colocacion") ~
-    get[Option[DateTime]]("fecha_observacion") ~
-    get[Option[String]]("observacion") ~
-    get[Option[Int]]("es_observacion") ~
-    get[Option[Int]]("es_compromiso") ~
-    get[Option[DateTime]]("fecha_compromiso") ~
-    get[Option[String]]("id_usuario") ~
-    get[Option[String]]("empleado") map {
-      case 
-        id_agencia ~
-        id_colocacion ~
-        fecha_observacion ~
-        observacion ~
-        es_observacion ~
-        es_compromiso ~
-        fecha_compromiso ~
-        id_usuario ~
-        empleado => ControlCobro(
-          id_agencia,
-          id_colocacion,
-          fecha_observacion,
-          observacion,
-          es_observacion,
-          es_compromiso,
-          fecha_compromiso,
-          id_usuario,
-          empleado      
-        )
-    }
-  }
-
-}
-
 class ControlCobroRepository @Inject()(dbapi: DBApi, _f: Funcion, _gcol: GlobalesCol, _uService: UsuarioRepository)(
     implicit ec: DatabaseExecutionContext
 ) {
@@ -241,58 +45,51 @@ class ControlCobroRepository @Inject()(dbapi: DBApi, _f: Funcion, _gcol: Globale
             }
       }
       // Debo verificar el filtro de busqueda
-      for (c <- creditos) { 
-        val nombre = db.withConnection { implicit connection =>
+      db.withConnection { implicit connection =>
+        for (c <- creditos) { 
+          val nombre = 
                         SQL("""SELECT (p.NOMBRE || ' ' || p.PRIMER_APELLIDO || ' ' || p.SEGUNDO_APELLIDO) AS NOMBRE FROM "gen$persona" p WHERE p.ID_IDENTIFICACION = {id_identificacion} AND p.ID_PERSONA = {id_persona} """).
                         on(
                           'id_identificacion -> c._1._3.get,
                           'id_persona -> c._1._4.get
                         ).as(SqlParser.scalar[String].singleOpt)
-        }
 
-        val centro_costo = db.withConnection { implicit connection => 
-            SQL("""SELECT DESCRIPCION_AGENCIA FROM "gen$agencia" WHERE ID_AGENCIA = {id_agencia}""").
+          val centro_costo = SQL("""SELECT DESCRIPCION_AGENCIA FROM "gen$agencia" WHERE ID_AGENCIA = {id_agencia}""").
             on(
               'id_agencia -> c._1._1.get
             ).as(SqlParser.scalar[String].singleOpt)
-        }
 
-        val estadoDesc = db.withConnection { implicit connection => 
-          SQL("""SELECT DESCRIPCION_ESTADO_COLOCACION FROM "col$estado" WHERE ID_ESTADO_COLOCACION = {id_estado_colocacion}""").
-          on(
-            'id_estado_colocacion -> c._6._5.get
-          ).as(SqlParser.scalar[String].singleOpt)
-        }
+          val estadoDesc = SQL("""SELECT DESCRIPCION_ESTADO_COLOCACION FROM "col$estado" WHERE ID_ESTADO_COLOCACION = {id_estado_colocacion}""").
+            on(
+              'id_estado_colocacion -> c._6._5.get
+            ).as(SqlParser.scalar[String].singleOpt)
 
-        val tipo_cuota = db.withConnection { implicit connection =>
-          SQL("""SELECT DESCRIPCION_TIPO_CUOTA FROM "col$tiposcuota" WHERE ID_TIPOS_CUOTA = {id_tipos_cuota}""").
-          on(
-            'id_tipos_cuota -> c._5._1.get
-          ).as(SqlParser.scalar[String].singleOpt)
-        }
+          val tipo_cuota = SQL("""SELECT DESCRIPCION_TIPO_CUOTA FROM "col$tiposcuota" WHERE ID_TIPOS_CUOTA = {id_tipos_cuota}""").
+            on(
+              'id_tipos_cuota -> c._5._1.get
+            ).as(SqlParser.scalar[String].singleOpt)
 
-        val numero_cuotas = db.withConnection { implicit connection => 
-          SQL("""SELECT COUNT(*) FROM "col$tablaliquidacion" t WHERE t.ID_COLOCACION = {id_colocacion} and t.PAGADA = 0""").
-          on(
+
+          val numero_cuotas = SQL("""SELECT COUNT(*) FROM "col$tablaliquidacion" t WHERE t.ID_COLOCACION = {id_colocacion} and t.PAGADA = 0""").
+            on(
             'id_colocacion -> c._1._2.get
           ).as(SqlParser.scalar[Int].singleOpt)
-        }
 
-        var valor = c._3._3.get 
-        var abono = c._6._2.get
-        var deuda = valor - abono
-        var tasa_nominal = _f.tasaNominalVencida(c._4._3.get, c._5._3.get)
+          var valor = c._3._3.get 
+          var abono = c._6._2.get
+          var deuda = valor - abono
+          var tasa_nominal = _f.tasaNominalVencida(c._4._3.get, c._5._3.get)
 
-        var dias_mora = 0
-        if (deuda > 0) {
-          dias_mora = _gcol.obtenerDiasMora(c._1._2.get)
-          if (dias_mora < -1) { dias_mora += 2 }
-        }        
-        val estCol = c._6._5.get
-        estado match {
-        case -1 =>
-          if (dias_mora >= dias_ini && dias_mora <= dias_fin) {
-            var _cc = new ControlCobroVista(
+          var dias_mora = 0
+          if (deuda > 0) {
+            dias_mora = _gcol.obtenerDiasMora(c._1._2.get)
+            if (dias_mora < -1) { dias_mora += 2 }
+          }        
+          val estCol = c._6._5.get
+          estado match {
+          case -1 =>
+            if (dias_mora >= dias_ini && dias_mora <= dias_fin) {
+              var _cc = new ControlCobroVista(
                                         c._1._1,
                                         c._1._2, 
                                         nombre, 
@@ -312,9 +109,9 @@ class ControlCobroRepository @Inject()(dbapi: DBApi, _f: Funcion, _gcol: Globale
                                         tipo_cuota,
                                         Some(""), 
                                         centro_costo)
-            _lista += _cc                                        
-          }
-        case estCol =>
+              _lista += _cc                                        
+            }
+          case estCol =>
             if (dias_mora >= dias_ini && dias_mora <= dias_fin) {
               var _cc = new ControlCobroVista(
                                         c._1._1,
@@ -336,76 +133,64 @@ class ControlCobroRepository @Inject()(dbapi: DBApi, _f: Funcion, _gcol: Globale
                                         tipo_cuota,
                                         Some(""), 
                                         centro_costo)
-            _lista += _cc
+              _lista += _cc
+            }
           }
         }
       }
       _lista.toList
     }
 
-  def obtenerCreditos(id_identificacion: Int, id_persona: String): Future[Iterable[ControlCobroVista]] = Future[Iterable[ControlCobroVista]] {
+  def obtenerCreditoPorColocacion(id_colocacion: String): Future[Iterable[ControlCobroVista]] = Future[Iterable[ControlCobroVista]] {
       var _lista = new mutable.ListBuffer[ControlCobroVista]()      
       val creditos = db.withConnection { implicit connection =>
             SQL("""SELECT a.ID_AGENCIA, a.ID_COLOCACION, a.ID_IDENTIFICACION, a.ID_PERSONA, a.ID_CLASIFICACION, a.ID_LINEA, a.ID_INVERSION, a.ID_RESPALDO, a.ID_GARANTIA, a.ID_CATEGORIA, a.ID_EVALUACION, a.FECHA_DESEMBOLSO, a.VALOR_DESEMBOLSO, a.PLAZO_COLOCACION, a.FECHA_VENCIMIENTO, a.TIPO_INTERES, a.ID_INTERES, a.TASA_INTERES_CORRIENTE, a.TASA_INTERES_MORA, a.PUNTOS_INTERES, a.ID_TIPO_CUOTA, a.AMORTIZA_CAPITAL, a.AMORTIZA_INTERES, a.PERIODO_GRACIA, a.DIAS_PRORROGADOS, a.VALOR_CUOTA, a.ABONOS_CAPITAL, a.FECHA_CAPITAL, a.FECHA_INTERES, a.ID_ESTADO_COLOCACION, a.ID_ENTE_APROBADOR, a.ID_EMPLEADO, a.NOTA_CONTABLE, a.NUMERO_CUENTA, a.ES_ANORMAL, a.DIAS_PAGO, a.RECIPROCIDAD, a.FECHA_SALDADO, 'D' AS tipo FROM \"col$colocacion\" a
-             WHERE a.ID_IDENTIFICACION = {id_identificacion} and a.ID_PERSONA = {id_persona} and a.ID_ESTADO_COLOCACION IN (0,1,2,3,7,8,9)
-             UNION ALL
-             SELECT a.ID_AGENCIA, a.ID_COLOCACION, a.ID_IDENTIFICACION, a.ID_PERSONA, a.ID_CLASIFICACION, a.ID_LINEA, a.ID_INVERSION, a.ID_RESPALDO, a.ID_GARANTIA, a.ID_CATEGORIA, a.ID_EVALUACION, a.FECHA_DESEMBOLSO, a.VALOR_DESEMBOLSO, a.PLAZO_COLOCACION, a.FECHA_VENCIMIENTO, a.TIPO_INTERES, a.ID_INTERES, a.TASA_INTERES_CORRIENTE, a.TASA_INTERES_MORA, a.PUNTOS_INTERES, a.ID_TIPO_CUOTA, a.AMORTIZA_CAPITAL, a.AMORTIZA_INTERES, a.PERIODO_GRACIA, a.DIAS_PRORROGADOS, a.VALOR_CUOTA, a.ABONOS_CAPITAL, a.FECHA_CAPITAL, a.FECHA_INTERES, a.ID_ESTADO_COLOCACION, a.ID_ENTE_APROBADOR, a.ID_EMPLEADO, a.NOTA_CONTABLE, a.NUMERO_CUENTA, a.ES_ANORMAL, a.DIAS_PAGO, a.RECIPROCIDAD, a.FECHA_SALDADO, 'F' AS tipo FROM \"col$colocacion\" a
-             LEFT JOIN \"col$colgarantias\" g ON g.ID_COLOCACION = a.ID_COLOCACION WHERE g.ID_IDENTIFICACION = {id_identificacion} and g.ID_PERSONA = {id_persona} and a.ID_ESTADO_COLOCACION IN (0,1,2,3,7,8,9)
+             WHERE a.ID_COLOCACION = {id_colocacion} and a.ID_ESTADO_COLOCACION IN (0,1,2,3,7,8,9)
             """).
             on(
-                'id_identificacion -> id_identificacion,
-                'id_persona -> id_persona
+                'id_colocacion -> id_colocacion
             ).as(Credito._set *)
       }
       // Debo verificar el filtro de busqueda
-      for (c <- creditos) {
-        val nombre = db.withConnection { implicit connection =>
-                        SQL("""SELECT (p.NOMBRE || ' ' || p.PRIMER_APELLIDO || ' ' || p.SEGUNDO_APELLIDO) AS NOMBRE FROM "gen$persona" p WHERE p.ID_IDENTIFICACION = {id_identificacion} AND p.ID_PERSONA = {id_persona} """).
+      db.withConnection { implicit connection =>      
+        for (c <- creditos) {
+          val nombre = SQL("""SELECT (p.NOMBRE || ' ' || p.PRIMER_APELLIDO || ' ' || p.SEGUNDO_APELLIDO) AS NOMBRE FROM "gen$persona" p WHERE p.ID_IDENTIFICACION = {id_identificacion} AND p.ID_PERSONA = {id_persona} """).
                         on(
                           'id_identificacion -> c._1._3.get,
                           'id_persona -> c._1._4.get
                         ).as(SqlParser.scalar[String].singleOpt)
-        }
-
-        val centro_costo = db.withConnection { implicit connection => 
-            SQL("""SELECT DESCRIPCION_AGENCIA FROM "gen$agencia" WHERE ID_AGENCIA = {id_agencia}""").
+ 
+          val centro_costo = SQL("""SELECT DESCRIPCION_AGENCIA FROM "gen$agencia" WHERE ID_AGENCIA = {id_agencia}""").
             on(
               'id_agencia -> c._1._1.get
             ).as(SqlParser.scalar[String].singleOpt)
-        }
 
-        val estadoDesc = db.withConnection { implicit connection => 
-          SQL("""SELECT DESCRIPCION_ESTADO_COLOCACION FROM "col$estado" WHERE ID_ESTADO_COLOCACION = {id_estado_colocacion}""").
-          on(
-            'id_estado_colocacion -> c._6._5.get
-          ).as(SqlParser.scalar[String].singleOpt)
-        }
+          val estadoDesc = SQL("""SELECT DESCRIPCION_ESTADO_COLOCACION FROM "col$estado" WHERE ID_ESTADO_COLOCACION = {id_estado_colocacion}""").
+            on(
+              'id_estado_colocacion -> c._6._5.get
+            ).as(SqlParser.scalar[String].singleOpt)
 
-        val tipo_cuota = db.withConnection { implicit connection =>
-          SQL("""SELECT DESCRIPCION_TIPO_CUOTA FROM "col$tiposcuota" WHERE ID_TIPOS_CUOTA = {id_tipos_cuota}""").
-          on(
-            'id_tipos_cuota -> c._5._1.get
-          ).as(SqlParser.scalar[String].singleOpt)
-        }
+          val tipo_cuota = SQL("""SELECT DESCRIPCION_TIPO_CUOTA FROM "col$tiposcuota" WHERE ID_TIPOS_CUOTA = {id_tipos_cuota}""").
+            on(
+              'id_tipos_cuota -> c._5._1.get
+            ).as(SqlParser.scalar[String].singleOpt)
 
-        val numero_cuotas = db.withConnection { implicit connection => 
-          SQL("""SELECT COUNT(*) FROM "col$tablaliquidacion" t WHERE t.ID_COLOCACION = {id_colocacion} and t.PAGADA = 0""").
-          on(
-            'id_colocacion -> c._1._2.get
-          ).as(SqlParser.scalar[Int].singleOpt)
-        }
+          val numero_cuotas = SQL("""SELECT COUNT(*) FROM "col$tablaliquidacion" t WHERE t.ID_COLOCACION = {id_colocacion} and t.PAGADA = 0""").
+            on(
+              'id_colocacion -> c._1._2.get
+            ).as(SqlParser.scalar[Int].singleOpt)
 
-        var valor = c._3._3.get 
-        var abono = c._6._2.get
-        var deuda = valor - abono
-        var tasa_nominal = _f.tasaNominalVencida(c._4._3.get, c._5._3.get)
+          var valor = c._3._3.get 
+          var abono = c._6._2.get
+          var deuda = valor - abono
+          var tasa_nominal = _f.tasaNominalVencida(c._4._3.get, c._5._3.get)
 
-        var dias_mora = 0
-        if (deuda > 0) { 
-          dias_mora = _gcol.obtenerDiasMora(c._1._2.get)
-          if (dias_mora < -1) { dias_mora += 2 }
-        }
-        var _cc = new ControlCobroVista(
+          var dias_mora = 0
+          if (deuda > 0) { 
+            dias_mora = _gcol.obtenerDiasMora(c._1._2.get)
+            if (dias_mora < -1) { dias_mora += 2 }
+          }
+          var _cc = new ControlCobroVista(
                                         c._1._1,
                                         c._1._2, 
                                         nombre, 
@@ -425,7 +210,87 @@ class ControlCobroRepository @Inject()(dbapi: DBApi, _f: Funcion, _gcol: Globale
                                         tipo_cuota,
                                         Some(""), 
                                         centro_costo)
-        _lista += _cc 
+          _lista += _cc
+        } 
+      }
+      _lista.toList      
+  }
+
+  def obtenerCreditos(id_identificacion: Int, id_persona: String): Future[Iterable[ControlCobroVista]] = Future[Iterable[ControlCobroVista]] {
+      var _lista = new mutable.ListBuffer[ControlCobroVista]()      
+      val creditos = db.withConnection { implicit connection =>
+            SQL("""SELECT a.ID_AGENCIA, a.ID_COLOCACION, a.ID_IDENTIFICACION, a.ID_PERSONA, a.ID_CLASIFICACION, a.ID_LINEA, a.ID_INVERSION, a.ID_RESPALDO, a.ID_GARANTIA, a.ID_CATEGORIA, a.ID_EVALUACION, a.FECHA_DESEMBOLSO, a.VALOR_DESEMBOLSO, a.PLAZO_COLOCACION, a.FECHA_VENCIMIENTO, a.TIPO_INTERES, a.ID_INTERES, a.TASA_INTERES_CORRIENTE, a.TASA_INTERES_MORA, a.PUNTOS_INTERES, a.ID_TIPO_CUOTA, a.AMORTIZA_CAPITAL, a.AMORTIZA_INTERES, a.PERIODO_GRACIA, a.DIAS_PRORROGADOS, a.VALOR_CUOTA, a.ABONOS_CAPITAL, a.FECHA_CAPITAL, a.FECHA_INTERES, a.ID_ESTADO_COLOCACION, a.ID_ENTE_APROBADOR, a.ID_EMPLEADO, a.NOTA_CONTABLE, a.NUMERO_CUENTA, a.ES_ANORMAL, a.DIAS_PAGO, a.RECIPROCIDAD, a.FECHA_SALDADO, 'D' AS tipo FROM \"col$colocacion\" a
+             WHERE a.ID_IDENTIFICACION = {id_identificacion} and a.ID_PERSONA = {id_persona} and a.ID_ESTADO_COLOCACION IN (0,1,2,3,7,8,9)
+             UNION ALL
+             SELECT a.ID_AGENCIA, a.ID_COLOCACION, a.ID_IDENTIFICACION, a.ID_PERSONA, a.ID_CLASIFICACION, a.ID_LINEA, a.ID_INVERSION, a.ID_RESPALDO, a.ID_GARANTIA, a.ID_CATEGORIA, a.ID_EVALUACION, a.FECHA_DESEMBOLSO, a.VALOR_DESEMBOLSO, a.PLAZO_COLOCACION, a.FECHA_VENCIMIENTO, a.TIPO_INTERES, a.ID_INTERES, a.TASA_INTERES_CORRIENTE, a.TASA_INTERES_MORA, a.PUNTOS_INTERES, a.ID_TIPO_CUOTA, a.AMORTIZA_CAPITAL, a.AMORTIZA_INTERES, a.PERIODO_GRACIA, a.DIAS_PRORROGADOS, a.VALOR_CUOTA, a.ABONOS_CAPITAL, a.FECHA_CAPITAL, a.FECHA_INTERES, a.ID_ESTADO_COLOCACION, a.ID_ENTE_APROBADOR, a.ID_EMPLEADO, a.NOTA_CONTABLE, a.NUMERO_CUENTA, a.ES_ANORMAL, a.DIAS_PAGO, a.RECIPROCIDAD, a.FECHA_SALDADO, 'F' AS tipo FROM \"col$colocacion\" a
+             LEFT JOIN \"col$colgarantias\" g ON g.ID_COLOCACION = a.ID_COLOCACION WHERE g.ID_IDENTIFICACION = {id_identificacion} and g.ID_PERSONA = {id_persona} and a.ID_ESTADO_COLOCACION IN (0,1,2,3,7,8,9)
+            """).
+            on(
+                'id_identificacion -> id_identificacion,
+                'id_persona -> id_persona
+            ).as(Credito._set *)
+      }
+      // Debo verificar el filtro de busqueda
+      db.withConnection { implicit connection =>      
+        for (c <- creditos) {
+          val nombre = SQL("""SELECT (p.NOMBRE || ' ' || p.PRIMER_APELLIDO || ' ' || p.SEGUNDO_APELLIDO) AS NOMBRE FROM "gen$persona" p WHERE p.ID_IDENTIFICACION = {id_identificacion} AND p.ID_PERSONA = {id_persona} """).
+                        on(
+                          'id_identificacion -> c._1._3.get,
+                          'id_persona -> c._1._4.get
+                        ).as(SqlParser.scalar[String].singleOpt)
+
+          val centro_costo = SQL("""SELECT DESCRIPCION_AGENCIA FROM "gen$agencia" WHERE ID_AGENCIA = {id_agencia}""").
+            on(
+              'id_agencia -> c._1._1.get
+            ).as(SqlParser.scalar[String].singleOpt)
+
+          val estadoDesc = SQL("""SELECT DESCRIPCION_ESTADO_COLOCACION FROM "col$estado" WHERE ID_ESTADO_COLOCACION = {id_estado_colocacion}""").
+            on(
+              'id_estado_colocacion -> c._6._5.get
+            ).as(SqlParser.scalar[String].singleOpt)
+
+          val tipo_cuota = SQL("""SELECT DESCRIPCION_TIPO_CUOTA FROM "col$tiposcuota" WHERE ID_TIPOS_CUOTA = {id_tipos_cuota}""").
+            on(
+              'id_tipos_cuota -> c._5._1.get
+            ).as(SqlParser.scalar[String].singleOpt)
+
+          val numero_cuotas = SQL("""SELECT COUNT(*) FROM "col$tablaliquidacion" t WHERE t.ID_COLOCACION = {id_colocacion} and t.PAGADA = 0""").
+          on(
+            'id_colocacion -> c._1._2.get
+          ).as(SqlParser.scalar[Int].singleOpt)
+
+          var valor = c._3._3.get 
+          var abono = c._6._2.get
+          var deuda = valor - abono
+          var tasa_nominal = _f.tasaNominalVencida(c._4._3.get, c._5._3.get)
+
+          var dias_mora = 0
+          if (deuda > 0) { 
+            dias_mora = _gcol.obtenerDiasMora(c._1._2.get)
+            if (dias_mora < -1) { dias_mora += 2 }
+          }
+          var _cc = new ControlCobroVista(
+                                        c._1._1,
+                                        c._1._2, 
+                                        nombre, 
+                                        Some(deuda), 
+                                        c._6._1,
+                                        c._3._4,
+                                        c._5._2,
+                                        c._5._3,
+                                        Some(tasa_nominal),
+                                        numero_cuotas,                                        
+                                        c._6._3, 
+                                        c._6._4, 
+                                        estadoDesc,
+                                        Some(dias_mora),
+                                        c._1._3,
+                                        c._1._4,
+                                        tipo_cuota,
+                                        Some(""), 
+                                        centro_costo)
+          _lista += _cc
+        } 
       }
       _lista.toList      
   }

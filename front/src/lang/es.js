@@ -32,6 +32,7 @@ export default {
     'menu1-2liquidacionmanual': 'Liquidación Manual',
     'menu2gestion': 'Gestión',
     'menu2-1controlcobro': 'Control de Cobro',
+    'menu2-2periodogracia': 'Periodo Gracia',
     'menu3causacion': 'Causación',
     'menu3-1proceso': 'Procesar',
     'menu3-2consulta': 'Consultar',

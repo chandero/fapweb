@@ -37,7 +37,15 @@ class ControlCobroController @Inject()(
         cService.obtenerCreditos(id_identificacion, id_persona).map { p =>
             Ok(Json.toJson(p))
         }
-    }   
+    }
+
+    def obtenerCreditoPorColocacion(id_colocacion: String) = authenticatedUserAction.async {
+        implicit request: Request[AnyContent] =>
+              // val usua_id = Utility.extraerUsuario(request)
+        cService.obtenerCreditoPorColocacion(id_colocacion).map { p =>
+            Ok(Json.toJson(p))
+        }
+    }
     
     def obtenerDireccion(id_identificacion: Int, id_persona: String) = authenticatedUserAction.async { 
         implicit request: Request[AnyContent] =>

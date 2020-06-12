@@ -83,6 +83,25 @@
                 </el-row>
               </el-form>
             </el-tab-pane>
+            <el-tab-pane>
+              <span slot="label"><i class="el-icon-search" />Colocación</span>
+              <el-form label-position="left">
+                <el-row>
+                  <el-col :span="7">
+                    <el-form-item label="Colocacion">
+                      <el-input v-model="id_colocacion_buscar" />
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+                <el-row>
+                  <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
+                    <el-form-item>
+                      <el-button :disabled="id_colocacion_buscar === null || id_colocacion_buscar === ''" type="success" icon="el-icon-search" title="Buscar Datos" @click="buscarPorEstado">Buscar</el-button>
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+              </el-form>
+            </el-tab-pane>
           </el-tabs>
         </el-col>
       </el-row>
@@ -238,7 +257,7 @@ import LiquidacionDePruebaComponent from '@/components/LiquidacionDePrueba'
 import { obtenerGarantiaPersonal, obtenerGarantiaReal } from '@/api/credito'
 import { obtenerExtractoColocacion } from '@/api/extractocolocacion'
 import { obtenerListaTipoIdentificacion, obtenerListaTipoEstadoColocacion, obtenerListaTipoDireccion, obtenerListaMunicipios, obtenerListaAsesores } from '@/api/tipos'
-import { buscarCreditoPorEstado, buscarCreditoPorDocumento, buscarDireccionPersona, buscarControlCobro } from '@/api/controlcobro'
+import { buscarCreditoPorColocacion, buscarCreditoPorEstado, buscarCreditoPorDocumento, buscarDireccionPersona, buscarControlCobro } from '@/api/controlcobro'
 import { obtenerPersona } from '@/api/persona'
 
 export default {
@@ -261,6 +280,7 @@ export default {
         id_agencia: 1,
         id_colocacion: '00000000000'
       },
+      id_colocacion_buscar: null,
       controlcobro: {
         fecha_observacion: new Date(),
         es_compromiso: false,
@@ -385,6 +405,16 @@ export default {
       this.loading = true
       this.limpiarTablas()
       buscarCreditoPorEstado(this.id_estado_colocacion, this.dias_ini, this.dias_fin, this.ases_id).then(response => {
+        this.dataColocacion = response.data
+        this.loading = false
+      }).catch(() => {
+        this.loading = false
+      })
+    },
+    buscarPorColocacion() {
+      this.loading = true
+      this.limpiarTablas()
+      buscarCreditoPorColocacion(this.id_colocacion_buscar).then(response => {
         this.dataColocacion = response.data
         this.loading = false
       }).catch(() => {

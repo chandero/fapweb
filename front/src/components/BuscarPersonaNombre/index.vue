@@ -5,7 +5,7 @@
         <el-row>
           <el-col :span="5">
             <el-form-item label="Primer Apellido">
-              <el-input v-model="primer_apellido" @input="primer_apellido=primer_apellido.toUpperCase()"/>
+              <el-input v-model="data.primer_apellido" @input="data.primer_apellido=data.primer_apellido.toUpperCase()"/>
             </el-form-item>
           </el-col>
           <el-col :span="1">
@@ -13,7 +13,7 @@
           </el-col>
           <el-col :span="5">
             <el-form-item label="Segundo Apellido">
-              <el-input v-model="segundo_apellido" @input="segundo_apellido=segundo_apellido.toUpperCase()" />
+              <el-input v-model="data.segundo_apellido" @input="data.segundo_apellido=data.segundo_apellido.toUpperCase()" />
             </el-form-item>
           </el-col>
           <el-col :span="1">
@@ -21,12 +21,12 @@
           </el-col>
           <el-col :span="5">
             <el-form-item label="Nombre">
-              <el-input v-model="nombre" @input="nombre=nombre.toUpperCase()" />
+              <el-input v-model="data.nombre" @input="data.nombre=data.nombre.toUpperCase()" />
             </el-form-item>
           </el-col>
           <el-col :span="5">
             <el-form-item>
-              <el-button :disabled="primer_apellido == null && segundo_apellido == null && nombre == null" type="success" icon="el-icon-search" title="Buscar Datos" @click="buscarPorNombre()">Buscar</el-button>
+              <el-button :disabled="data.primer_apellido == null && data.segundo_apellido == null && data.nombre == null" type="success" icon="el-icon-search" title="Buscar Datos" @click="buscarPorNombre()">Buscar</el-button>
             </el-form-item>
           </el-col>
         </el-row>
@@ -99,13 +99,23 @@ export default {
   },
   data() {
     return {
-      personas: null,
-      loading: null
+      personas: [],
+      loading: null,
+      data: {
+        primer_apellido: null,
+        segundo_apellido: null,
+        nombre: null
+      }
     }
+  },
+  beforeMount() {
+    this.data.primer_apellido = this.primer_apellido
+    this.data.segundo_apellido = this.segundo_apellido
+    this.data.nombre = this.nombre
   },
   methods: {
     buscarPorNombre() {
-      obtenerPersonaPorApellidosYNombre(this.primer_apellido.trim() + '%', this.segundo_apellido.trim() + '%', this.nombre.trim() + '%').then(response => {
+      obtenerPersonaPorApellidosYNombre(this.data.primer_apellido.trim() + '%', this.data.segundo_apellido.trim() + '%', this.data.nombre.trim() + '%').then(response => {
         this.personas = response.data
       })
     },
@@ -113,7 +123,7 @@ export default {
       this.primer_apellido = ''
       this.segundo_apellido = ''
       this.nombre = ''
-      this.personas = null
+      this.personas = []
       const data = {
         id_identificacion: id_identificacion,
         id_persona: id_persona

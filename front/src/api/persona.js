@@ -11,6 +11,16 @@ export function obtenerPersona(i, p) {
   })
 }
 
+export function obtenerPersonaPorColocacion(c) {
+  const data = {
+    c
+  }
+  return request({
+    url: '/pers/bpc/' + data.c,
+    method: 'get'
+  })
+}
+
 export function guardarPersona(p) {
   const data = {
     p

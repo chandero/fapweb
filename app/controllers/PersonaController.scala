@@ -45,6 +45,14 @@ class PersonaController @Inject()(
               }
         }
         
+        def obtenerPersonaPorColocacion(c: String) = authenticatedUserAction.async {
+            implicit request: Request[AnyContent] =>
+              val usua_id = Utility.extraerUsuario(request)
+              pService.obtenerPersonaPorColocacion(c).map { p =>
+                Ok(Json.toJson(p))
+              }
+        }        
+
         def guardar() = authenticatedUserAction.async {
           implicit request: Request[AnyContent] =>
           val usua_id = Utility.extraerUsuario(request)

@@ -45,6 +45,12 @@ const cartera2Router = {
           component: () => import('@/views/cartera2/menu2gestion/menu2-1controlcobro'),
           name: 'Menu2-1controlcobro',
           meta: { title: 'menu2-1controlcobro' }
+        },
+        {
+          path: 'menu2-2periodogracia',
+          component: () => import('@/views/cartera2/menu2gestion/menu2-2periodogracia'),
+          name: 'Menu2-2periodogracia',
+          meta: { title: 'menu2-2periodogracia' }
         }
       ]
     },

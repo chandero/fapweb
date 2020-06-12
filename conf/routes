@@ -79,6 +79,7 @@ GET     /api/cred/ldp/:i/:c/:f          controllers.CreditoController.liquidacio
 # Control Cobro
 GET     /api/coco/bpd/:i/:p             controllers.ControlCobroController.obtenerCreditosPorDocumento(i: Int, p: String)
 GET     /api/coco/bpe/:e/:i/:f/:a       controllers.ControlCobroController.obtenerCreditosPorEstado(e: Int, i: Int, f: Int, a: Int)
+GET     /api/coco/bpc/:c                controllers.ControlCobroController.obtenerCreditoPorColocacion(c: String)
 GET     /api/coco/bdp/:i/:p             controllers.ControlCobroController.obtenerDireccion(i: Int, p: String)
 GET     /api/coco/bcc/:i                controllers.ControlCobroController.obtenerControlCobro(i: String)
 POST    /api/coco/ccs                   controllers.ControlCobroController.agregar
@@ -115,6 +116,7 @@ GET     /api/tess/obt                   controllers.TipoEstadoSolicitudControlle
 GET     /api/pers/ver/:i/:p             controllers.PersonaController.obtener(i:Int , p:String)
 POST    /api/pers/gdr                   controllers.PersonaController.guardar()
 POST    /api/pers/opn                   controllers.PersonaController.obtenerPorApellidosyNombres
+GET     /api/pers/bpc/:c                controllers.PersonaController.obtenerPersonaPorColocacion(c: String)
 
 # Solicitud
 POST   /api/soex/                       controllers.SolicitudExternaController.crear()
@@ -136,6 +138,14 @@ GET    /api/gare/ogr/:c                 controllers.GarantiaRealController.obten
 
 # Puc
 GET    /api/puc/ocn/:c                  controllers.PucController.obtenerNombre(c: String)
+
+# ColPeriodoGracia
+GET    /api/pegr/get                    controllers.ColPeriodoGraciaController.todos
+GET    /api/pegr/norm/:c                controllers.ColPeriodoGraciaController.normalizarColocacionPeriodoGracia(c: String)
+GET    /api/pegr/norv/:c                controllers.ColPeriodoGraciaController.normalizarreversoColocacionPeriodoGracia(c: String)
+GET    /api/pegr/elim/:c                controllers.ColPeriodoGraciaController.marcarEliminado(c: String)
+GET    /api/pegr/add/:c/:f/:d           controllers.ColPeriodoGraciaController.agregarPeriodoGracia(c: String, f: Long, d: Int)
+GET    /api/pegr/upd/:c/:d              controllers.ColPeriodoGraciaController.actualizarPeriodoGracia(c: String, d: Int)
 
 # Http
 GET    /api/http/status                 controllers.HttpClientController.status

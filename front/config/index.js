@@ -15,6 +15,7 @@ module.exports = {
         secure: false,
         changeOrigin: true,
         proxyTimeout: 0,
+        timeout: 0,
         onProxyReq: (proxyReq, req, res) => req.setTimeout(0)
       }
     },

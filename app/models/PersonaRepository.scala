@@ -1254,6 +1254,115 @@ class PersonaRepository @Inject()(dbapi: DBApi)(
       }      
     }
 
+    def obtenerPersonaPorColocacion(id_colocacion: String): Future[Option[Persona]] = Future {
+      db.withConnection { implicit connection =>
+        val persona_a = SQL(
+          """SELECT p.* FROM "col$colocacion" c 
+             INNER JOIN "gen$persona" p ON p.ID_IDENTIFICACION = c.ID_IDENTIFICACION and p.ID_PERSONA = c.ID_PERSONA
+             WHERE c.ID_COLOCACION = {id_colocacion}"""
+        ).on(
+            'id_colocacion -> id_colocacion
+          )
+          .as(Persona_a._set.singleOpt)
+
+        persona_a match {
+          case Some(p) =>
+            val persona_b = SQL(
+              """SELECT * FROM \"gen$persona\" p WHERE p.ID_IDENTIFICACION = {id_identificacion} AND p.ID_PERSONA = {id_persona}"""
+            ).on(
+              'id_identificacion -> p.id_identificacion,
+              'id_persona -> p.id_persona
+            )
+            .as(Persona_b._set.singleOpt)
+
+            val persona_c = SQL(
+              """SELECT * FROM \"gen$persona\" p WHERE p.ID_IDENTIFICACION = {id_identificacion} AND p.ID_PERSONA = {id_persona}"""
+            ).on(
+              'id_identificacion -> p.id_identificacion,
+              'id_persona -> p.id_persona
+            )
+            .as(Persona_c._set.singleOpt)
+
+            val persona_d = SQL(
+              """SELECT * FROM \"gen$persona\" p WHERE p.ID_IDENTIFICACION = {id_identificacion} AND p.ID_PERSONA = {id_persona}"""
+            ).on(
+              'id_identificacion -> p.id_identificacion,
+              'id_persona -> p.id_persona
+            )
+            .as(Persona_d._set.singleOpt)
+
+            val persona_e = SQL(
+              """SELECT * FROM \"gen$persadicional\" p WHERE p.ID_IDENTIFICACION = {id_identificacion} AND p.ID_PERSONA = {id_persona}"""
+            ).on(
+                'id_identificacion -> p.id_identificacion,
+                'id_persona -> p.id_persona
+            )
+            .as(Persona_e._set.singleOpt)
+
+            val persona_f = SQL(
+              """SELECT * FROM \"gen$personaextra\" p WHERE p.ID_IDENTIFICACION = {id_identificacion} AND p.ID_PERSONA = {id_persona}"""
+            ).on(
+              'id_identificacion -> p.id_identificacion,
+              'id_persona -> p.id_persona
+            )
+            .as(Persona_f._set.singleOpt)
+
+            val direcciones = SQL(
+              """SELECT d.consecutivo, d.id_direccion, d.direccion, d.barrio, d.cod_municipio, m.NOMBRE AS municipio, d.telefono1, d.telefono2, d.telefono3, d.telefono4 FROM \"gen$direccion\" d 
+                INNER JOIN \"gen$municipios" m ON m.COD_MUNICIPIO = d.COD_MUNICIPIO
+                WHERE d.ID_IDENTIFICACION = {id_identificacion} AND d.ID_PERSONA = {id_persona}
+                ORDER BY d.ID_DIRECCION ASC"""
+            ).on(
+              'id_identificacion -> p.id_identificacion,
+              'id_persona -> p.id_persona
+            )
+            .as(Direccion._set *)
+
+            val referencias = SQL(
+              """SELECT * FROM \"gen$referencias\" d WHERE d.TIPO_ID_REFERENCIA = {id_identificacion} AND d.ID_REFERENCIA = {id_persona}"""
+            ).on(
+              'id_identificacion -> p.id_identificacion,
+              'id_persona -> p.id_persona
+            )
+            .as(Referencia._set *)          
+
+            val beneficiarios = SQL(
+              """SELECT * FROM \"gen$beneficiario\" b WHERE b.ID_IDENTIFICACION = {id_identificacion} AND b.ID_PERSONA = {id_persona}"""
+            ).on(
+              'id_identificacion -> p.id_identificacion,
+              'id_persona -> p.id_persona
+            )
+            .as(Beneficiario._set *)
+
+            val hijos = SQL(
+              """SELECT * FROM \"gen$hijo\" h WHERE h.ID_IDENTIFICACION = {id_identificacion} AND h.ID_PERSONA = {id_persona}"""
+            ).on(
+              'id_identificacion -> p.id_identificacion,
+              'id_persona -> p.id_persona
+            ).as(Hijo._set *)          
+
+            var persona = new Persona(
+              persona_a,
+              persona_b,
+              persona_c,
+              persona_d,
+              persona_e,
+              persona_f,
+              direcciones,
+              referencias,
+              beneficiarios,
+              hijos
+            )
+
+            Some(persona)
+
+        case None => None
+        }
+    }
+     
+
+    }
+
     def guardar(p: Persona): Future[Boolean] = {
       db.withConnection { implicit connection =>
         var a = p.a.get

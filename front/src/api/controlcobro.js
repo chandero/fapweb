@@ -35,6 +35,16 @@ export function buscarCreditoPorEstado(es, fi, ff, ases_id) {
   })
 }
 
+export function buscarCreditoPorColocacion(id_colocacion) {
+  const data = {
+    id_colocacion
+  }
+  return request({
+    url: '/coco/bpc/' + data.id_colocacion,
+    method: 'get'
+  })
+}
+
 export function buscarControlCobro(id) {
   const data = {
     id

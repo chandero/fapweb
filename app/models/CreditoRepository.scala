@@ -27,43 +27,6 @@ import scala.math.BigDecimal
 import utilities._
 import java.time.DateTimeException
 
-
-case class Liquidacion(
-    items: Option[List[CuotasLiq]],
-    saldo: Option[BigDecimal],
-    fecha_capital : Option[DateTime],
-    fecha_interes: Option[DateTime],
-    fecha_proxima: Option[DateTime],
-    liquidado: Boolean 
-)
-
-object Liquidacion {
-  implicit val yourJodaDateReads =
-    JodaReads.jodaDateReads("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-  implicit val yourJodaDateWrites =
-    JodaWrites.jodaDateWrites("yyyy-MM-dd'T'HH:mm:ss.SSSZ'")
-
-  implicit val wWrites = new Writes[Liquidacion] {
-    def writes(e: Liquidacion) = Json.obj( 
-        "items" -> e.items,
-        "saldo" -> e.saldo,
-        "fecha_capital" -> e.fecha_capital,
-        "fecha_interes" -> e.fecha_interes,
-        "fecha_proxima" -> e.fecha_proxima,
-        "liquidado" -> e.liquidado
-    )
-  }
-  
-  implicit val rReads: Reads[Liquidacion] = (
-        (__ \ "items").readNullable[List[CuotasLiq]] and
-        (__ \ "saldo").readNullable[BigDecimal] and
-        (__ \ "fecha_capital").readNullable[DateTime] and
-        (__ \ "fecha_interes").readNullable[DateTime] and
-        (__ \ "fecha_proxima").readNullable[DateTime] and
-        (__ \ "liquidado").read[Boolean]
-  )(Liquidacion.apply _)  
-}
-
 class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol)(
     implicit ec: DatabaseExecutionContext
 ) {
