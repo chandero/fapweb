@@ -77,7 +77,8 @@ const user = {
           }
 
           commit('SET_NAME', data.usua_nombre + ' ' + data.usua_apellido)
-          commit('SET_AVATAR', data.avatar)
+          // commit('SET_AVATAR', data.avatar)
+          commit('SET_AVATAR', require('@/assets/default-user.png'))
           commit('SET_INTRODUCTION', data.introduction)
           resolve(response)
         }).catch(error => {

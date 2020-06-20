@@ -5,6 +5,7 @@ name := "sgfcv"
 
 version := "0.5"
 
+sbtVersion := "1.3.12"
 scalaVersion := "2.12.6"
 
 scalacOptions ++= Seq("-deprecation", "-feature", "-language:postfixOps")
@@ -38,7 +39,7 @@ libraryDependencies ++= Seq(
 )
 
 // Play framework hooks for development
-PlayKeys.playRunHooks += WebpackServer(file("./front"))
+// PlayKeys.playRunHooks += WebpackServer(file("./frontend"))
 
 unmanagedResourceDirectories in Test +=  baseDirectory ( _ /"target/web/public/test" ).value
 
@@ -58,13 +59,15 @@ cleanFrontEndBuild := {
   }
 }
 
+/*
 lazy val frontEndBuild = taskKey[Unit]("Execute the npm build command to build the front-end")
 
 frontEndBuild := {
-  println(Process(s"cmd /c npm install", file("front")).!!)
-  println(Process(s"cmd /c npm run build:prod", file("front")).!!)
+  //println(Process(s"cmd /c npm install", file("frontend")).!!)
+  println(Process(s"cmd /c npm run build", file("frontend")).!!)
 }
 
 frontEndBuild := (frontEndBuild dependsOn cleanFrontEndBuild).value
 
 dist := (dist dependsOn frontEndBuild).value
+*/

@@ -1,0 +1,1 @@
+set DEBUG=backend:* & npm start env=development
