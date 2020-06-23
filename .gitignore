@@ -20,4 +20,5 @@ front/node_modules
 *.log
 *.rar
 *.csv
-frontend
+frontend/package-lock.json
+frontend/node_modules
