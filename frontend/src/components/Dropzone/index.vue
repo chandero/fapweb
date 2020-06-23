@@ -138,8 +138,8 @@ export default {
         done()
       },
       sending: (file, xhr, formData) => {
-        // formData.append('token', file.token);
-        // formData.append('key', file.key);
+        formData.append('token', file.token);
+        formData.append('key', file.key);
         vm.initOnce = false
       }
     })
