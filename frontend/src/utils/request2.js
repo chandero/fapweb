@@ -6,7 +6,7 @@ import axios from 'axios'
 
 // create an axios instance
 const service = axios.create({
-  baseURL: window.location.protocol + '//' + window.location.host + '/api2', // process.env.BASE_API, // api 的 base_url
+  baseURL: window.location.protocol + '//' + window.location.host + '/ipa', // process.env.BASE_API, // api 的 base_url
   timeout: 1200000 // request timeout
 })
 

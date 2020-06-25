@@ -9,8 +9,11 @@ module.exports = {
               timeout: 0,
               onProxyReq: (proxyReq, req, res) => req.setTimeout(0)
             },
-            '^/api2': {
+            '^/ipa': {
               target: 'http://localhost:3000',
+              pathRewrite:  {
+                '^/ipa' : '/'
+              },              
               secure: false,
               changeOrigin: true,
               proxyTimeout: 0,

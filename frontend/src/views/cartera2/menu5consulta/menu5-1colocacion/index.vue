@@ -58,7 +58,7 @@
                 <el-row>
                   <el-col :xs="24" :sm="24" :md="2" :lg="2" :xl="2">
                     <el-form-item>
-                      <el-button :disabled="id_colocacion_buscar === null || id_colocacion_buscar === ''" type="success" icon="el-icon-search" title="Buscar Datos" @click="buscarPorEstado">Buscar</el-button>
+                      <el-button :disabled="id_colocacion_buscar === null || id_colocacion_buscar === ''" type="success" icon="el-icon-search" title="Buscar Datos" @click="buscarPorColocacion">Buscar</el-button>
                     </el-form-item>
                   </el-col>
                 </el-row>
@@ -74,56 +74,56 @@
       </el-row>
       <el-row>
         <el-col>
-          <el-table v-loading="loading" :data="dataColocacion" :row-class-name="tableRowClassName" highlight-current-row style="width: 100%; font-size: 12px;" max-height="350" @current-change="handleCurrentChange" >
+          <el-table v-loading="loading" :data="dataColocacion" :row-class-name="tableRowClassName" highlight-current-row style="width: 100%; font-size: 12px;" max-height="350" >
             <el-table-column type="selection" width="55" />
             <el-table-column sortable label="Colocación" prop="id_colocacion" width="110">
               <template slot-scope="scope">
-                <span style="margin-left: 10px">{{ scope.row.id_colocacion }}</span>
+                <span style="margin-left: 10px">{{ scope.row.ID_COLOCACION }}</span>
               </template>
             </el-table-column>
             <el-table-column sortable label="Nombre" prop="nombre" width="350">
               <template slot-scope="scope">
-                <span style="margin-left: 10px">{{ scope.row.nombre }}</span>
+                <span style="margin-left: 10px">{{ scope.row.NOMBRE }}</span>
               </template>
             </el-table-column>
             <el-table-column label="Saldo" prop="saldo" align="right" width="110">
               <template slot-scope="scope">
-                <span style="margin-left: 10px">${{ scope.row.saldo | currency }}</span>
+                <span style="margin-left: 10px">${{ (scope.row.VALOR_DESEMBOLSO - scope.row.ABONOS_CAPITAL) | currency }}</span>
               </template>
             </el-table-column>
             <el-table-column label="Cuota" prop="cuota" align="right" width="110">
               <template slot-scope="scope">
-                <span style="margin-left: 10px">${{ scope.row.cuota | currency }}</span>
+                <span style="margin-left: 10px">${{ scope.row.VALOR_CUOTA | currency }}</span>
               </template>
             </el-table-column>
             <el-table-column label="Capital" prop="fecha_capital" width="110">
               <template slot-scope="scope">
-                <span style="margin-left: 10px">{{ scope.row.fecha_capital | moment("YYYY-MM-DD") }}</span>
+                <span style="margin-left: 10px">{{ scope.row.FECHA_CAPITAL | moment("YYYY-MM-DD") }}</span>
               </template>
             </el-table-column>
             <el-table-column label="Interés" prop="fecha_interes" width="110">
               <template slot-scope="scope">
-                <span style="margin-left: 10px">{{ scope.row.fecha_interes | moment("YYYY-MM-DD") }}</span>
+                <span style="margin-left: 10px">{{ scope.row.FECHA_INTERES | moment("YYYY-MM-DD") }}</span>
               </template>
             </el-table-column>
             <el-table-column sortable label="D.Mora" prop="dias_mora" width="80">
               <template slot-scope="scope">
-                <span style="margin-left: 10px">{{ scope.row.dias_mora }}</span>
+                <span style="margin-left: 10px">{{ scope.row.DIAS_MORA }}</span>
               </template>
             </el-table-column>
             <el-table-column sortable label="Estado" prop="estado" width="110">
               <template slot-scope="scope">
-                <span style="margin-left: 10px">{{ scope.row.estado }}</span>
+                <span style="margin-left: 10px">{{ scope.row.ESTADO }}</span>
               </template>
             </el-table-column>
             <el-table-column sortable label="Id" prop="tipo_id" width="50">
               <template slot-scope="scope">
-                <span style="margin-left: 10px">{{ scope.row.id_identificacion }}</span>
+                <span style="margin-left: 10px">{{ scope.row.ID_IDENTIFICACION }}</span>
               </template>
             </el-table-column>
             <el-table-column sortable label="Identificación" prop="documento" width="110">
               <template slot-scope="scope">
-                <span style="margin-left: 10px">{{ scope.row.id_persona }}</span>
+                <span style="margin-left: 10px">{{ scope.row.ID_PERSONA }}</span>
               </template>
             </el-table-column>
             <el-table-column
@@ -135,8 +135,9 @@
                   Info
                   <el-dropdown-menu slot="dropdown">
                     <el-dropdown-item><div @click="buscarDireccion(scope.row)"><i class="el-icon-service" title="Dirección y Teléfono" />Dirección</div></el-dropdown-item>
-                    <el-dropdown-item><div @click="buscarGarantia(scope.row.id_colocacion)"><i class="el-icon-s-custom" title="Garantías" />Garantía</div></el-dropdown-item>
-                    <el-dropdown-item><div @click="buscarExtracto(scope.row.id_colocacion)"><i class="el-icon-document" title="Extracto" />Extracto</div></el-dropdown-item>
+                    <el-dropdown-item><div @click="buscarGarantia(scope.row.ID_COLOCACION)"><i class="el-icon-s-custom" title="Garantías" />Garantía</div></el-dropdown-item>
+                    <el-dropdown-item><div @click="buscarPlanPago(scope.row.ID_COLOCACION)"><i class="el-icon-s-custom" title="Plan de Pago" />Plan de Pago</div></el-dropdown-item>                    
+                    <el-dropdown-item><div @click="buscarExtracto(scope.row.ID_COLOCACION)"><i class="el-icon-document" title="Extracto" />Extracto</div></el-dropdown-item>
                     <el-dropdown-item v-if="scope.row.saldo !== 0"><div @click="buscarLiquidacion(scope.row)"><i class="el-icon-s-finance" title="Liquidación" />Liquidación</div></el-dropdown-item>
                   </el-dropdown-menu>
                 </el-dropdown>
@@ -146,17 +147,7 @@
         </el-col>
       </el-row>
       <el-row>
-        <el-col :span="24">
-          <div style="text-align: center;"><h3>Información General</h3></div>
-        </el-col>
-      </el-row>
-      <el-row>
         <el-col />
-      </el-row>
-      <el-row>
-        <el-col :span="24">
-          <div style="text-align: center;"><h3>Plan de Pago</h3></div>
-        </el-col>
       </el-row>
       <el-row>
         <el-col />
@@ -182,6 +173,10 @@
     <el-dialog :visible.sync="showLiquidacionDePruebaDlg" :show-close="false" :destroy-on-close="true" title="Liquidación Proyectada" width="90%">
       <liquidacion-prueba :colocacion="colocacion" @cerrarLiquidacionDePruebaEvent="cerrarLiquidacionDePruebaEvento" />
     </el-dialog>
+    <!-- Dialogo Plan Pago Colocacion -->
+    <el-dialog :visible.sync="showPlanDlg" :title="'Plan de Pago Colocación : ' + plan_colocacion" :show-close="false" :destroy-on-close="true" width="90%">
+      <planpago-colocacion :colocacion="plan_colocacion" :datos="plan_data" @cerrarPlanEvent="cerrarPlanEvento" />
+    </el-dialog>    
   </el-container>
 
 </template>
@@ -191,11 +186,13 @@ import ExtractoColocacionComponent from '@/components/ExtractoColocacion'
 import GarantiaCreditoComponent from '@/components/GarantiaCredito'
 import DireccionPersonaComponent from '@/components/DireccionPersona'
 import LiquidacionDePruebaComponent from '@/components/LiquidacionDePrueba'
+import PlanPagoColocacionComponent from '@/components/PlandePago'
 import { obtenerGarantiaPersonal, obtenerGarantiaReal } from '@/api/credito'
 import { obtenerExtractoColocacion } from '@/api/extractocolocacion'
 import { obtenerListaTipoIdentificacion, obtenerListaTipoDireccion } from '@/api/tipos'
 import { buscarCreditoPorColocacion, buscarCreditoPorEstado, buscarCreditoPorDocumento, buscarDireccionPersona } from '@/api/controlcobro'
 import { obtenerPersona } from '@/api/persona'
+import { obtenerPlan, obtenerListaColocacion, obtenerListaPorDocumento } from '@/api2/colocacion'
 
 export default {
   components: {
@@ -203,7 +200,8 @@ export default {
     'extracto-colocacion': ExtractoColocacionComponent,
     'garantias': GarantiaCreditoComponent,
     'direccion': DireccionPersonaComponent,
-    'liquidacion-prueba': LiquidacionDePruebaComponent
+    'liquidacion-prueba': LiquidacionDePruebaComponent,
+    'planpago-colocacion': PlanPagoColocacionComponent
   },
   data() {
     return {
@@ -239,6 +237,8 @@ export default {
       asesores: [],
       extracto_colocacion: null,
       extracto_data: [],
+      plan_colocacion: null,
+      plan_data: [],
       personal: [],
       real: [],
       pignoracion: [],
@@ -248,6 +248,7 @@ export default {
       showExtractoDlg: false,
       showGarantiaDlg: false,
       showLiquidacionDePruebaDlg: false,
+      showPlanDlg: false,
       loader: null
     }
   },
@@ -284,8 +285,21 @@ export default {
         this.$message.error('Error buscando extracto colocación: ' + error)
       })
     },
+    buscarPlanPago(id_colocacion) {
+      this.mostrarLoader()
+      obtenerPlan(id_colocacion).then(response => {
+        this.plan_colocacion = id_colocacion
+        this.plan_data = response.data
+        console.log("plan_data: " + this.plan_data)
+        this.showPlanDlg = true
+        this.ocultarLoader()
+      }).catch(error => {
+        this.ocultarLoader()
+        this.$message.error('Error buscando plan de pago de colocación: ' + error)
+      })
+    },    
     buscarLiquidacion(colocacion) {
-      this.extracto_colocacion = colocacion.id_colocacion
+      this.extracto_colocacion = colocacion.ID_COLOCACION
       this.colocacion = colocacion
       this.showLiquidacionDePruebaDlg = true
     },
@@ -294,6 +308,11 @@ export default {
       this.extracto_colocacion = null
       this.showExtractoDlg = false
     },
+    cerrarPlanEvento() {
+      this.plan_data = []
+      this.plan_colocacion = null
+      this.showPlanDlg = false
+    },    
     buscarGarantia(id_colocacion) {
       console.log('estoy en garantias')
       this.extracto_colocacion = id_colocacion
@@ -327,7 +346,7 @@ export default {
     buscarPorColocacion() {
       this.loading = true
       this.limpiarTablas()
-      buscarCreditoPorColocacion(this.id_colocacion_buscar).then(response => {
+      obtenerListaColocacion(this.id_colocacion_buscar).then(response => {
         this.dataColocacion = response.data
         this.loading = false
       }).catch(() => {
@@ -343,7 +362,7 @@ export default {
     buscarPorDocumento() {
       this.loading = true
       this.limpiarTablas()
-      buscarCreditoPorDocumento(this.id_identificacion, this.id_persona).then(response => {
+      obtenerListaPorDocumento(this.id_identificacion, this.id_persona).then(response => {
         this.dataColocacion = response.data
         this.loading = false
       }).catch(() => {

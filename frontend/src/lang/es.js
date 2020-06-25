@@ -39,6 +39,8 @@ export default {
     'menu4informe': 'Informes',
     'menu4-1recaudoxmes': 'Recaudo Caja/Bancos',
     'menu4-2recaudointerescausado': 'Interés Causado P.G.',
+    'menu5consulta': 'Consulta',
+    'menu5-1colocacion': 'Colocacion',
     causacion: 'Causación',
     procesar: 'Procesar',
     informe: 'Informes',
