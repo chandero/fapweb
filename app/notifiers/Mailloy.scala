@@ -25,8 +25,11 @@ import scala.collection.JavaConversions._
 
 import play.api._
 import play.api.Configuration._
+import com.typesafe.config.ConfigFactory
 
 import views._
+
+import javax.inject.Inject
 
 /**
  * this class providers a wrapper for sending email in Play! 2.0
@@ -37,12 +40,11 @@ import views._
  * make sure to include Apache Commons Mail in dependencies
  * "org.apache.commons" % "commons-mail" % "1.2"
  */
-
 trait Mailloy {
   
   var notifications = new ThreadLocal[MailloyContext]
   
-  val conf = play.api.Play.current.configuration
+  val conf = Configuration(ConfigFactory.load("application.conf"))
   val smtpHost = conf.get[String]("smtp.host")
   val smtpPort = conf.get[Int]("smtp.port")
   val smtpSsl  = conf.get[Boolean]("smtp.ssl")
@@ -149,29 +151,29 @@ trait Mailloy {
 
     var email: MultiPartEmail = getEmail(bodyText, bodyHtml)
 
-		email.setCharset(current.charset)
-		
-		setAddress(current.from) { (address, name) => email.setFrom(address, name) }
-		setAddress(current.replyTo) { (address, name) => email.addReplyTo(address, name) }
-		current.recipients.foreach(setAddress(_) { (address, name) => email.addTo(address, name) })
-		current.ccRecipients.foreach(setAddress(_) { (address, name) => email.addCc(address, name) })
-		current.bccRecipients.foreach(setAddress(_) { (address, name) => email.addBcc(address, name) })
-		
-		email.setSubject(current.subject)
-		current.headers foreach ((entry) => email.addHeader(entry._1, entry._2))
-		
-		// do the work to prepare sending on SMTP
-		email.setHostName(smtpHost);
-		email.setSmtpPort(smtpPort);
-		//email.setSSL(smtpSsl)
+    email.setCharset(current.charset)
+    
+    setAddress(current.from) { (address, name) => email.setFrom(address, name) }
+    setAddress(current.replyTo) { (address, name) => email.addReplyTo(address, name) }
+    current.recipients.foreach(setAddress(_) { (address, name) => email.addTo(address, name) })
+    current.ccRecipients.foreach(setAddress(_) { (address, name) => email.addCc(address, name) })
+    current.bccRecipients.foreach(setAddress(_) { (address, name) => email.addBcc(address, name) })
+    
+    email.setSubject(current.subject)
+    current.headers foreach ((entry) => email.addHeader(entry._1, entry._2))
+    
+    // do the work to prepare sending on SMTP
+    email.setHostName(smtpHost);
+    email.setSmtpPort(smtpPort);
+    //email.setSSL(smtpSsl)
         email.setSSLOnConnect(smtpSsl)
-		email.setAuthenticator(new DefaultAuthenticator(smtpUser, smtpPass));
-		email.setDebug(false);
+    email.setAuthenticator(new DefaultAuthenticator(smtpUser, smtpPass));
+    email.setDebug(false);
       
     email.send
-		
-		// now flush the stored context and send
-		notifications.remove
+    
+    // now flush the stored context and send
+    notifications.remove
   }
   
   /**
@@ -248,8 +250,6 @@ trait Mailloy {
   }
 
 }
-
-
 
 class MailloyContext {
 

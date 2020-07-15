@@ -11,10 +11,11 @@ export function loginByUsername(username, password) {
   })
 }
 
-export function logout() {
+export function logout(token) {
   return request({
     url: '/login/logout',
-    method: 'post'
+    method: 'post',
+    data: token
   })
 }
 

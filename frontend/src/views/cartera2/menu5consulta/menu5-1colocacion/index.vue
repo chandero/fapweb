@@ -136,7 +136,7 @@
                   <el-dropdown-menu slot="dropdown">
                     <el-dropdown-item><div @click="buscarDireccion(scope.row)"><i class="el-icon-service" title="Dirección y Teléfono" />Dirección</div></el-dropdown-item>
                     <el-dropdown-item><div @click="buscarGarantia(scope.row.ID_COLOCACION)"><i class="el-icon-s-custom" title="Garantías" />Garantía</div></el-dropdown-item>
-                    <el-dropdown-item><div @click="buscarPlanPago(scope.row.ID_COLOCACION)"><i class="el-icon-s-custom" title="Plan de Pago" />Plan de Pago</div></el-dropdown-item>                    
+                    <el-dropdown-item><div @click="buscarPlanPago(scope.row.ID_COLOCACION)"><i class="el-icon-notebook-2" title="Plan de Pago" />Plan de Pago</div></el-dropdown-item>                    
                     <el-dropdown-item><div @click="buscarExtracto(scope.row.ID_COLOCACION)"><i class="el-icon-document" title="Extracto" />Extracto</div></el-dropdown-item>
                     <el-dropdown-item v-if="scope.row.saldo !== 0"><div @click="buscarLiquidacion(scope.row)"><i class="el-icon-s-finance" title="Liquidación" />Liquidación</div></el-dropdown-item>
                   </el-dropdown-menu>
@@ -190,7 +190,7 @@ import PlanPagoColocacionComponent from '@/components/PlandePago'
 import { obtenerGarantiaPersonal, obtenerGarantiaReal } from '@/api/credito'
 import { obtenerExtractoColocacion } from '@/api/extractocolocacion'
 import { obtenerListaTipoIdentificacion, obtenerListaTipoDireccion } from '@/api/tipos'
-import { buscarCreditoPorColocacion, buscarCreditoPorEstado, buscarCreditoPorDocumento, buscarDireccionPersona } from '@/api/controlcobro'
+import { buscarCreditoPorEstado, buscarDireccionPersona } from '@/api/controlcobro'
 import { obtenerPersona } from '@/api/persona'
 import { obtenerPlan, obtenerListaColocacion, obtenerListaPorDocumento } from '@/api2/colocacion'
 
@@ -265,7 +265,7 @@ export default {
     })
   },
   methods: {
-    tableRowClassName({ row, rowIndex }) {
+    tableRowClassName({ row, /* rowIndex */ }) {
       if (row.estado === 'JURIDICO') {
         return 'warning-row'
       } else if (row.estado === 'SALDADO') {
@@ -388,9 +388,9 @@ export default {
       })
     },
     buscarDireccion(persona) {
-      this.nombrecompleto = persona.nombre
+      this.nombrecompleto = persona.NOMBRE
       this.direcciones = []
-      buscarDireccionPersona(persona.id_identificacion, persona.id_persona).then(response => {
+      buscarDireccionPersona(persona.ID_IDENTIFICACION, persona.ID_PERSONA).then(response => {
         this.direcciones = response.data
         this.showDireccionDlg = true
       }).catch(() => {

@@ -4,11 +4,11 @@
   </div>
 </template>
 <script>
-import DropdownMenu from '@/components/Share/dropdownMenu'
+// import DropdownMenu from '@/components/Share/dropdownMenu'
 
 export default {
   name: 'Documentation',
-  components: { DropdownMenu },
+  // components: { DropdownMenu },
   data() {
     return {
       articleList: [

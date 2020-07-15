@@ -2,6 +2,9 @@ package controllers
 
 import javax.inject.Inject
 import java.time.Instant
+import java.nio.charset.StandardCharsets
+
+
 import org.joda.time.DateTime
 import models._
 import dto._
@@ -40,10 +43,10 @@ class UsuarioController @Inject()(
       usuarioService.autenticar(usua_email, usua_clave).flatMap { esValido =>
         if (esValido) {
           usuarioService.buscarPorEmail(usua_email).flatMap { usuario =>
-            var session = JwtSession()
-            session = session + ("usua_id", usuario.get.id.get)
-            session = session + ("empr_id", usuario.get.empr_id.get)
-            val token = session.serialize
+            var session = request.session
+            session = session + ("usua_id" -> usuario.get.id.get.toString())
+            session = session + ("empr_id" -> usuario.get.empr_id.get.toString())
+            val token = java.util.Base64.getEncoder.encodeToString(session.toString().getBytes(StandardCharsets.UTF_8))
             val user = new UsuarioDto(usuario.get.id,
                                       usuario.get.email.get,
                                       Some(""),
@@ -51,7 +54,7 @@ class UsuarioController @Inject()(
                                       usuario.get.primer_apellido.get,
                                       Some(token),
                                       0)
-            Future(Ok(Json.toJson(user)))
+            Future(Ok(Json.toJson(user)).withSession(session))
           }
         } else {
           Future(Unauthorized("Usuario o Contresaña Incorrecto!"))
@@ -71,31 +74,35 @@ class UsuarioController @Inject()(
     }
   }
 
+  def logout() = authenticatedUserAction.async { implicit request => 
+    Future.successful(Ok("logout").withNewSession)
+  }
+
   def userinfo(): Action[AnyContent] = Action.async {
     implicit request: Request[AnyContent] =>
       val token = request.headers.get("Authorization")
-      var session = JwtSession.deserialize(token.get)
+      var session = request.session
       val usua_id = Utility.extraerUsuario(request)
       val empr_id = Utility.extraerEmpresa(request)
       usuarioService.buscarPorId(usua_id.get).map { usuario =>
         usuario match {
-          case None => {
+          case None => 
             Forbidden("No hay registro activo.")
-          }
-          case Some(usuario) => {
+          
+          case Some(usuario) => 
             val uep = perfilService.buscarPorId(usuario.perf_id.get)
             val empresa = empresaService.buscarPorId(empr_id.get)
             val perfil = new ListBuffer[String]()
             perfil += uep.get.perf_abreviatura
-              empresa match {
-                case None => {
+            empresa match {
+                case None => 
                   Forbidden("No hay registro activo.")
-                }
-                case Some(empresa) => {
-                  var newsession = JwtSession()
-                  newsession = newsession + ("usua_id", usuario.id.get)
-                  newsession = newsession + ("empr_id", empresa.empr_id.get)
-                  var newtoken = newsession.serialize
+                
+                case Some(empresa) => 
+                  var newsession = request.session
+                  newsession = newsession + ("usua_id" -> usuario.id.get.toString())
+                  newsession = newsession + ("empr_id" -> empresa.empr_id.get.toString())
+                  var newtoken = java.util.Base64.getEncoder.encodeToString(newsession.toString().getBytes(StandardCharsets.UTF_8))
                   var userinfo = new UserInfoDto(
                     usuario.id.get,
                     usuario.email.get,
@@ -107,13 +114,11 @@ class UsuarioController @Inject()(
                     perfil.toList,
                     "admin"
                   )
-                  Ok(Json.toJson(userinfo))
-                }
+                  Ok(Json.toJson(userinfo)).withSession(session)
               }
-            }
-          }
         }
       }
+    }
 
   def guardar() = authenticatedUserAction.async { implicit request: Request[AnyContent] =>
     val json = request.body.asJson.get

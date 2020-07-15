@@ -48,6 +48,7 @@ import net.sf.jasperreports.engine.util.JRLoader
 // DataSource
 import jrds.LibroMayorDS
 import listeners.JrListener
+import play.api.Configuration
 
 case class PucLibro(codigo: Option[String], id_agencia: Option[Int], nombre: Option[String], saldo_inicial: Option[BigDecimal], descripcion_agencia: Option[String])
 case class LibroMayor(codigo: Option[String], nombre: Option[String], saldo_inicial: Option[BigDecimal], debito: Option[BigDecimal], credito: Option[BigDecimal], saldo_final: Option[BigDecimal])
@@ -157,7 +158,7 @@ object LibroMayor {
   }
 }
 
-class LibroMayorRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutionContext) {
+class LibroMayorRepository @Inject()(dbapi: DBApi, conf: Configuration)(implicit ec: DatabaseExecutionContext) {
     // private val db = dbapi.database("default")
     private val REPORT_DEFINITION_PATH = System.getProperty("user.dir") + "/app/resources/"
 
@@ -206,7 +207,7 @@ class LibroMayorRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutio
         var _listData = ListBuffer[LibroMayor]()
         db.withConnection {
             implicit connection =>
-            val id_agencia = play.Play.application.configuration.getString("id_agencia")
+            val id_agencia = conf.get[String]("id_agencia")
             val empresa: (String, String) = dbdefault.withConnection { implicit connection =>
               SQL("""SELECT EMPR_DESCRIPCION, EMPR_IDENTIFICACION FROM EMPRESA""").as(SqlParser.str(1) ~ SqlParser.str(2) map (SqlParser.flatten) single)
             }
@@ -326,7 +327,7 @@ class LibroMayorRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutio
                 params.put("USUARIO", usuario)
                 params.put("PAGINA_LIBRO", (pagina_libro + 1).longValue().asInstanceOf[java.lang.Long])
                 params.put("ANHO", "%d".format(anho))
-                params.put("PERIODO", Utility.obtenerMes(periodo))
+                params.put("PERIODO", Utility.mes(periodo))
 
                 val handle = AsynchronousFillHandle.createHandle(jasperReport, params, ds)
                 var pagina = 0
@@ -359,7 +360,7 @@ class LibroMayorRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutio
                       'lire_pagina -> (pagina_libro + pagina)
                     ).executeUpdate()
                   }
-                  val destino = play.Play.application.configuration.getString("reporte_ruta")
+                  val destino = conf.get[String]("reporte_ruta")
                   JasperExportManager.exportReportToPdfFile(jasperPrint, destino + nombre)
 
                   
@@ -370,7 +371,7 @@ class LibroMayorRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutio
 
     def ver(lire_anho: Int, lire_periodo: Int, lire_consecutivo: Int): Array[Byte] = {
       val nombre = "FAP999_"+lire_anho+"%02d".format(lire_periodo)+"_MAYORYBALANCE_"+ lire_consecutivo +".pdf"
-      val destino = play.Play.application.configuration.getString("reporte_ruta")      
+      val destino = conf.get[String]("reporte_ruta")      
       val byteArray = Files.readAllBytes(Paths.get(destino + nombre))
       byteArray
     } 

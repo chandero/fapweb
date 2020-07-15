@@ -1,51 +1,60 @@
 import Layout from '@/views/layout/Layout'
 
 const creditoRouter = {
-  path: '/credito',
+  path: '/menu_credito',
   component: Layout,
-  redirect: '/credito/nuevo/solicitud',
-  name: 'Credito',
+  redirect: '/menu_credito/menu1solicitud',
+  name: 'menu_credito',
   meta: {
-    title: 'credito',
-    icon: 'nested',
-    roles: ['admin', 'credito', 'cartera']
+    title: 'menu_credito',
+    icon: 'el-icon-bank-card',
+    roles: ['admin', 'credito']
   },
   children: [
     {
-      path: 'solicitud',
-      component: () => import('@/views/credito/nuevo/solicitud/index'), // Parent router-view
-      name: 'Solicitud',
-      meta: { title: 'Solicitud', roles: ['admin', 'credito'] },
-      redirect: '/credito/nuevo/solicitud',
+      path: 'menu1solicitud',
+      component: () => import('@/views/credito/menu1solicitud/index'), // Parent router-view
+      name: 'menu_credito_menu1solicitud',
+      meta: { title: 'menu_credito_menu1solicitud', icon: 'form', roles: ['admin', 'credito'] },
+      redirect: '/credito/menu1solicitud/menu1-1list',
       children: [
         {
-          path: 'solicitud',
-          component: () => import('@/views/credito/nuevo/solicitud'),
-          name: 'solicitud',
-          redirect: '/credito/nuevo/solicitud',
-          meta: { title: 'Solicitud', roles: ['admin', 'credito'] },
-          children: [
-            {
-              path: 'nuevo',
-              component: () => import('@/views/credito/nuevo/solicitud'),
-              name: 'nuevo',
-              meta: { title: 'nuevo', roles: ['admin', 'credito'] }
-            }
-          ]
+          path: 'menu1-1list',
+          component: () => import('@/views/credito/menu1solicitud/menu1-1list'),
+          name: 'menu_solicitud_menu1solicitud_menu1-1list',
+          hidden: true,          
+          meta: { title: 'menu_credito_menu1solicitud_menu1-1list', roles: ['admin', 'credito'] }
+        },
+        {
+          path: 'menu1-2create',
+          component: () => import('@/views/credito/menu1solicitud/menu1-2create'),
+          name: 'menu_solicitud_menu1solicitud_menu1-2create',
+          hidden: true,
+          meta: { title: 'menu_credito_menu1solicitud_menu1-2create', roles: ['admin', 'credito'] }
+        },
+        {
+          path: 'menu1-3edit',
+          component: () => import('@/views/credito/menu1solicitud/menu1-3edit'),
+          name: 'menu_solicitud_menu1solicitud_menu1-3edit',
+          hidden: true,
+          meta: { title: 'menu_credito_menu1solicitud_menu1-3edit', roles: ['admin', 'credito'] }
         }
       ]
     },
     {
-      path: 'menu2',
-      name: 'Menu2',
-      component: () => import('@/views/nested/menu2/index'),
-      meta: { title: 'menu2', roles: ['admin'] }
-    },
-    {
-      path: 'buenpago',
-      name: 'BuenPago',
-      component: () => import('@/views/credito/buenpago/index'),
-      meta: { title: 'buenpago', roles: ['admin', 'cartera'] }
+      path: 'menu3informe',
+      name: 'menu3informe',
+      component: () => import('@/views/credito/menu3informe/index'),
+      meta: { title: 'menu_credito_menu3informe', icon:'pdf', roles: ['admin', 'credito'] },
+      redirect: '/menu3informe/menu3-5buenpago',
+      children: [
+        {
+          path: 'menu3-5buenpago',
+          component: () => import('@/views/credito/menu3informe/menu3-5buenpago'),
+          name: 'menu_credito_menu3informe_menu3-5buenpago',
+          meta: { title: 'menu_credito_menu3informe_menu3-5buenpago', icon: 'money', roles: ['admin', 'credito'] }
+        }
+      ]      
     }
   ]
 }

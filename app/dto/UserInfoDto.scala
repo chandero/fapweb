@@ -5,7 +5,15 @@ import play.api.libs.json.JodaReads
 import play.api.libs.json.JodaWrites
 import play.api.libs.functional.syntax._
 
-case class UserInfoDto(usua_id: Long, usua_email: String, usua_nombre: String, usua_apellido: String, empr_id: Long, empr_descripcion: String, token: String, perfil: List[String], image: String)
+case class UserInfoDto(usua_id: Long, 
+                       usua_email: String, 
+                       usua_nombre: String, 
+                       usua_apellido: String, 
+                       empr_id: Long, 
+                       empr_descripcion: String, 
+                       token: String, 
+                       perfil: List[String], 
+                       image: String)
 
 object UserInfoDto {
     implicit val yourJodaDateReads = JodaReads.jodaDateReads("yyyy-MM-dd'T'HH:mm:ss.SSSZ")

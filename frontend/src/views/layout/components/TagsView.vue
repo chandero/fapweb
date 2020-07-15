@@ -1,26 +1,16 @@
 <template>
   <div class="tags-view-container">
-    <scroll-pane ref="scrollPane" class="tags-view-wrapper">
-      <router-link
-        v-for="tag in visitedViews"
-        ref="tag"
-        :class="isActive(tag)?'active':''"
-        :to="{ path: tag.path, query: tag.query, fullPath: tag.fullPath }"
-        :key="tag.path"
-        tag="span"
-        class="tags-view-item"
-        @click.middle.native="closeSelectedTag(tag)"
-        @contextmenu.prevent.native="openMenu(tag,$event)">
-        {{ generateTitle(tag.title) }}
-        <span v-if="!tag.meta.affix" class="el-icon-close" @click.prevent.stop="closeSelectedTag(tag)" />
+    <scroll-pane class='tags-view-wrapper' ref='scrollPane'>
+      <router-link ref='tag' class="tags-view-item" :class="isActive(tag)?'active':''" v-for="tag in Array.from(visitedViews)"
+        :to="tag.path" :key="tag.path" @contextmenu.prevent.native="openMenu(tag,$event)">
+        {{generateTitle(tag.title)}}
+        <span class='el-icon-close' @click.prevent.stop='closeSelectedTag(tag)'></span>
       </router-link>
     </scroll-pane>
-    <ul v-show="visible" :style="{left:left+'px',top:top+'px'}" class="contextmenu">
-      <li @click="refreshSelectedTag(selectedTag)">{{ $t('tagsView.refresh') }}</li>
-      <li v-if="!(selectedTag.meta&&selectedTag.meta.affix)" @click="closeSelectedTag(selectedTag)">{{
-      $t('tagsView.close') }}</li>
-      <li @click="closeOthersTags">{{ $t('tagsView.closeOthers') }}</li>
-      <li @click="closeAllTags(selectedTag)">{{ $t('tagsView.closeAll') }}</li>
+    <ul class='contextmenu' v-show="visible" :style="{left:left+'px',top:top+'px'}">
+      <li @click="closeSelectedTag(selectedTag)">{{$t('tagsView.close')}}</li>
+      <li @click="closeOthersTags">{{$t('tagsView.closeOthers')}}</li>
+      <li @click="closeAllTags">{{$t('tagsView.closeAll')}}</li>
     </ul>
   </div>
 </template>
@@ -28,33 +18,28 @@
 <script>
 import ScrollPane from '@/components/ScrollPane'
 import { generateTitle } from '@/utils/i18n'
-import path from 'path'
 
 export default {
   components: { ScrollPane },
-  data() {
+  data () {
     return {
       visible: false,
       top: 0,
       left: 0,
-      selectedTag: {},
-      affixTags: []
+      selectedTag: {}
     }
   },
   computed: {
-    visitedViews() {
+    visitedViews () {
       return this.$store.state.tagsView.visitedViews
-    },
-    routers() {
-      return this.$store.state.permission.routers
     }
   },
   watch: {
-    $route() {
-      this.addTags()
+    $route () {
+      this.addViewTags()
       this.moveToCurrentTag()
     },
-    visible(value) {
+    visible (value) {
       if (value) {
         document.body.addEventListener('click', this.closeMenu)
       } else {
@@ -62,128 +47,67 @@ export default {
       }
     }
   },
-  mounted() {
-    this.initTags()
-    this.addTags()
+  mounted () {
+    this.addViewTags()
   },
   methods: {
     generateTitle, // generateTitle by vue-i18n
-    isActive(route) {
-      return route.path === this.$route.path
-    },
-    filterAffixTags(routes, basePath = '/') {
-      let tags = []
-      routes.forEach(route => {
-        if (route.meta && route.meta.affix) {
-          const tagPath = path.resolve(basePath, route.path)
-          tags.push({
-            fullPath: tagPath,
-            path: tagPath,
-            name: route.name,
-            meta: { ...route.meta }
-          })
-        }
-        if (route.children) {
-          const tempTags = this.filterAffixTags(route.children, route.path)
-          if (tempTags.length >= 1) {
-            tags = [...tags, ...tempTags]
-          }
-        }
-      })
-
-      return tags
-    },
-    initTags() {
-      const affixTags = this.affixTags = this.filterAffixTags(this.routers)
-      for (const tag of affixTags) {
-        // Must have tag name
-        if (tag.name) {
-          this.$store.dispatch('addVisitedView', tag)
-        }
-      }
-    },
-    addTags() {
-      const { name } = this.$route
-      if (name) {
-        this.$store.dispatch('addView', this.$route)
+    generateRoute () {
+      if (this.$route.name) {
+        return this.$route
       }
       return false
     },
-    moveToCurrentTag() {
+    isActive (route) {
+      return route.path === this.$route.path || route.name === this.$route.name
+    },
+    addViewTags () {
+      const route = this.generateRoute()
+      if (!route) {
+        return false
+      }
+      this.$store.dispatch('addVisitedViews', route)
+    },
+    moveToCurrentTag () {
       const tags = this.$refs.tag
       this.$nextTick(() => {
         for (const tag of tags) {
-          if (tag.to.path === this.$route.path) {
-            this.$refs.scrollPane.moveToTarget(tag)
-
-            // when query is different then update
-            if (tag.to.fullPath !== this.$route.fullPath) {
-              this.$store.dispatch('updateVisitedView', this.$route)
-            }
-
+          if (tag.to === this.$route.path) {
+            this.$refs.scrollPane.moveToTarget(tag.$el)
             break
           }
         }
       })
     },
-    refreshSelectedTag(view) {
-      this.$store.dispatch('delCachedView', view).then(() => {
-        const { fullPath } = view
-        this.$nextTick(() => {
-          this.$router.replace({
-            path: '/redirect' + fullPath
-          })
-        })
-      })
-    },
-    closeSelectedTag(view) {
-      this.$store.dispatch('delView', view).then(({ visitedViews }) => {
+    closeSelectedTag (view) {
+      this.$store.dispatch('delVisitedViews', view).then((views) => {
         if (this.isActive(view)) {
-          this.toLastView(visitedViews)
+          const latestView = views.slice(-1)[0]
+          if (latestView) {
+            this.$router.push(latestView.path)
+          } else {
+            this.$router.push('/')
+          }
         }
       })
     },
-    closeOthersTags() {
-      this.$router.push(this.selectedTag)
+    closeOthersTags () {
+      this.$router.push(this.selectedTag.path)
       this.$store.dispatch('delOthersViews', this.selectedTag).then(() => {
         this.moveToCurrentTag()
       })
     },
-    closeAllTags(view) {
-      this.$store.dispatch('delAllViews').then(({ visitedViews }) => {
-        if (this.affixTags.some(tag => tag.path === view.path)) {
-          return
-        }
-        this.toLastView(visitedViews)
-      })
+    closeAllTags () {
+      this.$store.dispatch('delAllViews')
+      this.$router.push('/')
     },
-    toLastView(visitedViews) {
-      const latestView = visitedViews.slice(-1)[0]
-      if (latestView) {
-        this.$router.push(latestView)
-      } else {
-        // You can set another route
-        this.$router.push('/')
-      }
-    },
-    openMenu(tag, e) {
-      const menuMinWidth = 105
-      const offsetLeft = this.$el.getBoundingClientRect().left // container margin left
-      const offsetWidth = this.$el.offsetWidth // container width
-      const maxLeft = offsetWidth - menuMinWidth // left boundary
-      const left = e.clientX - offsetLeft + 15 // 15: margin right
-
-      if (left > maxLeft) {
-        this.left = maxLeft
-      } else {
-        this.left = left
-      }
-      this.top = e.clientY
-
+    openMenu (tag, e) {
       this.visible = true
       this.selectedTag = tag
+      this.left = e.clientX
+      this.top = e.clientY
     },
-    closeMenu() {
+    closeMenu () {
       this.visible = false
     }
   }
@@ -192,16 +116,14 @@ export default {
 
 <style rel="stylesheet/scss" lang="scss" scoped>
 .tags-view-container {
-  height: 34px;
-  width: 100%;
-  background: #fff;
-  border-bottom: 1px solid #d8dce5;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .12), 0 0 3px 0 rgba(0, 0, 0, .04);
   .tags-view-wrapper {
+    background: #fff;
+    height: 48px;
+    border-bottom: 1px solid #d8dce5;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .12), 0 0 3px 0 rgba(0, 0, 0, .04);
     .tags-view-item {
       display: inline-block;
       position: relative;
-      cursor: pointer;
       height: 26px;
       line-height: 26px;
       border: 1px solid #d8dce5;
@@ -213,9 +135,6 @@ export default {
       margin-top: 4px;
       &:first-of-type {
         margin-left: 15px;
-      }
-      &:last-of-type {
-        margin-right: 15px;
       }
       &.active {
         background-color: #42b983;
@@ -237,7 +156,7 @@ export default {
   .contextmenu {
     margin: 0;
     background: #fff;
-    z-index: 100;
+    z-index: 2;
     position: absolute;
     list-style-type: none;
     padding: 5px 0;

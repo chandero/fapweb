@@ -54,15 +54,19 @@ class EmpresaController @Inject()(
           Future.successful(Forbidden("Dude, you’re not logged in."))
         }
         case Some(token) => {
-          val session = JwtSession.deserialize(token)
+          println("token:" + token)
+          val session = request.session
+          // val session = JwtSession.deserialize(token)
+          println("session: " + session.toString)
           val usuaId = session.get("usua_id")
+          println("usua_id:" + usuaId)          
           usuaId match {
             case None => {
               Future.successful(Ok)
             }
             case Some(usuaId) => {
-              println("usua_id: ", Json.stringify(usuaId))
-              empresaService.buscarPorUsuario(usuaId.as[Long]).map { empresas =>
+              println("usua_id:" + usuaId)
+              empresaService.buscarPorUsuario(usuaId.toLong).map { empresas =>
                 Ok(Json.toJson(empresas))
               }
             }

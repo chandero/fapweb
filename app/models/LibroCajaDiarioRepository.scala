@@ -260,7 +260,7 @@ class LibroCajaDiarioRepository @Inject()(dbapi: DBApi, conf: Configuration)(imp
                 params.put("USUARIO", usuario)
                 params.put("PAGINA_LIBRO", (pagina_libro + 1).longValue().asInstanceOf[java.lang.Long])
                 params.put("ANHO", "%d".format(anho))
-                params.put("PERIODO", Utility.obtenerMes(periodo))
+                params.put("PERIODO", Utility.mes(periodo))
                 params.put("MES", new Integer(periodo))
                 params.put("SUBREPORT_DIR", REPORT_DEFINITION_PATH)
 

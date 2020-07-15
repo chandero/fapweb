@@ -7,16 +7,16 @@ Vue.use(Router)
 import Layout from '@/views/layout/Layout'
 
 /* Router Modules */
-import componentsRouter from './modules/components'
-import chartsRouter from './modules/charts'
-import tableRouter from './modules/table'
-import nestedRouter from './modules/nested'
+// import componentsRouter from './modules/components'
+// import chartsRouter from './modules/charts'
+// import tableRouter from './modules/table'
+// import nestedRouter from './modules/nested'
 
 /* Router Module FaP */
 import contabilidadRouter from './modules/contabilidad'
 import creditoRouter from './modules/credito'
-// import carteraRouter from './modules/cartera'
 import carteraRouter from './modules/cartera2'
+import iconRouter from './modules/icon'
 
 /** note: sub-menu only appear when children.length>=1
  *  detail see  https://panjiachen.github.io/vue-element-admin-site/guide/essentials/router-and-nav.html
@@ -83,6 +83,7 @@ export const constantRouterMap = [
     path: '',
     component: Layout,
     redirect: 'dashboard',
+    hidden: true,
     children: [
       {
         path: 'dashboard',
@@ -133,6 +134,7 @@ export const asyncRouterMap = [
   contabilidadRouter,
   creditoRouter,
   carteraRouter,
+  /*
   {
     path: '/permission',
     component: Layout,
@@ -164,28 +166,15 @@ export const asyncRouterMap = [
         }
       }
     ]
-  },
-
-  {
-    path: '/icon',
-    component: Layout,
-    hidden: true,
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/svg-icons/index'),
-        name: 'Icons',
-        meta: { title: 'icons', icon: 'icon', noCache: true }
-      }
-    ]
-  },
+  },*/
+  iconRouter,
 
   /** When your routing table is too long, you can split it into small modules**/
-  componentsRouter,
-  chartsRouter,
-  nestedRouter,
-  tableRouter,
-
+  // componentsRouter,
+  // chartsRouter,
+  // nestedRouter,
+  // tableRouter,
+  /*
   {
     path: '/example',
     component: Layout,
@@ -400,4 +389,5 @@ export const asyncRouterMap = [
   },
 
   { path: '*', redirect: '/404', hidden: true }
+  */
 ]

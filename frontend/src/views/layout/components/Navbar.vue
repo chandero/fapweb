@@ -1,83 +1,71 @@
 <template>
-  <div class="navbar">
-    <hamburger :toggle-click="toggleSideBar" :is-active="sidebar.opened" class="hamburger-container"/>
-
-    <breadcrumb class="breadcrumb-container"/>
-
+  <el-menu class="navbar" mode="horizontal">
+    <hamburger class="hamburger-container" :toggleClick="toggleSideBar" :isActive="sidebar.opened"></hamburger>
+    <div class="userinfo-container">
+      <div style="display: inline;"><userinfo/><span style="padding: 10px; font-size: 12px;">Estado Actual del Sistema: {{ isIdle? "Inactivo": "Activo" }}</span></div>
+    </div>
+    <div class="breadcrumb-container">
+      <breadcrumb></breadcrumb>
+    </div>
     <div class="right-menu">
-      <template v-if="device!=='mobile'">
-        <search class="right-menu-item" />
+      <error-log class="errLog-container right-menu-item"></error-log>
 
-        <error-log class="errLog-container right-menu-item hover-effect"/>
+      <!--
+      <el-tooltip effect="dark" :content="$t('navbar.screenfull')" placement="bottom">
+        <screenfull class="screenfull right-menu-item"></screenfull>
+      </el-tooltip>
 
-        <screenfull class="right-menu-item hover-effect"/>
-
-        <el-tooltip :content="$t('navbar.size')" effect="dark" placement="bottom">
-          <size-select class="right-menu-item hover-effect"/>
-        </el-tooltip>
-
-        <lang-select class="right-menu-item hover-effect"/>
-
-        <el-tooltip :content="$t('navbar.theme')" effect="dark" placement="bottom">
-          <theme-picker class="right-menu-item hover-effect"/>
-        </el-tooltip>
-      </template>
-
-      <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
+      <lang-select class="international right-menu-item"></lang-select>
+      -->
+      <el-dropdown class="avatar-container right-menu-item" trigger="click">
         <div class="avatar-wrapper">
-          <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">
-          <i class="el-icon-caret-bottom"/>
+          <img class="user-avatar" :src="avatar+'?imageView2/1/w/80/h/80'">
+          <i class="el-icon-caret-bottom"></i>
         </div>
         <el-dropdown-menu slot="dropdown">
           <router-link to="/">
             <el-dropdown-item>
-              {{ $t('navbar.dashboard') }}
+              {{$t('navbar.dashboard')}}
             </el-dropdown-item>
           </router-link>
           <el-dropdown-item divided>
-            <span style="display:block;" @click="logout">{{ $t('navbar.logOut') }}</span>
+            <span @click="logout" style="display:block;">{{$t('navbar.logOut')}}</span>
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
     </div>
-  </div>
+  </el-menu>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
+import UserInfo from '@/components/UserInfo'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
 import ErrorLog from '@/components/ErrorLog'
-import Screenfull from '@/components/Screenfull'
-import SizeSelect from '@/components/SizeSelect'
-import LangSelect from '@/components/LangSelect'
-import ThemePicker from '@/components/ThemePicker'
-import Search from '@/components/HeaderSearch'
 
 export default {
   components: {
+    userinfo: UserInfo,
     Breadcrumb,
     Hamburger,
-    ErrorLog,
-    Screenfull,
-    SizeSelect,
-    LangSelect,
-    ThemePicker,
-    Search
+    ErrorLog
   },
   computed: {
     ...mapGetters([
       'sidebar',
       'name',
-      'avatar',
-      'device'
-    ])
+      'avatar'
+    ]),
+    isIdle () {
+      return this.$store.state.idleVue.isIdle
+    }
   },
   methods: {
-    toggleSideBar() {
+    toggleSideBar () {
       this.$store.dispatch('toggleSideBar')
     },
-    logout() {
+    logout () {
       this.$store.dispatch('LogOut').then(() => {
         location.reload()// In order to re-instantiate the vue-router object to avoid bugs
       })
@@ -89,72 +77,60 @@ export default {
 <style rel="stylesheet/scss" lang="scss" scoped>
 .navbar {
   height: 50px;
-  overflow: hidden;
-
+  line-height: 50px;
+  border-radius: 0px !important;
   .hamburger-container {
-    line-height: 46px;
-    height: 100%;
+    line-height: 58px;
+    height: 50px;
     float: left;
-    cursor: pointer;
-    transition: background .3s;
-
-    &:hover {
-      background: rgba(0, 0, 0, .025)
-    }
+    padding: 0 10px;
   }
-
-  .breadcrumb-container {
+  .breadcrumb-container{
     float: left;
   }
-
+  .userinfo-container {
+    float: left;
+  }
   .errLog-container {
     display: inline-block;
     vertical-align: top;
   }
-
+  .alert-container {
+    display: inline-block;
+    width: 40px;
+  }
   .right-menu {
     float: right;
     height: 100%;
-    line-height: 50px;
-
-    &:focus {
-      outline: none;
+    &:focus{
+     outline: none;
     }
-
     .right-menu-item {
       display: inline-block;
-      padding: 0 8px;
-      height: 100%;
-      font-size: 18px;
-      color: #5a5e66;
-      vertical-align: text-bottom;
-
-      &.hover-effect {
-        cursor: pointer;
-        transition: background .3s;
-
-        &:hover {
-          background: rgba(0, 0, 0, .025)
-        }
-      }
+      margin: 0 8px;
     }
-
+    .screenfull {
+      height: 20px;
+    }
+    .international{
+      vertical-align: top;
+    }
+    .theme-switch {
+      vertical-align: 15px;
+    }
     .avatar-container {
+      height: 50px;
       margin-right: 30px;
-
       .avatar-wrapper {
+        cursor: pointer;
         margin-top: 5px;
         position: relative;
-
         .user-avatar {
-          cursor: pointer;
           width: 40px;
           height: 40px;
           border-radius: 10px;
         }
-
         .el-icon-caret-bottom {
-          cursor: pointer;
           position: absolute;
           right: -20px;
           top: 25px;

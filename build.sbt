@@ -1,41 +1,46 @@
 import com.typesafe.sbt.packager.MappingsHelper._
 mappings in Universal ++= directory(baseDirectory.value / "public")
 
-name := "sgfcv"
+packageSummary in Windows := "FAPWEB v1.0.0"
+packageDescription in Windows := "Sistema de Gestión Financiera FAP"
+maintainer := "aldacm2001@gmail.com"
 
-version := "0.5"
+scalaVersion := "2.12.11"
 
-sbtVersion := "1.3.12"
-scalaVersion := "2.12.6"
+scalacOptions += "-feature"
+scalacOptions += "-language:postfixOps"
 
-scalacOptions ++= Seq("-deprecation", "-feature", "-language:postfixOps")
+crossScalaVersions := Seq("2.12.7", "2.12.11")
 
-lazy val `sgfcv` = (project in file(".")).enablePlugins(PlayScala)
+lazy val `fapweb` = (project in file(".")).enablePlugins(PlayScala)
 
 libraryDependencies ++= Seq(
   guice, 
   filters, 
-  jdbc , 
-  cacheApi ,
-  ws , 
+  jdbc, 
+  cacheApi,
+  ws, 
   specs2 % Test,
   "com.typesafe.play" %% "anorm" % "2.5.3",
-  "org.firebirdsql.jdbc" % "jaybird-jdk18" % "3.0.4",
-  "com.typesafe.play" %% "play-json" % "2.8.0",
-  "com.typesafe.play" %% "play-json-joda" % "2.8.0",
-  "com.pauldijou" %% "jwt-play" % "0.16.0",
+  "org.postgresql" % "postgresql" % "42.2.2",
+  "com.typesafe.play" %% "play-json" % "2.6.10",
+  "com.typesafe.play" %% "play-json-joda" % "2.6.10",
+  "com.pauldijou" %% "jwt-play" % "4.2.0",
   "org.apache.commons" % "commons-email" % "1.5",
   "com.jaroop" %% "anorm-relational" % "0.3.0",
-  "org.joda" % "joda-money" % "0.10.0",
-  // JasperReport
+  // Jasper Report
   "org.olap4j" % "olap4j" % "1.2.0",
-  "com.lowagie" % "itext" % "2.1.7.js6",
+  "com.lowagie" % "itext" % "2.1.7.js7",
   "org.springframework" % "spring-beans" % "5.1.0.RELEASE",
-  "net.sf.jasperreports" % "jasperreports" % "6.7.0",
-  "net.sf.jasperreports" % "jasperreports-functions" % "6.7.0",
-  "net.sf.jasperreports" % "jasperreports-chart-themes" % "6.7.0",
-  "com.norbitltd" %% "spoiwo" % "1.4.1",
-  "com.lihaoyi" %% "requests" % "0.1.8"
+  "net.sf.jasperreports" % "jasperreports" % "6.13.0",
+  "net.sf.jasperreports" % "jasperreports-functions" % "6.13.0",
+  "net.sf.jasperreports" % "jasperreports-chart-themes" % "6.13.0",
+  "com.norbitltd" %% "spoiwo" % "1.7.0",
+  "org.mozilla" % "rhino" % "1.7R3",
+
+  "com.lihaoyi" %% "requests" % "0.6.2",
+  "org.joda" % "joda-money" % "1.0.1",
+  "org.firebirdsql.jdbc" % "jaybird" % "4.0.0.java8"
 )
 
 // Play framework hooks for development
@@ -46,6 +51,8 @@ unmanagedResourceDirectories in Test +=  baseDirectory ( _ /"target/web/public/t
 resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
 resolvers += "Jasper" at "https://jaspersoft.artifactoryonline.com/jaspersoft/jr-ce-releases/"
 resolvers += "Jasper2" at "https://jaspersoft.jfrog.io/jaspersoft/jaspersoft-repo/"
+resolvers += "Jasper3" at "https://jaspersoft.artifactoryonline.com/jaspersoft/repo/"
+resolvers += "Jasper4" at "https://mvnrepository.com/artifact/net.sf.jasperreports/jasperreports"
 
 // Production front-end build
 lazy val cleanFrontEndBuild = taskKey[Unit]("Remove the old front-end build")

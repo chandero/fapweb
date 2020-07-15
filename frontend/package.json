@@ -29,6 +29,7 @@
     "screenfull": "^5.0.2",
     "script-loader": "^0.7.2",
     "sortablejs": "^1.10.2",
+    "svg-sprite-loader": "^5.0.0",
     "tui-editor": "^1.4.10",
     "vue": "^2.6.11",
     "vue-count-to": "^1.0.13",

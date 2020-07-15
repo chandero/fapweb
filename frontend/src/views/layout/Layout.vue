@@ -1,71 +1,79 @@
 <template>
-  <div :class="classObj" class="app-wrapper">
-    <div v-if="device==='mobile'&&sidebar.opened" class="drawer-bg" @click="handleClickOutside"/>
-    <sidebar class="sidebar-container"/>
-    <div class="main-container">
-      <navbar/>
-      <tags-view/>
-      <app-main/>
-    </div>
-  </div>
+<el-container v-loading="loading"
+		:element-loading-text="$t('lostserverconnection')"
+    element-loading-spinner="el-icon-loading"
+    element-loading-background="rgba(0, 0, 0, 0.8)"
+		>
+	<div class="app-wrapper" :class="{hideSidebar:!sidebar.opened}">
+		<sidebar class="sidebar-container"></sidebar>
+		<div class="main-container">
+			<navbar></navbar>
+			<tags-view><span>Is Idle - {{ isIdle }}</span></tags-view>
+			<app-main></app-main>
+		</div>
+	</div>
+  <ModalIdle v-if="isIdle"/>
+</el-container>
 </template>
-
 <script>
+import { isReachable } from '@/api2/isreachable'
 import { Navbar, Sidebar, AppMain, TagsView } from './components'
-import ResizeMixin from './mixin/ResizeHandler'
+import ModalIdle from '@/components/ModalIdle'
 
 export default {
-  name: 'Layout',
+  name: 'layout',
   components: {
+    ModalIdle,
     Navbar,
     Sidebar,
     AppMain,
     TagsView
   },
-  mixins: [ResizeMixin],
+  timers: {
+    checkServer: { name: 'checkServer', time: 5000, autostart: true, repeat: true }
+  },
+  data () {
+    return {
+      loading: false
+    }
+  },
   computed: {
-    sidebar() {
+    sidebar () {
       return this.$store.state.app.sidebar
     },
-    device() {
-      return this.$store.state.app.device
-    },
-    classObj() {
-      return {
-        hideSidebar: !this.sidebar.opened,
-        openSidebar: this.sidebar.opened,
-        withoutAnimation: this.sidebar.withoutAnimation,
-        mobile: this.device === 'mobile'
-      }
+    isIdle () {
+      return this.$store.state.idleVue.isIdle
     }
   },
   methods: {
-    handleClickOutside() {
-      this.$store.dispatch('closeSideBar', { withoutAnimation: false })
+    checkServer () {
+      isReachable().then(reachable => {
+        if (reachable) {
+          this.loading = false
+        } else {
+          this.loading = true
+        }
+      }).catch(error => {
+        this.loading = true
+        console.log(error)
+      })
     }
   }
 }
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
-  @import "~@/styles/mixin.scss";
-  .app-wrapper {
+	@import "src/styles/mixin.scss";
+	.app-wrapper {
     @include clearfix;
     position: relative;
     height: 100%;
     width: 100%;
-    &.mobile.openSidebar{
-      position: fixed;
-      top: 0;
-    }
   }
-  .drawer-bg {
-    background: #000;
-    opacity: 0.3;
-    width: 100%;
-    top: 0;
-    height: 100%;
-    position: absolute;
-    z-index: 999;
+  .app_main {
+    max-height: 800px;
+  }
+  .sidebar-container {
+    max-height: 800px;
   }
 </style>
