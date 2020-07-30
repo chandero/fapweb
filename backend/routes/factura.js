@@ -17,4 +17,7 @@ router.route('/gbnr/:start/:end')
 router.route('/gitm/:id')
     .get(model.readItems);
 
+router.route('/send/:id')
+    .get(model.sendToProvider)
+
 module.exports = router;

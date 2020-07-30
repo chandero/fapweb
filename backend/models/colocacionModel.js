@@ -2,6 +2,7 @@
 
 const util = require('util');
 const df = require('dateformat');
+var SqlString = require('sqlstring');
 
 var factory = require('./firebird.js');
 var conn = factory.getConnection();
@@ -49,10 +50,7 @@ var Colocacion = function (item) {
 };
 
 Colocacion.create = function (newE, result) {
-    firebird.attach(options, function (err, sql) {
-        if (err)
-            throw err;
-        sql.query(`INSERT INTO \"col$colocacion\"
+    var sql = `INSERT INTO \"col$colocacion\"
             (   ID_AGENCIA, 
                 ID_COLOCACION, 
                 ID_IDENTIFICACION, 
@@ -91,62 +89,140 @@ Colocacion.create = function (newE, result) {
                 DIAS_PAGO, 
                 RECIPROCIDAD, 
                 FECHA_SALDADO)
-            VALUES( ?, ?, ?, ?, ?, ?, ?, ?, 
-                    ?, ?, ?, ?, ?, ?, ?, ?, 
-                    ?, ?, ?, ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?, ?, ?)`, newE, function (err, res) {
-            if (err) {
-                console.log("error: ", err);
-                sql.detach();
-                result(err, null);
-            }
-            else {
-                console.log(res);
-                sql.detach();
-                result(null, res);
-            }
-        });
+            VALUES( %i, 
+                %s, 
+                %i, 
+                %s, 
+                %i, 
+                %i, 
+                %i, 
+                %i, 
+                %i, 
+                %s, 
+                %s, 
+                %s, 
+                %d, 
+                %i, 
+                %s, 
+                %s, 
+                %i, 
+                %d, 
+                %d, 
+                %i, 
+                %i, 
+                %i, 
+                %i, 
+                %i, 
+                %i, 
+                %d, 
+                %d, 
+                %s, 
+                %s, 
+                %i, 
+                %i, 
+                %s, 
+                %i, 
+                %i, 
+                %i, 
+                %i, 
+                %i, 
+                %s)`;
+    sql = util.format(sql, this.ID_AGENCIA, 
+        this.ID_COLOCACION, 
+        this.ID_IDENTIFICACION, 
+        this.ID_PERSONA, 
+        this.ID_CLASIFICACION, 
+        this.ID_LINEA, 
+        this.ID_INVERSION, 
+        this.ID_RESPALDO, 
+        this.ID_GARANTIA, 
+        this.ID_CATEGORIA, 
+        this.ID_EVALUACION, 
+        this.FECHA_DESEMBOLSO, 
+        this.VALOR_DESEMBOLSO, 
+        this.PLAZO_COLOCACION, 
+        this.FECHA_VENCIMIENTO, 
+        this.TIPO_INTERES, 
+        this.ID_INTERES, 
+        this.TASA_INTERES_CORRIENTE, 
+        this.TASA_INTERES_MORA, 
+        this.PUNTOS_INTERES, 
+        this.ID_TIPO_CUOTA, 
+        this.AMORTIZA_CAPITAL, 
+        this.AMORTIZA_INTERES, 
+        this.PERIODO_GRACIA, 
+        this.DIAS_PRORROGADOS, 
+        this.VALOR_CUOTA, 
+        this.ABONOS_CAPITAL, 
+        this.FECHA_CAPITAL, 
+        this.FECHA_INTERES, 
+        this.ID_ESTADO_COLOCACION, 
+        this.ID_ENTE_APROBADOR, 
+        this.ID_EMPLEADO, 
+        this.NOTA_CONTABLE, 
+        this.NUMERO_CUENTA, 
+        this.ES_ANORMAL, 
+        this.DIAS_PAGO, 
+        this.RECIPROCIDAD, 
+        this.FECHA_SALDADO);
+    if(!conn.inTransaction){
+        conn.startNewTransactionSync();
+    }
+    conn.query(sql, (err, rs) => {
+        if (err) {
+            console.log("error: "+ err);
+            conn.rollback();
+            result(err, null);
+        }
+        if (rs) {
+            var rows = rs.fetchSync('all', true);
+            conn.commit();
+            result(null, rows)
+        }
     });
 };
+
 Colocacion.getById = function (id_colocacion, result) {
-    console.log("estoy en getbyid");
-    firebird.attach(Firebird.options, function (err, sql) {
-        console.log("voy a ejecutar el query con el Id: " + Id);
-        sql.query("SELECT * FROM \"col$colocacion\" WHERE ID_COLOCACION = ?", [id_colocacion], function (err, res) {
-            if (err) {
-                console.log("error: ", err);
-                sql.detach();
-                result(err, null);
-            }
-            else {
-                console.log("res:" + JSON.stringify(res));
-                sql.detach();
-                result(null, res);
-            }
-        });
-    });
+    var sql = `SELECT * FROM "col$colocacion" WHERE ID_COLOCACION = %s`;
+    util.format(sql, id_colocacion);
+    if (!conn.inTransaction) {
+        conn.startNewTransactionSync();
+    }
+    conn.query(sql, (err, rs) => {
+        if (err) {
+            console.log("error: " + err);
+            conn.rollback();
+            result(err, null);
+        }
+        if (rs) {
+            var rows = rs.fetchSync('all', true);
+            conn.commit();
+            result(null, rows);
+        }
+    });    
 };
+
 Colocacion.getAll = function (result) {
-    firebird.attach(options, function (err, sql) {
-        sql.query("SELECT * FROM \"col$colocacion\" ", function (err, res) {
-            if (err) {
-                console.log("error: ", err);
-                sql.detach();
-                result(null, err);
-            }
-            else {
-                console.log('elementos : ', res);
-                sql.detach();
-                result(null, res);
-            }
-        });
-    });
+    var sql =`SELECT * FROM "col$colocacion" WHERE ID_ESTADO_COLOCACION <> 9`;
+    if (!conn.inTransaction) {
+        conn.startNewTransactionSync();
+    }
+    conn.query(sql, (err, rs) => {
+        if (err) {
+            console.log("error: " + err);
+            conn.rollback();
+            result(err, null);
+        }
+        if (rs) {
+            var rows = rs.fetchSync('all', true);
+            conn.commit();
+            result(null, rows);
+        }
+    });    
 };
-Colocacion.updateById = function (id, e, result) {
-    firebird.attach(options, function (err, sql) {
-        sql.query(`UPDATE \"col$colocacion\"
-             SET ID_AGENCIA = ?, ID_IDENTIFICACION=?, ID_PERSONA=?, ID_CLASIFICACION=?, ID_LINEA=?, 
+Colocacion.update = function (result) {
+    var sql = SqlString.format(`UPDATE \"col$colocacion\"
+             SET ID_AGENCIA = ?, ID_COLOCACION = ?, ID_IDENTIFICACION=?, ID_PERSONA=?, ID_CLASIFICACION=?, ID_LINEA=?, 
              ID_INVERSION=?, ID_RESPALDO=?, ID_GARANTIA=?, ID_CATEGORIA=?, ID_EVALUACION=?, 
              FECHA_DESEMBOLSO=?, VALOR_DESEMBOLSO=?, PLAZO_COLOCACION=?, FECHA_VENCIMIENTO=?,
              TIPO_INTERES=?, ID_INTERES=?, TASA_INTERES_CORRIENTE=?, TASA_INTERES_MORA=?,
@@ -154,36 +230,26 @@ Colocacion.updateById = function (id, e, result) {
              PERIODO_GRACIA=?, DIAS_PRORROGADOS=?, VALOR_CUOTA=?, ABONOS_CAPITAL=?,
              FECHA_CAPITAL=?, FECHA_INTERES=?, ID_ESTADO_COLOCACION=?, ID_ENTE_APROBADOR=?,
              ID_EMPLEADO=?, NOTA_CONTABLE=?, NUMERO_CUENTA=?, ES_ANORMAL=?, DIAS_PAGO=?,
-             RECIPROCIDAD=?, FECHA_SALDADO=? WHERE ID_COLOCACION=?`, [e, id], function (err, res) {
-            if (err) {
-                console.log("error: ", err);
-                sql.detach();
-                result(null, err);
-            }
-            else {
-                console.log('res : ', res);
-                sql.detach();
-                result(null, res);
-            }
-        });
-    });
-};
-Colocacion.remove = function (id, result) {
-    firebird.attach(options, function (err, sql) {
-        sql.query("DELETE FROM \"col$colocacion\" WHERE ID_COLOCACION = ?", [id], function (err, res) {
-            if (err) {
-                console.log("error: ", err);
-                result(null, err);
-            }
-            else {
-                result(null, res);
-            }
-        });
-    });
+             RECIPROCIDAD=?, FECHA_SALDADO=? WHERE ID_COLOCACION=?`, [Colocacion.toArray(), this.ID_COLOCACION]);
+    if (!conn.inTransaction) {
+        conn.startNewTransactionSync();
+    }
+    conn.query(sql, (err, rs) => {
+        if (err) {
+            console.log("error: " + err);
+            conn.rollback();
+            result(err, null);
+        }
+        if (rs) {
+            var rows = rs.fetchSync('all', true);
+            conn.commit();
+            result(null, rows);
+        }
+    });             
 };
 
-Colocacion.getPlan = function (id, result) {
-    var sql = `SELECT * FROM "col$tablaliquidacion" t WHERE t.ID_COLOCACION = '%s';`;
+Colocacion.remove = function (id, result) {
+    var sql =`UPDATE "col$colocacion" SET ID_ESTADO_COLOCACION = 9 WHERE ID_COLOCACION = %s`;
     sql = util.format(sql, id);
     if (!conn.inTransaction) {
         conn.startNewTransactionSync();
@@ -196,6 +262,29 @@ Colocacion.getPlan = function (id, result) {
         }
         if (rs) {
             var rows = rs.fetchSync('all', true);
+            conn.commit();
+            result(null, rows);
+        }
+    });    
+};
+
+Colocacion.getPlan = function (id, result) {
+    var sql = `SELECT t.ID_COLOCACION, t.CUOTA_NUMERO, t.ID_AGENCIA, CAST(t.FECHA_A_PAGAR AS VARCHAR(10)) AS FECHA_A_PAGAR , t.CAPITAL_A_PAGAR, t.INTERES_A_PAGAR, t.PAGADA, CAST(t.FECHA_PAGADA AS VARCHAR(10)) AS FECHA_PAGADA , t.ES_ANORMAL
+    FROM "col$tablaliquidacion" t WHERE t.ID_COLOCACION = '%s' ORDER BY t.CUOTA_NUMERO;`;
+    sql = util.format(sql, id);
+    console.log("query plan: " + sql);
+    if (!conn.inTransaction) {
+        conn.startNewTransactionSync();
+    }
+    conn.query(sql, (err, rs) => {
+        if (err) {
+            console.log("error: " + err);
+            conn.rollback();
+            result(err, null);
+        }
+        if (rs) {
+            var rows = rs.fetchSync('all', true);
+            console.log("res: " + JSON.stringify(rows));
             conn.commit();
             result(null, rows);
         }

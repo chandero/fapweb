@@ -37,3 +37,5 @@ Puc.getAll = function (result) {
         });  
     }); 
 };
+
+module.exports = Puc;

@@ -1,0 +1,23 @@
+var express = require('express');
+var router = express.Router();
+var model = require('../controllers/contabilidadController');
+
+router.route('/add')
+    .get(model.create);
+
+router.route('/gtpc')
+    .get(model.getTypes);
+
+router.route('/all')
+    .get(model.list_all);
+
+router.route('/allpage/:current_page/:page_size')
+    .get(model.list_all_page);
+
+router.route('/gcom/:tp/:id')
+    .get(model.readComp)
+
+router.route('/gaux/:tp/:id')
+    .get(model.readAux)
+
+module.exports = router;    

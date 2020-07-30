@@ -1150,7 +1150,7 @@ class PersonaRepository @Inject()(dbapi: DBApi)(
         val direcciones = SQL(
           """SELECT d.consecutivo, d.id_direccion, d.direccion, d.barrio, d.cod_municipio, m.NOMBRE AS municipio, d.telefono1, d.telefono2, d.telefono3, d.telefono4 FROM \"gen$direccion\" d 
              INNER JOIN \"gen$municipios" m ON m.COD_MUNICIPIO = d.COD_MUNICIPIO
-             WHERE d.ID_IDENTIFICACION = {id_identificacion} AND d.ID_PERSONA = {id_persona}"""
+             WHERE d.ID_IDENTIFICACION = {id_identificacion} AND d.ID_PERSONA = {id_persona} ORDER BY ID_DIRECCION ASC"""
         ).on(
             'id_identificacion -> id_identificacion,
             'id_persona -> id_persona

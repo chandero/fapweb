@@ -6,7 +6,6 @@ export function obtenerFacturas() {
       method: 'get'
     })
 }
-  
 
 export function obtenerFactura(id) {
     const data = {

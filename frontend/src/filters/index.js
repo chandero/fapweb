@@ -1,21 +1,27 @@
 // set function parseTime,formatTime to filter
 export { parseTime, formatTime } from '@/utils'
 
-function pluralize(time, label) {
+export function pluralize(time, label) {
   if (time === 1) {
     return time + label
   }
   return time + label + 's'
 }
 
+export function pad(num, size) {
+  var s = num+"";
+  while (s.length < size) s = "0" + s;
+  return s;
+}
+
 export function timeAgo(time) {
   const between = Date.now() / 1000 - Number(time)
   if (between < 3600) {
-    return pluralize(~~(between / 60), ' minute')
+    return pluralize(~~(between / 60), ' minutos')
   } else if (between < 86400) {
-    return pluralize(~~(between / 3600), ' hour')
+    return pluralize(~~(between / 3600), ' hora')
   } else {
-    return pluralize(~~(between / 86400), ' day')
+    return pluralize(~~(between / 86400), ' día')
   }
 }
 

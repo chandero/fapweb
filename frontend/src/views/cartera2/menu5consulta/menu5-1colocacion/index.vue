@@ -305,12 +305,12 @@ export default {
     },
     cerrarExtractoEvento() {
       this.extracto_data = []
-      this.extracto_colocacion = null
+      this.extracto_colocacion = ''
       this.showExtractoDlg = false
     },
     cerrarPlanEvento() {
       this.plan_data = []
-      this.plan_colocacion = null
+      this.plan_colocacion = ''
       this.showPlanDlg = false
     },    
     buscarGarantia(id_colocacion) {

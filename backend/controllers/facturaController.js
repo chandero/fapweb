@@ -1,6 +1,12 @@
 'use strict';
 
+const axios = require('axios');
 var Model = require('../models/facturaModel');
+
+const environment = require('../environments');
+const PropertiesReader = require('properties-reader');
+
+var properties = new PropertiesReader(environment);
 
 exports.list_all = function(req, res) {
     Model.getAll(function(err, items) {
@@ -10,23 +16,22 @@ exports.list_all = function(req, res) {
     });
 };
 
-/*
 exports.create = function(req, res) {
-  var new_item = new Task(req.body);
+  var nueva_factura = new Factura(req.body);
 
   //handles null error 
-    if(!new_item){
-            res.status(400).send({ error:true, message: 'Por favor provea un item' });
+    if(!nueva_factura){
+            res.status(400).send({ error:true, message: 'Por favor provea una nueva factura' });
     }
     else{  
-        Model.create(new_item, function(err, item) {    
+        Model.create(nueva_factura, function(err, item) {    
             if (err)
                 res.send(err);
             res.json(item);
         });
     }
 };
-*/
+
 
 exports.read = function(req, res) {
   Model.getById(req.params.id, function(err, item) {
@@ -60,17 +65,14 @@ exports.readItems = function(req, res) {
     });
 };
 
-/*
 exports.update = function(req, res) {
-  Model.updateById(req.params.id_colocacion, new Model(req.body), function(err, item) {
+  Model.update(new Model(req.body), function(err, item) {
     if (err)
       res.send(err);
     res.json(item);
   });
 };
-*/
 
-/*
 exports.delete = function(req, res) {
   Model.remove( req.params.id_colocacion, function(err, item) {
     if (err)
@@ -78,4 +80,24 @@ exports.delete = function(req, res) {
     res.json({ message: 'Item eliminado con exito!' });
   });
 };
-*/
+
+exports.sendToProvider = function(req, res) {
+  const urlProvider = properties.get('facturacion.provider.url');
+  const httpQuery = urlProvider + '/' + req.params.id;
+  axios.get(httpQuery)
+  .then(response => {
+    Model.updateStatus(req.params.id, response, function(err, res){
+      if (err)
+        res.send(err);
+      res.json(response);
+    })
+  })
+  .catch(error => {
+    Model.updateStatus(req.params.id, error, function(err, result){
+      if (err)
+        res.send(err);
+      res.json(error);
+    })    
+    res.json(error);
+  });
+}

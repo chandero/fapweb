@@ -2,9 +2,9 @@
 
 
 var fb = require("firebird");
+
 const environment = require('../environments');
 const PropertiesReader = require('properties-reader');
-
 
 var properties = new PropertiesReader(environment);
 
@@ -28,6 +28,25 @@ Factory.getConnection = function() {
         console.log("Connected to database");
     }
     return conn;
+}
+
+Factory.execQuery = function (query, result) {
+    var conn = Factory.getConnection();
+    if(!conn.inTransaction){
+        conn.startNewTransactionSync();
+    }
+    conn.query(query, (err, rs) => {
+        if (err) {
+            console.log("error: "+ err);
+            conn.rollback();
+            result(err, null);
+        }
+        if (rs) {
+          var rows = rs.fetchSync('all', true);
+          conn.commit();
+          result(null, rows)
+        }
+    });    
 }
 
 module.exports = Factory;
