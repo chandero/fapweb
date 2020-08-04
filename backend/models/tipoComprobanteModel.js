@@ -1,4 +1,4 @@
-'user strict';
+'use strict';
 
 const util = require('util');
 const df = require('dateformat');
@@ -18,7 +18,7 @@ var TipoComprobante = function (item) {
 }
 
 TipoComprobante.getAll = function (result) {
-    var sql = `SELECT t.* FROM "con$tipocomprobante" t ORDER BY ID ASC`;
+    var sql = `SELECT t.ID, t.DESCRIPCION, t.ABREVIATURA, t.LLAVECSC FROM "con$tipocomprobante" t ORDER BY ID ASC`;
     if (!conn.inTransaction) {
         conn.startNewTransactionSync();
     }

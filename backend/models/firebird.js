@@ -1,4 +1,4 @@
-'user strict';
+'use strict';
 
 
 var fb = require("firebird");

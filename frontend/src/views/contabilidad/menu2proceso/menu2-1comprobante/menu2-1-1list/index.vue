@@ -4,6 +4,12 @@
       <h1>Comprobantes Contables</h1>
     </el-header>
     <el-main>
+        <el-row>
+          <el-col :span="24">
+            <query-builder :labels="qlabels" :rules="qrules" :styled="qstyled" :maxDepth="3" v-model="qbquery"></query-builder>
+            <el-button type="warning" icon="el-icon-search" circle @click="actualizar()" title="Actualizar Aplicando el Filtro"></el-button>
+        </el-col>
+      </el-row>
       <el-row :gutter="4">
         <el-col :span="2">
           <el-button type="warning" circle mini icon="el-icon-refresh" @click="listaComprobante()" />
@@ -85,12 +91,17 @@
   </el-container>
 </template>
 <script>
+import VueQueryBuilder from 'vue-query-builder';
 import {
   obtenerTiposComprobante,
   obtenerComprobantesPage,
 } from "@/api2/contabilidad";
+import { obtenerTiposDocumento } from '@/api2/persona'
 
 export default {
+  components: {
+    'query-builder': VueQueryBuilder
+  },  
   data() {
     return {
       tableData: [],
@@ -99,13 +110,81 @@ export default {
       total: 0,
       bhidepage: true,
       tipos_comprobante: [],
+      tipos_identificacion: [],
+      orderby: "cc.FECHADIA, cc.TIPO_COMPROBANTE, cc.ID_COMPROBANTE",
+      qbquery: {},
+      qrules: [
+        {
+          type: 'select',
+          id: 'CAST(TRIM(cc.TIPO_COMPROBANTE) AS INTEGER)',
+          label: 'Tipo de Comprobante',
+          choices: [],
+          operators: ['=']
+        },
+        {
+          type: 'text',
+          id: 'cc.ID_COMPROBANTE',
+          label: 'Número Comprobante',
+          operators: ['igual a']
+        },
+        {
+          type: 'select',
+          id: 'ca.ID_IDENTIFICACION',
+          label: 'Tipo Identificación',
+          choices: [],
+          operators: ['igual a']
+        },
+        {
+          type: 'text',
+          id: 'ca.ID_PERSONA',
+          label: 'Identificación',
+          operators: ['igual a']
+        },        
+        {
+          type: "custom-component",
+          component: 'el-date-picker',
+          id: 'cc.FECHADIA',
+          label: 'Fecha',
+          operators: ['<', '<=', '>', '>=', '=']
+        },
+        {
+          type: 'select',
+          id: 'cc.ESTADO',
+          label: 'Estado Actual',
+          choices: [
+            { label: 'Abierto', value: 'O' },
+            { label: 'Cerrado', value: 'C' },
+            { label: 'Anulado', value: 'N' }
+          ],
+          operators: ['igual a']
+        }
+      ],
+      qlabels: {
+        matchType: this.$i18n.t('qb.matchType'),
+        matchTypes: [
+          {
+            id: 'all',
+            label: this.$i18n.t('qb.matchTypeAll')
+          },
+          {
+            id: 'any',
+            label: this.$i18n.t('qb.matchTypeAny')
+          }
+        ],
+        addRule: this.$i18n.t('qb.addRule'),
+        removeRule: this.$i18n.t('qb.removeRule'),
+        addGroup: this.$i18n.t('qb.addGroup'),
+        removeGroup: this.$i18n.t('qb.removeGroup'),
+        textInputPlaceholder: this.$i18n.t('qb.textInputPlaceholder')
+      },
+      qstyled: true      
     };
   },
   beforeMount() {
     this.listaTipoComprobante();
   },
   methods: {
-    tableRowClassName({ row, rowIndex }) {
+    tableRowClassName({ row /*, rowIndex */ }) {
       if (row.ESTADO === "C") {
         return "success-row";
       } else if (row.ESTADO === "N") {
@@ -125,7 +204,10 @@ export default {
       obtenerTiposComprobante()
         .then((response) => {
           this.tipos_comprobante = response.data;
-          this.listaComprobante();
+          this.tipos_comprobante.forEach(tc => {
+            this.qrules[0].choices.push( { label: tc.DESCRIPCION, value: tc.ID });
+          });
+          this.listaTipoIdentificacion();
         })
         .catch((error) => {
           this.$message({
@@ -134,8 +216,20 @@ export default {
           });
         });
     },
+    listaTipoIdentificacion() {
+      obtenerTiposDocumento().then(response => {
+        this.tipos_identificacion = response.data;
+        this.tipos_identificacion.forEach(ti => {
+          this.qrules[2].choices.push({ label: ti.DESCRIPCION_IDENTIFICACION, value: ti.ID_IDENTIFICACION });
+        })
+        this.listaComprobante();
+      })
+    },
+    actualizar() {
+      this.listaComprobante();
+    },
     listaComprobante() {
-      obtenerComprobantesPage(this.current_page, this.page_size)
+      obtenerComprobantesPage(this.current_page, this.page_size, this.orderby, this.qbquery)
         .then((response) => {
           this.total = response.data.total;
           this.tableData = response.data.data;

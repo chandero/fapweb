@@ -10,6 +10,9 @@ import play.api.Configuration
 
 import scala.concurrent.{ExecutionContext, Future}
 
+import net.liftweb.json._
+import net.liftweb.json.Serialization.write
+
 import models._
 
 class HttpClient @Inject()(ws: WSClient, service:FacturaRepository, conf: Configuration)(implicit ec: ExecutionContext) {
@@ -29,8 +32,11 @@ class HttpClient @Inject()(ws: WSClient, service:FacturaRepository, conf: Config
 
     def setDocument(f: Long) = {
         service.enviarFactura(f).map { rootInterface =>
-            var jsonString = Json.stringify(Json.toJson(rootInterface))
+            // var jsonString = Json.stringify(Json.toJson(rootInterface))
+            implicit val formats = DefaultFormats
+            var jsonString = write(rootInterface)
             jsonString = "{\"Documento\":" + jsonString + "}"
+            println("json factura: " + jsonString)
             jsonString
         }
     }

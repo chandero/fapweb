@@ -1,4 +1,4 @@
-'user strict';
+'use strict';
 
 const util = require('util');
 const df = require('dateformat');

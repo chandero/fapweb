@@ -1,6 +1,9 @@
-'user strict';
+'use strict';
 var options = require('./connection.js');
-var firebird = require('node-firebird');
+
+var SqlString = require('sqlstring');
+var factory = require('./firebird.js');
+var conn = factory.getConnection();
 
 //Puc object constructor
 var Puc = function(item){
@@ -22,20 +25,41 @@ var Puc = function(item){
 }
 
 Puc.getAll = function (result) {
-    firebird.attach(options, function(err, sql) {    
-        sql.query("SELECT * FROM \"con$puc\" ORDER BY CODIGO ASC", function (err, res) {
-                if(err) {
-                    console.log("error: ", err);
-                    sql.detach();
-                    result(null, err);
-                }
-                else{
-                  console.log('puc : ', res);  
-                  sql.detach();
-                  result(null, res);
-                }
-        });  
-    }); 
+    var sql = SqlString.format(`SELECT * FROM "con$puc" ORDER BY CODIGO ASC`, [id]);
+    if (!conn.inTransaction) {
+        conn.startNewTransactionSync();
+    }
+    conn.query(sql, (err, rs) => {
+        if (err) {
+            console.log("error: " + err);
+            conn.rollback();
+            result(err, null);
+        }
+        if (rs) {
+            var rows = rs.fetchSync('all', true);
+            conn.commit();
+            result(null, rows);
+        }
+    });
 };
+
+Puc.getById = function (id, result) {
+    var sql = SqlString.format(`SELECT * FROM "con$puc" WHERE CODIGO = ?`, [id]);
+    if (!conn.inTransaction) {
+        conn.startNewTransactionSync();
+    }
+    conn.query(sql, (err, rs) => {
+        if (err) {
+            console.log("error: " + err);
+            conn.rollback();
+            result(err, null);
+        }
+        if (rs) {
+            var rows = rs.fetchSync('all', true);
+            conn.commit();
+            result(null, rows);
+        }
+    });
+}
 
 module.exports = Puc;

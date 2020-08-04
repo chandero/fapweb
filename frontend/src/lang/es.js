@@ -30,6 +30,7 @@ export default {
     menu_contabilidad_menu2proceso: 'Proceso',
     'menu_contabilidad_menu2proceso_menu2-1comprobante': 'Comprobante',
     'menu_contabilidad_menu2proceso_menu2-1comprobante_menu2-1-1list': 'Consulta',
+    'menu_contabilidad_menu2proceso_menu2-1comprobante_menu2-1-2gestion': 'Gestión',
     menu_contabilidad_menu3libros: 'Libros Oficiales',
     'menu_contabilidad_menu3libros_menu3-1mayorbalance': 'Mayor y Balance',
     'menu_contabilidad_menu3libros_menu3-1mayorbalance_menu3-1-1consultar': 'Consultar',
@@ -247,5 +248,16 @@ export default {
       tipo_parentesco_select: 'Seleccione Tipo Parentesco',
       tipo_parentesco: 'Tipo Parentesco'
     }
+  },
+  qb: {
+    matchType: 'Concordancia',
+    matchTypeAll: 'and',
+    matchTypeAny: 'or',
+    addRule: 'Agregar filtro',
+    addGroup: 'Agregar grupo',
+    removeRule: 'Quitar filtro',
+    removeGroup: 'Quitar grupo',
+    textInputPlaceholder: 'Ingrese valor'
   }
+
 }

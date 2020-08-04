@@ -40,7 +40,10 @@ libraryDependencies ++= Seq(
 
   "com.lihaoyi" %% "requests" % "0.6.2",
   "org.joda" % "joda-money" % "1.0.1",
-  "org.firebirdsql.jdbc" % "jaybird" % "4.0.0.java8"
+  "org.firebirdsql.jdbc" % "jaybird" % "4.0.0.java8",
+
+  // JSON
+  "net.liftweb" %% "lift-json" % "3.4.1"
 )
 
 // Play framework hooks for development

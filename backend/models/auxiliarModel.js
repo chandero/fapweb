@@ -1,4 +1,4 @@
-'user strict';
+'use strict';
 
 const util = require('util');
 const df = require('dateformat');
@@ -70,13 +70,13 @@ Auxiliar.getAll = function (result) {
 };
 
 Auxiliar.getById = function (tp, id, result) {
-    console.log('en Auxiliar get By Id');
     var sql = SqlString.format(`
                         SELECT 
                          a.ID_COMPROBANTE, 
                          a.ID_AGENCIA, 
                          CAST(a.FECHA AS VARCHAR(10)) AS FECHA, 
                          a.CODIGO, 
+                         p.NOMBRE AS CUENTA,
                          a.DEBITO, 
                          a.CREDITO, 
                          a.ID_CUENTA, 
@@ -93,10 +93,13 @@ Auxiliar.getById = function (tp, id, result) {
                          e.DETALLE,
                          e.CHEQUE,
                          e.ID_COMPROBANTE,
-                         e.TIPO_COMPROBANTE,
-                         e.ID_AGENCIA
+                         CAST(e.TIPO_COMPROBANTE AS INTEGER) AS TIPO_COMPROBANTE,
+                         e.ID_AGENCIA,
+                         (TRIM(r.NOMBRE) || ' ' || TRIM(r.PRIMER_APELLIDO) || ' ' || TRIM(r.SEGUNDO_APELLIDO)) AS PERSONA
                         FROM "con$auxiliar" a
                         LEFT JOIN "con$auxiliarext" e ON e.ID = a.ID
+                        LEFT JOIN "con$puc" p ON p.CODIGO = a.CODIGO
+                        LEFT JOIN "gen$persona" r ON r.ID_IDENTIFICACION = a.ID_IDENTIFICACION and r.ID_PERSONA = a.ID_PERSONA
                         WHERE a.TIPO_COMPROBANTE = ? and a.ID_COMPROBANTE = ?`, [parseInt(tp,10), parseInt(id, 10)]);
     if (!conn.inTransaction) {
         conn.startNewTransactionSync();

@@ -68,14 +68,14 @@ case class _CompradorFactura (
   CompradorDireccion: Option[String],
   CompradorEnviarCorreo: Option[Boolean],
   CompradorIdentificacion: Option[String],
-//  CompradorImpuesto: Option[String],
+  CompradorImpuesto: Option[String],
   CompradorNombreCompleto: Option[String],
   CompradorNombrePais: Option[String],
-//  CompradorNotaCont: Option[String],
+  CompradorNotaCont: Option[String],
   CompradorPais: Option[String],
   CompradorPrimerNombre: Option[String],
   CompradorRazonSocial: Option[String],
-//  CompradorRespFiscal: Option[String],
+  CompradorRespFiscal: Option[String],
   CompradorSector: Option[String],
   CompradorSegundoNombre: Option[String],
   CompradorTelefonoCont: Option[String],
@@ -211,6 +211,7 @@ case class _RootInterface (
   lsNotas: Option[Seq[_LsNota]]
 )
 
+/*
 object _AutorizacionFactura {
   implicit val yourJodaDateReads =
     JodaReads.jodaDateReads("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
@@ -238,6 +239,7 @@ object _AutorizacionFactura {
   )(_AutorizacionFactura.apply _)
 }
 
+
 object _CompradorFactura {
   implicit val yourJodaDateReads =
     JodaReads.jodaDateReads("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
@@ -257,14 +259,14 @@ object _CompradorFactura {
       "CompradorDireccion" -> r.CompradorDireccion,
       "CompradorEnviarCorreo" -> r.CompradorEnviarCorreo,
       "CompradorIdentificacion" -> r.CompradorIdentificacion,
-//      "CompradorImpuesto" -> r.CompradorImpuesto,
+      "CompradorImpuesto" -> r.CompradorImpuesto,
       "CompradorNombreCompleto" -> r.CompradorNombreCompleto,
       "CompradorNombrePais" -> r.CompradorNombrePais,
-//      "CompradorNotaCont" -> r.CompradorNotaCont,
+      "CompradorNotaCont" -> r.CompradorNotaCont,
       "CompradorPais" -> r.CompradorPais,
       "CompradorPrimerNombre" -> r.CompradorPrimerNombre,
       "CompradorRazonSocial" -> r.CompradorRazonSocial,
-//    "CompradorRespFiscal" -> r.CompradorRespFiscal,
+      "CompradorRespFiscal" -> r.CompradorRespFiscal,
       "CompradorSector" -> r.CompradorSector,
       "CompradorSegundoNombre" -> r.CompradorSegundoNombre,                                    
       "CompradorTelefonoCont" -> r.CompradorTelefonoCont,                                    
@@ -286,14 +288,14 @@ object _CompradorFactura {
     (__ \ "CompradorDireccion").readNullable[String] and
     (__ \ "CompradorEnviarCorreo").readNullable[Boolean] and
     (__ \ "CompradorIdentificacion").readNullable[String] and
-//    (__ \ "CompradorImpuesto").readNullable[String] and
+    (__ \ "CompradorImpuesto").readNullable[String] and
     (__ \ "CompradorNombreCompleto").readNullable[String] and
     (__ \ "CompradorNombrePais").readNullable[String] and
-//    (__ \ "CompradorNotaCont").readNullable[String] and
+    (__ \ "CompradorNotaCont").readNullable[String] and
     (__ \ "CompradorPais").readNullable[String] and
     (__ \ "CompradorPrimerNombre").readNullable[String] and
     (__ \ "CompradorRazonSocial").readNullable[String] and
-//    (__ \ "CompradorRespFiscal").readNullable[String] and
+    (__ \ "CompradorRespFiscal").readNullable[String] and
     (__ \ "CompradorSector").readNullable[String] and                                                
     (__ \ "CompradorSegundoNombre").readNullable[String] and                                                
     (__ \ "CompradorTelefonoCont").readNullable[String] and      
@@ -676,8 +678,7 @@ object _RootInterface {
     (__ \ "lsNotas").readNullable[Seq[_LsNota]]
   )(_RootInterface.apply _)
 }
-
-
+*/
 
 object FacturaItem {
   implicit val yourJodaDateReads =
@@ -811,6 +812,7 @@ object Factura {
   }
 }
 
+
 class FacturaRepository @Inject()(dbapi: DBApi, personaService: PersonaRepository)(
     implicit ec: DatabaseExecutionContext) {
   private val db = dbapi.database("default")
@@ -906,12 +908,12 @@ class FacturaRepository @Inject()(dbapi: DBApi, personaService: PersonaRepositor
                                                                            Some(autorizacion._6),
                                                                            Some(autorizacion._7))
 
-                          val _encabezadoData = new _EncabezadoData(Some("05"), None, None, Some(sdf.format(f.fact_fecha.get.toDate)), None, None, Some("01"), None)
+                          val _encabezadoData = new _EncabezadoData(Some("10"), None, None, Some(sdf.format(f.fact_fecha.get.toDate)), None, None, Some("01"), None)
 
                           var _sendemail = persona.d.get.email.exists(_.trim.nonEmpty)
-                          val _compradorData = new _CompradorFactura(persona.a.get.primer_apellido, 
-                                                                     direccion.municipio, 
-                                                                     Some(direccion.cod_municipio.get.toString), 
+                          val _compradorData = new _CompradorFactura(persona.a.get.primer_apellido,
+                                                                     direccion.municipio,
+                                                                     Some(direccion.cod_municipio.get.toString),
                                                                      Some(depa_id.toString),
                                                                      Some(depa_id.toString+"0001"),
                                                                      persona.d.get.email,
@@ -920,11 +922,14 @@ class FacturaRepository @Inject()(dbapi: DBApi, personaService: PersonaRepositor
                                                                      direccion.direccion,
                                                                      Some(_sendemail),
                                                                      f.id_persona,
+                                                                     None,
                                                                      Some(persona.a.get.nombre.get.concat(" ".concat(persona.a.get.primer_apellido.get.concat(" ".concat(persona.a.get.segundo_apellido.get))))),
                                                                      Some("COLOMBIA"),
+                                                                     Some(f.id_comprobante.toString()),
                                                                      Some("CO"),
                                                                      persona.a.get.nombre,
                                                                      None,
+                                                                     Some("R-99-PN"),
                                                                      direccion.barrio,
                                                                      None,
                                                                      direccion.telefono1,

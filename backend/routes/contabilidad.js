@@ -8,11 +8,17 @@ router.route('/add')
 router.route('/gtpc')
     .get(model.getTypes);
 
+router.route('/gpuc')
+    .get(model.getPucAll);
+
+router.route('/gpbi/:id')
+    .get(model.getPucById);
+    
 router.route('/all')
     .get(model.list_all);
 
-router.route('/allpage/:current_page/:page_size')
-    .get(model.list_all_page);
+router.route('/allpage')
+    .post(model.list_all_page);
 
 router.route('/gcom/:tp/:id')
     .get(model.readComp)

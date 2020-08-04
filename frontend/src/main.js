@@ -26,7 +26,25 @@ import './permission' // permission control
 import * as filters from './filters' // global filters
 
 Vue.use(VueMoment)
-Vue.use(VueCurrencyFilter)
+Vue.use(VueCurrencyFilter, [
+  { // default name 'currency'
+    symbol: '$',
+    thousandsSeparator: ',',
+    fractionCount: 2,
+    fractionSeparator: '.',
+    symbolPosition: 'front',
+    symbolSpacing: true
+  },
+  { // default name 'currency_2'
+    name: 'currency_2',
+    symbol: '',
+    thousandsSeparator: ',',
+    fractionCount: 2,
+    fractionSeparator: '.',
+    symbolPosition: 'front',
+    symbolSpacing: false
+  }
+ ]);
 Vue.use(VueCurrencyInput)
 Vue.use(Element, {
   size: Cookies.get('size') || 'medium', // set element-ui default size

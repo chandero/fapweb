@@ -2,8 +2,25 @@ import request from '@/utils/request2'
 
 export function obtenerTiposComprobante() {
     return request({
-      url: '/contable/gtpc',
-      method: 'get'
+        url: '/contable/gtpc',
+        method: 'get'
+    })
+}
+
+export function obtenerCodigos() {
+    return request({
+        url: '/contable/gpuc',
+        method: 'get'
+    })
+}
+
+export function obtenerCodigo(id) {
+    const data = {
+        id
+    }
+    return request({
+        url: '/contable/gpbi/' + data.id,
+        method: 'get'
     })
 }
 
@@ -14,14 +31,17 @@ export function obtenerComprobantes() {
     })
 }
 
-export function obtenerComprobantesPage(current_page, page_size) {
+export function obtenerComprobantesPage(current_page, page_size, order_by, filter) {
     const data = {
         current_page,
-        page_size
+        page_size,
+        order_by,
+        filter
     }
     return request({
-        url: '/contable/allpage/' + data.current_page + '/' + data.page_size,
-        method: 'get'
+        url: '/contable/allpage',
+        method: 'post',
+        data: data
     })
 }
 
@@ -44,5 +64,16 @@ export function obtenerAuxiliar(tp, id) {
     return request({
         url: '/contable/gaux/' + data.tp + '/' + data.id,
         method: 'get'
+    })
+}
+
+export function guardarComprobante(comprobante) {
+    const data = {
+        comprobante
+    }
+    return request({
+        url: '/contable/save',
+        method: 'post',
+        data: data.comprobante
     })
 }

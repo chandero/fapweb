@@ -8,6 +8,7 @@ var compression = require('compression');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var personaRouter = require('./routes/persona');
 var colocacionRouter = require('./routes/colocacion');
 var facturaRouter = require('./routes/factura');
 var contabilidadRouter = require('./routes/contabilidad');
@@ -41,6 +42,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/ipa', indexRouter);
 app.use('/ipa/users', usersRouter);
+app.use('/ipa/persona/', personaRouter);
 app.use('/ipa/colocacion', colocacionRouter);
 app.use('/ipa/factura/', facturaRouter);
 app.use('/ipa/contable/', contabilidadRouter);
