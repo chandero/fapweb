@@ -70,17 +70,20 @@
           <el-col :span="24">
             <el-form :model="aux">
               <el-row :gutter="4">
-                <el-col :xs="22" :sm="22" :md="10" :lg="10" :xl="10" >
+                <el-col :xs="22" :sm="22" :md="6" :lg="6" :xl="6" >
                   <el-form-item label="CODIGO">
-                    <el-input v-model="aux.CODIGO" />
+                    <el-input v-model="aux.CODIGO" @blur="validarCodigo"/>
                   </el-form-item>
                 </el-col>
                 <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">
-                    <el-popover placement="right" width="600" trigger="click">
+                  <el-form-item label="_">
+                    <el-popover placement="right" width="700" trigger="click" v-model="puc_visible">
+                      <puctree @selected="colocarcodigo"/>
                       <el-button slot="reference" mini circle icon="el-icon-search"></el-button>
-                    </el-popover>                  
+                    </el-popover>
+                  </el-form-item>
                 </el-col>
-                <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" >
+                <el-col :xs="24" :sm="24" :md="16" :lg="16" :xl="16" >
                   <el-form-item label="CUENTA">
                     <el-input readonly v-model="aux.CUENTA" />
                   </el-form-item>
@@ -156,6 +159,8 @@
   </el-container>
 </template>
 <script>
+import PucTree from '@/components/PucTree'
+
 import {
   obtenerTiposComprobante,
   obtenerComprobante,
@@ -174,6 +179,9 @@ export default {
       required: true,
     },
   },
+  components : {
+    puctree: PucTree
+  },
   data() {
     return {
       tipos_comprobante: [],
@@ -182,6 +190,7 @@ export default {
       auxiliar: [],
       filtro: null,
       aux: null,
+      puc_visible: false,
     };
   },
   beforeMount() {
@@ -190,17 +199,12 @@ export default {
     this.listaTipoComprobante();
   },
   mount() {
-    console.log(
-      "comprobante en componente: " + JSON.stringify(this.comprobante)
-    );
   },
   methods: {
     getSummaries(param) {
       const { columns, data } = param;
       const sums = [];
       columns.forEach((column, index) => {
-        console.log("Column: " + column.property);
-        console.log("Index: " + index);
         if (index === 0) {
           sums[index] = "Totales";
           return;
@@ -356,6 +360,14 @@ export default {
         this.compro;
       }
     },
+    colocarcodigo(codigo) {
+      this.puc_visible = false;
+      this.aux.CODIGO = codigo;
+      this.validarCodigo();
+    },
+    validarCodigo() {
+      
+    }
   },
 };
 </script>

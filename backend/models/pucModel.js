@@ -25,7 +25,7 @@ var Puc = function(item){
 }
 
 Puc.getAll = function (result) {
-    var sql = SqlString.format(`SELECT * FROM "con$puc" ORDER BY CODIGO ASC`, [id]);
+    var sql = `SELECT * FROM "con$puc" ORDER BY CODIGO ASC`;
     if (!conn.inTransaction) {
         conn.startNewTransactionSync();
     }

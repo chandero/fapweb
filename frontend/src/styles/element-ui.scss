@@ -6,6 +6,10 @@ body {
   font-size: 12px;
 }
 
+.el-tree-node__label {
+  font-size: 12px !important;
+}
+
 .el-breadcrumb__inner,
 .el-breadcrumb__inner a {
   font-weight: 400 !important;
