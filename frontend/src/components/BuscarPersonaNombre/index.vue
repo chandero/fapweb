@@ -2,7 +2,7 @@
   <el-container>
     <el-main>
       <el-form>
-        <el-row>
+        <el-row :gutter="4">
           <el-col :span="5">
             <el-form-item label="Primer Apellido">
               <el-input v-model="data.primer_apellido" @input="data.primer_apellido=data.primer_apellido.toUpperCase()"/>

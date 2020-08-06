@@ -7,6 +7,20 @@ export function obtenerTiposComprobante() {
     })
 }
 
+export function obtenerCentro() {
+    return request({
+        url: '/contable/gccc',
+        method: 'get'
+    })
+}
+
+export function obtenerTipoOperacion() {
+    return request({
+        url: '/contable/gcto',
+        method: 'get'
+    })
+}
+
 export function obtenerCodigos() {
     return request({
         url: '/contable/gpuc',

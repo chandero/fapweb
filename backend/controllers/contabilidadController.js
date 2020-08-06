@@ -6,6 +6,8 @@ var Puc = require('../models/pucModel');
 var Comprobante = require('../models/comprobanteModel');
 var Auxiliar = require('../models/auxiliarModel');
 var TipoComprobante = require('../models/tipoComprobanteModel');
+var Agencia = require('../models/agenciaModel');
+var TipoOperacion = require('../models/tipoOperacionModel');
 
 exports.getTypes = function(req, res) {
     TipoComprobante.getAll(function(err, items) {
@@ -28,6 +30,38 @@ exports.getPucById = function(req, res) {
         if (err)
            res.status(400).send(err)
         res.json(items)
+    });
+}
+
+exports.getCentro = function(req, res) {
+    Agencia.getAgencia(function(err, items) {
+        if (err)
+           res.status(400).send(err)
+        res.json(items)        
+    })
+}
+
+exports.getTipoOperacion = function(req, res) {
+    TipoOperacion.getAgencia(function(err, items) {
+        if (err)
+           res.status(400).send(err)
+        res.json(items)        
+    })
+}
+
+exports.getIsValid2Mov = function(req, res) {
+    Puc.getById(req.params.id, function(err, items) {
+        if (err)
+           res.status(400).send(err)
+        const p = items[0];
+        var esMovimiento;
+        if (p.MOVIMIENTO === 0) {
+            esMovimiento = false;
+        } else {
+            esMovimiento = true;
+        }
+        res.json({ cuenta: p, movimiento: esMovimiento });
+
     });
 }
 

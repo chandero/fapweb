@@ -8,8 +8,17 @@ router.route('/add')
 router.route('/gtpc')
     .get(model.getTypes);
 
+router.route('/gccc')
+    .get(model.getCentro);
+
+router.route('/gcto')
+    .get(model.getTipoOperacion);
+
 router.route('/gpuc')
     .get(model.getPucAll);
+
+router.route('/vcod/:id')
+    .get(model.getIsValid2Mov)
 
 router.route('/gpbi/:id')
     .get(model.getPucById);

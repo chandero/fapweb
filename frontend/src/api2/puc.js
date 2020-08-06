@@ -6,3 +6,13 @@ export function obtenerPuc() {
         method: 'get'
     })
 }
+
+export function esDeMovimiento(codigo) {
+    const data = {
+        codigo
+    }
+    return request({
+        url: '/contable/vcod/' + data.codigo,
+        method: 'get'
+    })
+}

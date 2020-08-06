@@ -3,7 +3,7 @@
     <el-main>
       <el-row :gutter="4">
         <el-col :span="24">
-          <el-input placeholder="Filtrar por" v-model="filterText"></el-input>
+          <el-input placeholder="Filtrar por" prefix-icon="el-icon-search" v-model="filterText"></el-input>
           <el-tree
             class="filter-tree"
             :data="pucdata"
