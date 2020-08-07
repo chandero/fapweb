@@ -15,7 +15,7 @@
           <el-button type="warning" circle mini icon="el-icon-refresh" @click="listaComprobante()" />
         </el-col>
         <el-col :span="2">
-          <el-button type="primary" circle mini icon="el-icon-plus" @click="nuevoComprobante()" />
+          <el-button type="primary" circle mini icon="el-icon-plus" @click="handleNew()" />
         </el-col>
       </el-row>
       <el-row :gutter="4">
@@ -266,6 +266,9 @@ export default {
           return 'ANULADO'
         }
       }
+    },
+    handleNew() {
+      this.$router.push({ path: '/contabilidad/menu2proceso/menu2-1comprobante/menu2-1-2gestion/' });
     },
     handleView (row) {
       this.$router.push({ path: '/contabilidad/menu2proceso/menu2-1comprobante/menu2-1-2gestion/' + parseInt(row.TIPO_COMPROBANTE) + '/' + row.ID_COMPROBANTE });

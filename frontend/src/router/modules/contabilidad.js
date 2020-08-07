@@ -31,7 +31,7 @@ const contabilidadRouter = {
               meta: { title: 'menu_contabilidad_menu2proceso_menu2-1comprobante_menu2-1-1list', icon: 'note-19', roles: ['admin', 'contabilidad', 'revisor'] }
             },
             {
-              path: 'menu2-1-2gestion/:tp/:id',
+              path: 'menu2-1-2gestion/:tp?/:id?',
               component: () => import('@/views/contabilidad/menu2proceso/menu2-1comprobante/menu2-1-2gestion/index'),
               name: 'menu_contabilidad_menu2proceso_menu2-1comprobante_menu2-1-2gestion',
               hidden: true,

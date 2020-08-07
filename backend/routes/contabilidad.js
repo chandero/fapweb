@@ -14,6 +14,9 @@ router.route('/gccc')
 router.route('/gcto')
     .get(model.getTipoOperacion);
 
+router.route('/gcic')
+    .get(model.getInformeContable);
+
 router.route('/gpuc')
     .get(model.getPucAll);
 

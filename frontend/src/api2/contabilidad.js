@@ -21,6 +21,13 @@ export function obtenerTipoOperacion() {
     })
 }
 
+export function obtenerInforme() {
+    return request({
+        url: '/contable/gcic',
+        method: 'get'
+    })
+}
+
 export function obtenerCodigos() {
     return request({
         url: '/contable/gpuc',
