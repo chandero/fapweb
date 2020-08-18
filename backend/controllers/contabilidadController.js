@@ -2,6 +2,8 @@
 
 var parsefilter = require("../utils/parsefilter");
 
+var Report = require('../reports/contabilidad/notacontable');
+
 var Puc = require("../models/pucModel");
 var Comprobante = require("../models/comprobanteModel");
 var Auxiliar = require("../models/auxiliarModel");
@@ -9,6 +11,7 @@ var TipoComprobante = require("../models/tipoComprobanteModel");
 var Agencia = require("../models/agenciaModel");
 var TipoOperacion = require("../models/tipoOperacionModel");
 var InformeContable = require("../models/informeContableModel");
+const Reporte = require("../reports/contabilidad/notacontable");
 
 exports.getTypes = function (req, res) {
   TipoComprobante.getAll(function (err, items) {
@@ -113,16 +116,47 @@ exports.list_all_page = function (req, res) {
   });
 };
 
-exports.create = function (req, res) {
+exports.save = function (req, res) {
   var new_item = new Comprobante(req.body);
 
   //handles null error
   if (!new_item) {
     res.status(400).send({ error: true, message: "Por favor provea un item" });
   } else {
-    Comprobante.create(function (err, item) {
+    new_item.save(function (err, items) {
       if (err) res.status(400).send(err);
       res.json(items);
     });
   }
 };
+
+exports.nullify = function (req, res) {
+  const tp = req.body.tp;
+  const id = req.body.id;
+  const texto = req.body.texto;
+  Comprobante.nullify(tp, id, texto, function(err, items) {
+    if (err) res.status(400).send(err);
+    res.json(items);
+  });
+};
+
+exports.pdfNota = function (req, res) {
+  const tp = req.params.tp;
+  const id = req.params.id;
+  const imgLoc = "../example_image.jpg";
+  Comprobante.getByIdAll(tp, id, function (err, result) {
+    if (err)
+      result(err);
+    Reporte.printreport({
+      image: imgLoc,
+      data: result
+    }, function (err, report) {
+      if (err)
+        res.status(400).send(err);
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'attachment; filename=nota.pdf');
+      res.send(report);
+    });
+  });
+
+}

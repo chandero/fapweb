@@ -19,7 +19,7 @@ options.pageSize = properties.get('database.firebird.pageSize'); // default when
 class Connection {
 
     static getConnection = function (callback) {
-        var conn = new Firebird.Database(options.host, options.port, options.database, options.user, options.password, callback(conn));
+        Firebird.attach(options, callback);
     };
 
     static executeQueryWithParams = function (query, params, response) {

@@ -53,18 +53,22 @@
           <el-col :xs="24" :sm="12" :md="12" :lg="6" :xl="6">
             <template>
               <el-form-item label="Número Comprobante">
-                <span style="font-size: 24px; font-weigth: bold;">{{
+                <span style="font-size: 24px; font-weigth: bold;">
+                  {{
                   comprobante.ID_COMPROBANTE | pad(6)
-                }}</span>
+                  }}
+                </span>
               </el-form-item>
             </template>
           </el-col>
           <el-col :xs="24" :sm="12" :md="12" :lg="6" :xl="6">
             <template>
               <el-form-item label="Estado Actual">
-                <span style="font-size: 24px; font-weigth: bold;">{{
+                <span style="font-size: 24px; font-weigth: bold;">
+                  {{
                   estado(comprobante.ESTADO)
-                }}</span>
+                  }}
+                </span>
               </el-form-item>
             </template>
           </el-col>
@@ -73,11 +77,7 @@
           <el-col :span="24">
             <template v-if="comprobante.ESTADO === 'O'">
               <el-form-item label="DESCRIPCION">
-                <el-input
-                  type="textarea"
-                  autosize
-                  v-model="comprobante.DESCRIPCION"
-                />
+                <el-input type="textarea" autosize v-model="comprobante.DESCRIPCION" />
               </el-form-item>
             </template>
             <template v-else>
@@ -89,26 +89,28 @@
         </el-row>
         <el-row>
           <el-col :span="24">
-            <template v-if="comprobante.ESTADO === 'O' && anular">
-              <el-form-item label="ANULADO POR">
-                <el-input
-                  type="textarea"
-                  autosize
-                  v-model="comprobante.ANULACION"
-                />
-              </el-form-item>
-            </template>
-            <template v-else-if="comprobante.ESTADO === 'N'">
+            <template v-if="comprobante.ESTADO === 'N'">
               <el-form-item label="ANULADO POR">
                 <span>{{ comprobante.DESCRIPCION }}</span>
               </el-form-item>
             </template>
           </el-col>
         </el-row>
+        <el-row :gutter="4">
+          <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
+            <span style="font-size: 20px;">Total Débito:${{ totaldebito | currency_2 }}</span>
+          </el-col>
+          <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
+            <span style="font-size: 20px;">Total Crébito:${{ totalcredito | currency_2 }}</span>
+          </el-col>
+          <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
+            <span style="font-size: 20px;">Diferencia:${{ totaldebito - totalcredito | currency_2 }}</span>
+          </el-col>
+        </el-row>
         <el-row>
           <el-col>
             <el-alert
-              v-if="comprobante.DEBITO === comprobante.CREDITO"
+              v-if="totaldebito === totalcredito"
               title="Comprobante Cuadrado"
               type="success"
               description="el comprobante presenta sumas iguales DEBITO CREDITO"
@@ -142,19 +144,9 @@
                 </el-col>
                 <el-col :xs="2" :sm="2" :md="2" :lg="2" :xl="2">
                   <el-form-item label="_">
-                    <el-popover
-                      placement="right"
-                      width="700"
-                      trigger="click"
-                      v-model="puc_visible"
-                    >
+                    <el-popover placement="right" width="700" trigger="click" v-model="puc_visible">
                       <puctree @selected="colocarcodigo" />
-                      <el-button
-                        slot="reference"
-                        mini
-                        circle
-                        icon="el-icon-search"
-                      ></el-button>
+                      <el-button slot="reference" mini circle icon="el-icon-search"></el-button>
                     </el-popover>
                   </el-form-item>
                 </el-col>
@@ -237,9 +229,11 @@
                             :value="t.id_identificacion"
                           />
                         </el-select>
-                        <span v-else>{{
+                        <span v-else>
+                          {{
                           tipo_documento(aux.ID_IDENTIFICACION)
-                        }}</span>
+                          }}
+                        </span>
                       </el-form-item>
                     </el-col>
                     <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
@@ -266,14 +260,14 @@
                         label="Nombre"
                       >
                         <span>{{ aux.PERSONA }}</span>
-                      <el-button
-                        type="primary"
-                        icon="el-icon-search"
-                        circle
-                        title="Buscar Por Apellidos y Nombre"
-                        @click="showBuscarPersonaDlg = true"
-                      />
-                      </el-form-item>                      
+                        <el-button
+                          type="primary"
+                          icon="el-icon-search"
+                          circle
+                          title="Buscar Por Apellidos y Nombre"
+                          @click="showBuscarPersonaDlg = true"
+                        />
+                      </el-form-item>
                     </el-col>
                   </el-row>
                 </el-col>
@@ -281,24 +275,15 @@
               <el-row :gutter="4">
                 <el-col :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
                   <el-form-item label="Valor Débito" style="text-align:right;">
-                    <el-input
+                    <currency-input
                       v-if="comprobante.ESTADO === 'O'"
                       ref="debito"
                       v-model="aux.DEBITO"
-                      v-currency="{
-                        locale: 'en',
-                        currency: 'USD',
-                        valueAsInteger: false,
-                        distractionFree: true,
-                        precision: 2,
-                        autoDecimalMode: false,
-                        valueRange: { min: 0 },
-                        allowNegative: false
-                      }"
+                      locale="en"
                       @blur="
                         aux.DEBITO > 0 ? (aux.CREDITO = 0) : (aux.DEBITO = 0)
                       "
-                      class="toright"
+                      style="text-align:right;"
                     />
                     <span v-else class="toright">{{ aux.DEBITO | currency_2 }}</span>
                   </el-form-item>
@@ -306,38 +291,25 @@
                 <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
                   <el-row :gutter="4">
                     <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                      <el-form-item
-                        v-if="informe.PIDOMONTO === 1"
-                        label="Monto"
-                      >
-                        <el-input
+                      <el-form-item v-if="informe.PIDOMONTO === 1" label="Monto">
+                        <currency-input
                           v-if="
                             comprobante.ESTADO === 'O' &&
                               informe.PIDOMONTO === 1
                           "
                           v-model="aux.MONTO_RETENCION"
-                          v-currency="{
-                            locale: 'en',
-                            currency: 'USD',
-                            valueAsInteger: false,
-                            distractionFree: true,
-                            precision: 2,
-                            autoDecimalMode: false,
-                            valueRange: { min: 0 },
-                            allowNegative: false
-                          }"
+                          locale="en"
+                          style="text-align:right;"
                         />
                         <span v-else>{{ aux.MONTO_RETENCION }}</span>
                       </el-form-item>
                     </el-col>
                     <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                      <el-form-item
-                        v-if="informe.PIDOTASA === 1"
-                        label="Tasa (%)"
-                      >
-                        <el-input
+                      <el-form-item v-if="informe.PIDOTASA === 1" label="Tasa (%)">
+                        <percent-input
                           v-if="comprobante.ESTADO === 'O'"
                           v-model="aux.TASA_RETENCION"
+                          style="text-align:right;"
                         />
                         <span v-else>{{ tasaValue }}</span>
                       </el-form-item>
@@ -348,20 +320,11 @@
               <el-row :gutter="4">
                 <el-col :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
                   <el-form-item label="Valor Crédito" style="text-align:right;">
-                    <el-input
+                    <currency-input
                       v-if="comprobante.ESTADO === 'O'"
                       ref="credito"
                       v-model="aux.CREDITO"
-                      v-currency="{
-                        locale: 'en',
-                        currency: 'USD',
-                        valueAsInteger: false,
-                        distractionFree: true,
-                        precision: 2,
-                        autoDecimalMode: false,
-                        valueRange: { min: 0 },
-                        allowNegative: false
-                      }"
+                      locale="en"
                       @blur="
                         aux.CREDITO > 0 ? (aux.DEBITO = 0) : (aux.CREDITO = 0)
                       "
@@ -385,26 +348,52 @@
           </el-col>
         </el-row>
         <el-row :gutter="4">
-          <el-col :xs="12" :sm="5" :md="2" :lg="2" :xl="2">
-            <el-button :disabled="!aux.CODIGO || (aux.DEBITO == 0 && aux.CREDITO == 0)" type="primary" mini @click="handleAdd"><i><svg-icon icon-class="item-plus" /></i> Agregar</el-button>
+          <el-col :xs="24" :sm="7" :md="5" :lg="3" :xl="3">
+            <el-button
+              :disabled="!aux.CODIGO || (aux.DEBITO == 0 && aux.CREDITO == 0)"
+              type="primary"
+              mini
+              @click="handleAdd"
+            >
+              <i>
+                <svg-icon icon-class="item-plus" />
+              </i> Agregar
+            </el-button>
           </el-col>
-          <el-col :xs="12" :sm="5" :md="2" :lg="2" :xl="2">
-            <el-button :disabled="!aux.CODIGO || (aux.DEBITO == 0 && aux.CREDITO == 0)" type="info" mini @click="handleUpdate"><i><svg-icon icon-class="item-update" /></i> Modificar</el-button>
-          </el-col>          
-        </el-row>        
+          <el-col :xs="24" :sm="7" :md="5" :lg="3" :xl="3">
+            <el-button
+              :disabled="!aux.CODIGO || (aux.DEBITO == 0 && aux.CREDITO == 0)"
+              type="info"
+              mini
+              @click="handleUpdate"
+            >
+              <i>
+                <svg-icon icon-class="item-update" />
+              </i> Modificar
+            </el-button>
+          </el-col>
+          <el-col :xs="24" :sm="7" :md="5" :lg="3" :xl="3">
+            <el-button
+              :disabled="!aux.CODIGO || (aux.DEBITO == 0 && aux.CREDITO == 0)"
+              type="warning"
+              mini
+              @click="handleClear"
+            >
+              <i>
+                <svg-icon icon-class="item-clear" />
+              </i> Limpiar
+            </el-button>
+          </el-col>
+        </el-row>
         <el-row :gutter="4">
           <el-col :span="24">
-            <el-input
-              ref="buscar"
-              v-model="filtro"
-              size="mini"
-              placeholder="Digite para Buscar"
-            />
+            <el-input ref="buscar" v-model="filtro" size="mini" placeholder="Digite para Buscar" />
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="24">
             <el-table
+              ref="tabla"
               :data="
                 auxiliares.filter(
                   a =>
@@ -417,27 +406,27 @@
                       a.PERSONA.includes(filtro.toUpperCase())
                 )
               "
-              :summary-method="getSummaries"
               highlight-current-row
-              @current-change="handleCurrentChange"
               show-summary
+              :summary-method="getSummaries"
+              @current-change="handleCurrentChange"
               max-height="600"
               stripe
               style="font-size: 14px; width: 100%; cursor: pointer;"
             >
-            <el-table-column type="expand">
-              <template slot-scope="props">
-                <p>Detalle: {{ props.row.DETALLE }}</p>
-                <p>Documento: {{ props.row.ID_PERSONA }}</p>
-                <p>Persona: {{ props.row.PERSONA }}</p>
-                <p>Monto: {{ props.row.address }}</p>
-                <p>Tasa: {{ props.row.zip }}</p>
-                <p>Colocacion: {{ props.row.ID_COLOCACION}}</p>
-                <p>Cuenta: {{ props.row.ID_CUENTA }}</p>
-                <p>Operacion: {{ operacion(props.row.ID_CLASE_OPERACION) }}</p>
-                <p>Cheque: {{ props.row.CHEQUE }}</p>
-              </template>
-            </el-table-column>            
+              <el-table-column type="expand">
+                <template slot-scope="props">
+                  <p>Detalle: {{ props.row.DETALLE }}</p>
+                  <p>Documento: {{ props.row.ID_PERSONA }}</p>
+                  <p>Persona: {{ props.row.PERSONA }}</p>
+                  <p>Monto: {{ props.row.address }}</p>
+                  <p>Tasa: {{ props.row.zip }}</p>
+                  <p>Colocacion: {{ props.row.ID_COLOCACION}}</p>
+                  <p>Cuenta: {{ props.row.ID_CUENTA }}</p>
+                  <p>Operacion: {{ operacion(props.row.ID_CLASE_OPERACION) }}</p>
+                  <p>Cheque: {{ props.row.CHEQUE }}</p>
+                </template>
+              </el-table-column>
               <el-table-column prop="CODIGO" label="Código" width="180">
                 <template slot-scope="scope">
                   <span>{{ scope.row.CODIGO }}</span>
@@ -448,22 +437,12 @@
                   <span>{{ scope.row.CUENTA | fm_truncate(50) }}</span>
                 </template>
               </el-table-column>
-              <el-table-column
-                prop="DEBITO"
-                label="V.Débito"
-                width="120"
-                align="right"
-              >
+              <el-table-column prop="DEBITO" label="V.Débito" width="120" align="right">
                 <template slot-scope="scope">
                   <span>{{ scope.row.DEBITO | currency_2 }}</span>
                 </template>
               </el-table-column>
-              <el-table-column
-                prop="CREDITO"
-                label="V.Crédito"
-                width="120"
-                align="right"
-              >
+              <el-table-column prop="CREDITO" label="V.Crédito" width="120" align="right">
                 <template slot-scope="scope">
                   <span>{{ scope.row.CREDITO | currency_2 }}</span>
                 </template>
@@ -475,19 +454,16 @@
               </el-table-column>
               <el-table-column prop="PERSONA" label="Persona" width="220">
                 <template slot-scope="scope">
-                  <span :title="scope.row.PERSONA">{{
+                  <span :title="scope.row.PERSONA">
+                    {{
                     scope.row.PERSONA | fm_truncate(20)
-                  }}</span>
+                    }}
+                  </span>
                 </template>
               </el-table-column>
               <el-table-column fixed="right" label="Ver" width="140">
                 <template slot-scope="scope">
-                  <el-dropdown
-                    :split-button="true"
-                    size="mini"
-                    type="primary"
-                    trigger="click"
-                  >
+                  <el-dropdown :split-button="true" size="mini" type="primary" trigger="click">
                     Tareas
                     <el-dropdown-menu slot="dropdown">
                       <el-dropdown-item>
@@ -502,6 +478,39 @@
             </el-table>
           </el-col>
         </el-row>
+        <el-row :gutter="4">
+          <el-col :xs="12" :sm="12" :md="4" :lg="4" :xl="4">
+            <el-button
+              :disabled="totaldebito !== totalcredito"
+              type="primary"
+              mini
+              @click="handleSave"
+            >
+              <i>
+                <svg-icon icon-class="item-save" />
+              </i> Guardar
+            </el-button>
+          </el-col>
+          <el-col :xs="12" :sm="12" :md="4" :lg="4" :xl="4">
+            <el-button
+              :disabled="totaldebito !== totalcredito"
+              type="warning"
+              mini
+              @click="handleNullify"
+            >
+              <i>
+                <svg-icon icon-class="item-remove" />
+              </i> Anular
+            </el-button>
+          </el-col>
+          <el-col :xs="12" :sm="12" :md="4" :lg="4" :xl="4">
+            <el-button :disabled="totaldebito !== totalcredito" type="info" mini @click="handlePdf">
+              <i>
+                <svg-icon icon-class="pdf" />
+              </i> Imprimir
+            </el-button>
+          </el-col>
+        </el-row>
       </el-form>
     </el-main>
     <!-- Dialogo Buscar por Apellidos y Nombre -->
@@ -514,10 +523,28 @@
     >
       <buscar-por-nombre @selectPersonEvent="setDatosPersonaDesdeElEvento" />
     </el-dialog>
+    <el-dialog title="Confirmación" :visible.sync="showGuardarDlg" width="50%">
+      <span>Seguro de guardar los cambios?</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="showGuardarDlg = false">No</el-button>
+        <el-button type="primary" @click="guardar">Sí</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog title="Anular Comprobante" :visible.sync="showAnularDlg">
+      <el-form>
+        <el-form-item label="Mótivo Anulación">
+          <el-input type="textarea" v-model="comprobante.ANULACION"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="comprobante.ANULACION = null; showAnularDlg = false">Cancelar</el-button>
+        <el-button type="primary" @click="anular">Anular</el-button>
+      </span>
+    </el-dialog>
   </el-container>
 </template>
 <script>
-import SvgIcon from '@/components/SvgIcon';
+import SvgIcon from "@/components/SvgIcon";
 import BuscarPersonaComponent from "@/components/BuscarPersonaNombre";
 import PucTree from "@/components/PucTree";
 import { CurrencyDirective } from "vue-currency-input";
@@ -533,7 +560,9 @@ import {
   obtenerCodigo,
   obtenerComprobante,
   obtenerAuxiliar,
-  guardarComprobante
+  guardarComprobante,
+  anularComprobante,
+  obtenerNotaPdf,
 } from "@/api2/contabilidad";
 
 import { obtenerListaTipoIdentificacion } from "@/api/tipos";
@@ -542,34 +571,36 @@ import { obtenerPersona } from "@/api/persona";
 export default {
   directives: {
     currency: CurrencyDirective,
-    percent: PercentDirective
+    percent: PercentDirective,
   },
   props: {
     id_comprobante: {
       type: Number,
-      required: true
+      required: true,
     },
     tipo_comprobante: {
       type: Number,
-      required: true
-    }
+      required: true,
+    },
   },
   components: {
-    'svg-icon': SvgIcon,
+    "svg-icon": SvgIcon,
     puctree: PucTree,
-    "buscar-por-nombre": BuscarPersonaComponent
+    "buscar-por-nombre": BuscarPersonaComponent,
   },
   computed: {},
   data() {
     return {
       showBuscarPersonaDlg: false,
+      showGuardarDlg: false,
+      showAnularDlg: false,
       tipos_comprobante: [],
       tipos_operacion: [],
       tipos_documento: [],
       centros: [],
       informes: [],
       comprobante: {
-        ID_COMPROBANTE: 0
+        ID_COMPROBANTE: 0,
       },
       csc: 0,
       aux: null,
@@ -593,11 +624,25 @@ export default {
         CENTROCOSTO: null,
         SALDOINICIAL: null,
         ESCAPTACION: null,
-        ESCOLOCACION: null
+        ESCOLOCACION: null,
       },
       informe: null,
-      anular: false
+      totaldebito: 0,
+      totalcredito: 0,
     };
+  },
+  watch: {
+    auxiliares: {
+      deep: true,
+      handler() {
+        this.totaldebito = 0;
+        this.totalcredito = 0;
+        this.auxiliares.forEach((a) => {
+          this.totaldebito += a.DEBITO;
+          this.totalcredito += a.CREDITO;
+        });
+      },
+    },
   },
   beforeMount() {
     this.comprobante = this.comprobanteVacio();
@@ -617,24 +662,23 @@ export default {
         if (column.property !== "DEBITO" && column.property !== "CREDITO") {
           return;
         }
-        const values = data.map(item => Number(item[column.property]));
-        if (!values.every(value => isNaN(value))) {
-          var valor = this.$options.filters.currency_2(
-            values.reduce((prev, curr) => {
-              const value = Number(curr);
-              if (!isNaN(value)) {
-                return prev + curr;
-              } else {
-                return prev;
-              }
-            }, 0)
-          );
+        const values = data.map((item) => Number(item[column.property]));
+        if (!values.every((value) => isNaN(value))) {
+          var valor = values.reduce((prev, curr) => {
+            const value = Number(curr);
+            if (!isNaN(value)) {
+              return prev + curr;
+            } else {
+              return prev;
+            }
+          }, 0);
           if (column.property === "DEBITO") {
             this.comprobante.TOTAL_DEBITO = valor;
           } else {
             this.comprobante.TOTAL_CREDITO = valor;
           }
-          sums[index] = "$ " + valor;
+          const moneda = this.$options.filters.currency_2(valor);
+          sums[index] = "$ " + moneda;
         } else {
           sums[index] = "N/A";
         }
@@ -642,29 +686,103 @@ export default {
       return sums;
     },
     handleCurrentChange(val) {
-      this.setAuxiliar(val);
-      obtenerCodigo(this.aux.CODIGO)
-        .then(response => {
-          this.cuenta = response.data;
-          this.informe = this.tipo_informe(this.cuenta.INFORME);
-        })
-        .catch(error => {
-          this.$message({
-            message: "Error al consultar código contable: " + error,
-            type: "error"
+      if (val) {
+        this.setAuxiliar(val);
+        obtenerCodigo(this.aux.CODIGO)
+          .then((response) => {
+            this.cuenta = response.data[0];
+            this.informe = this.tipo_informe(this.cuenta.INFORME);
+          })
+          .catch((error) => {
+            this.$message({
+              message: "Error al consultar código contable: " + error,
+              type: "error",
+            });
           });
-        });
+      }
     },
     handleAdd() {
       this.csc += 1;
       this.aux.CSC = this.csc;
-      this.auxiliares.push(this.aux);
+      var lastaux = {
+        CSC: this.aux.CSC,
+        ID_AGENCIA: this.aux.ID_AGENCIA,
+        FECHA: this.aux.FECHA,
+        CODIGO: this.aux.CODIGO,
+        CUENTA: this.aux.CUENTA,
+        DEBITO: this.aux.DEBITO,
+        CREDITO: this.aux.CREDITO,
+        ID_CUENTA: this.aux.ID_CUENTA,
+        ID_COLOCACION: this.aux.ID_COLOCACION,
+        ID_IDENTIFICACION: this.aux.ID_IDENTIFICACION,
+        ID_PERSONA: this.aux.ID_PERSONA,
+        PERSONA: this.aux.PERSONA,
+        MONTO_RETENCION: this.aux.MONTO_RETENCION,
+        TASA_RETENCION: this.aux.TASA_RETENCION,
+        ESTADOAUX: this.aux.ESTADOAUX,
+        ID_CLASE_OPERACION: this.aux.ID_CLASE_OPERACION,
+        TIPO_COMPROBANTE: this.aux.TIPO_COMPROBANTE,
+        ID_COMPROBANTE: this.aux.ID_COMPROBANTE,
+        ID: this.aux.ID,
+        DETALLE: this.aux.DETALLE,
+        CHEQUE: this.aux.CHEQUE,
+      };
+      this.auxiliares.push(lastaux);
       this.aux = this.auxiliarVacio();
-      this.$refs['codigo'].focus();
-
+      this.$refs["codigo"].focus();
     },
     handleUpdate() {
-      this.lastaux = this.aux;
+      this.lastaux.CSC = this.aux.CSC;
+      this.lastaux.ID_AGENCIA = this.aux.ID_AGENCIA;
+      this.lastaux.FECHA = this.aux.FECHA;
+      this.lastaux.CODIGO = this.aux.CODIGO;
+      this.lastaux.CUENTA = this.aux.CUENTA;
+      this.lastaux.DEBITO = this.aux.DEBITO;
+      this.lastaux.CREDITO = this.aux.CREDITO;
+      this.lastaux.ID_CUENTA = this.aux.ID_CUENTA;
+      this.lastaux.ID_COLOCACION = this.aux.ID_COLOCACION;
+      this.lastaux.ID_IDENTIFICACION = this.aux.ID_IDENTIFICACION;
+      this.lastaux.ID_PERSONA = this.aux.ID_PERSONA;
+      this.lastaux.PERSONA = this.aux.PERSONA;
+      this.lastaux.MONTO_RETENCION = this.aux.MONTO_RETENCION;
+      this.lastaux.TASA_RETENCION = this.aux.TASA_RETENCION;
+      this.lastaux.ESTADOAUX = this.aux.ESTADOAUX;
+      this.lastaux.ID_CLASE_OPERACION = this.aux.ID_CLASE_OPERACION;
+      this.lastaux.TIPO_COMPROBANTE = this.aux.TIPO_COMPROBANTE;
+      this.lastaux.ID_COMPROBANTE = this.aux.ID_COMPROBANTE;
+      this.lastaux.ID = this.aux.ID;
+      this.lastaux.DETALLE = this.aux.DETALLE;
+      this.lastaux.CHEQUE = this.aux.CHEQUE;
+      var index = this.auxiliares.indexOf(this.aux);
+      if (~index) {
+        this.auxiliares.splice(index, 1, this.aux);
+      }
+      /*
+      this.auxiliares.forEach((a) => {
+        if (a.CSC === this.aux.CSC) {
+          a.ID_AGENCIA = this.aux.ID_AGENCIA;
+          a.FECHA = this.aux.FECHA;
+          a.CODIGO = this.aux.CODIGO;
+          a.CUENTA = this.aux.CUENTA;
+          a.DEBITO = this.aux.DEBITO;
+          a.CREDITO = this.aux.CREDITO;
+          a.ID_CUENTA = this.aux.ID_CUENTA;
+          a.ID_COLOCACION = this.aux.ID_COLOCACION;
+          a.ID_IDENTIFICACION = this.aux.ID_IDENTIFICACION;
+          a.ID_PERSONA = this.aux.ID_PERSONA;
+          a.PERSONA = this.aux.PERSONA;
+          a.MONTO_RETENCION = this.aux.MONTO_RETENCION;
+          a.TASA_RETENCION = this.aux.TASA_RETENCION;
+          a.ESTADOAUX = this.aux.ESTADOAUX;
+          a.ID_CLASE_OPERACION = this.aux.ID_CLASE_OPERACION;
+          a.TIPO_COMPROBANTE = this.aux.TIPO_COMPROBANTE;
+          a.ID_COMPROBANTE = this.aux.ID_COMPROBANTE;
+          a.ID = this.aux.ID;
+          a.DETALLE = this.aux.DETALLE;
+          a.CHEQUE = this.aux.CHEQUE;
+        }
+        
+      }); */
     },
     handleDelete(aux) {
       var _idx = this.auxiliares.indexOf(aux);
@@ -672,6 +790,33 @@ export default {
         this.auxiliares.splice(_idx, 1);
         this.aux = this.auxiliarVacio();
       }
+      this.$refs["tabla"].doLayout();
+    },
+    handleClear() {
+      this.aux = this.auxiliarVacio();
+    },
+    handleSave() {
+      this.showGuardarDlg = true;
+    },
+    handleNullify() {
+      this.showAnularDlg = true;
+    },
+    handlePdf() {
+      obtenerNotaPdf(
+        this.comprobante.TIPO_COMPROBANTE,
+        this.comprobante.ID_COMPROBANTE
+      ).then((response) => {
+        let blob = new Blob([response.data], { type: "application/pdf" });
+        let link = document.createElement("a");
+        link.href = window.URL.createObjectURL(blob);
+        link.download =
+          "nota_" +
+          this.tipo(this.comprobante.TIPO_COMPROBANTE).replace(/\s/g, "_") +
+          "_" +
+          this.comprobante.ID_COMPROBANTE +
+          ".pdf";
+        link.click();
+      });
     },
     setAuxiliar(val) {
       this.aux = {
@@ -695,13 +840,13 @@ export default {
         ID_COMPROBANTE: val.ID_COMPROBANTE,
         ID: val.ID,
         DETALLE: val.DETALLE,
-        CHEQUE: val.CHEQUE
+        CHEQUE: val.CHEQUE,
       };
       this.lastaux = val;
     },
     showId(id) {
       console.log("id: '" + id + "'");
-    },    
+    },
     comprobanteVacio() {
       return {
         ID_COMPROBANTE: 0,
@@ -714,7 +859,7 @@ export default {
         ESTADO: "O",
         IMPRESO: false,
         ANULACION: null,
-        ID_EMPLEADO: null
+        ID_EMPLEADO: null,
       };
     },
     auxiliarVacio() {
@@ -728,18 +873,18 @@ export default {
         CREDITO: 0,
         ID_CUENTA: null,
         ID_COLOCACION: null,
-        ID_IDENTIFICACION: null,
+        ID_IDENTIFICACION: 0,
         ID_PERSONA: null,
         PERSONA: null,
-        MONTO_RETENCION: null,
-        TASA_RETENCION: "",
+        MONTO_RETENCION: 0,
+        TASA_RETENCION: null,
         ESTADOAUX: null,
         ID_CLASE_OPERACION: null,
         TIPO_COMPROBANTE: null,
         ID_COMPROBANTE: null,
         ID: null,
         DETALLE: null,
-        CHEQUE: null
+        CHEQUE: null,
       };
     },
     informeVacio() {
@@ -749,15 +894,15 @@ export default {
         PIDOID: false,
         PIDOMONTO: false,
         PIDOTASA: false,
-        PIDOTIPOID: false
-      }
+        PIDOTIPOID: false,
+      };
     },
     tipo(id) {
       if (id === undefined || id === null) {
         return "SIN ID";
       } else {
         var _id = id;
-        var tipo = this.tipos_comprobante.find(o => o.ID === _id);
+        var tipo = this.tipos_comprobante.find((o) => o.ID === _id);
         if (tipo) {
           return tipo.DESCRIPCION;
         } else {
@@ -783,7 +928,7 @@ export default {
         return "SIN ID";
       } else {
         var _id = id;
-        var centro = this.centros.find(o => o.ID_AGENCIA === _id);
+        var centro = this.centros.find((o) => o.ID_AGENCIA === _id);
         if (centro) {
           return centro.DESCRIPCION_AGENCIA;
         } else {
@@ -796,7 +941,7 @@ export default {
         return "SIN ID";
       } else {
         var _id = id;
-        var op = this.centros.find(o => o.ID_CLASE_OPERACION === _id);
+        var op = this.centros.find((o) => o.ID_CLASE_OPERACION === _id);
         if (op) {
           return op.DESCRIPCION_CLASE_OPERACION;
         } else {
@@ -809,7 +954,7 @@ export default {
         return "SIN ID";
       } else {
         var _id = id;
-        var op = this.tipos_documento.find(o => o.ID_IDENTIFICACION === _id);
+        var op = this.tipos_documento.find((o) => o.ID_IDENTIFICACION === _id);
         if (op) {
           return op.DESCRIPCION_IDENTIFICACION;
         } else {
@@ -822,7 +967,7 @@ export default {
         return this.informeVacio();
       } else {
         var _id = id;
-        var op = this.informes.find(o => o.ID === _id);
+        var op = this.informes.find((o) => o.ID.trim() === _id);
         if (op) {
           return op;
         } else {
@@ -831,70 +976,98 @@ export default {
       }
     },
     guardar() {
-      guardarComprobante(this.comprobante).then(() => {});
+      this.showGuardarDlg = false;
+      this.comprobante.AUXS = this.auxiliares;
+      guardarComprobante(this.comprobante).then((response) => {
+        this.comprobante.ID_COMPROBANTE = response.data;
+        this.$message({
+          message: "Comprobante Guardado: " + response.data,
+          type: "success",
+        });
+      });
+    },
+    anular() {
+      this.showAnularDlg = false;
+      anularComprobante(
+        this.comprobante.TIPO_COMPROBANTE,
+        this.comprobante.ID_COMPROBANTE,
+        this.comprobante.ANULACION
+      )
+        .then(() => {
+          this.$message({
+            message: "Comprobante Anulado",
+            type: "success",
+          });
+        })
+        .catch((err) => {
+          this.$message({
+            message: "Error al anular el comprobante: " + err,
+            type: "error",
+          });
+        });
     },
     listaTipoComprobante() {
       obtenerTiposComprobante()
-        .then(response => {
+        .then((response) => {
           this.tipos_comprobante = response.data;
           this.listaInformes();
         })
-        .catch(error => {
+        .catch((error) => {
           this.$message({
             message: "Error al consultar los tipos de comprobantes: " + error,
-            type: "error"
+            type: "error",
           });
         });
     },
     listaInformes() {
       obtenerInforme()
-        .then(response => {
+        .then((response) => {
           this.informes = response.data;
           this.listaTipoOperacion();
         })
-        .catch(error => {
+        .catch((error) => {
           this.$message({
             message: "Error al consultar los informes: " + error,
-            type: "error"
+            type: "error",
           });
         });
     },
     listaTipoOperacion() {
       obtenerTipoOperacion()
-        .then(response => {
+        .then((response) => {
           this.tipos_operacion = response.data;
           this.listaCentro();
         })
-        .catch(error => {
+        .catch((error) => {
           this.$message({
             message: "Error al consultar los tipos de operación: " + error,
-            type: "error"
+            type: "error",
           });
         });
     },
     listaCentro() {
       obtenerCentro()
-        .then(response => {
+        .then((response) => {
           this.centros = response.data;
           this.listaTipoDocumento();
         })
-        .catch(error => {
+        .catch((error) => {
           this.$message({
             message: "Error al consultar los centros de costo: " + error,
-            type: "error"
+            type: "error",
           });
         });
     },
     listaTipoDocumento() {
       obtenerListaTipoIdentificacion()
-        .then(response => {
+        .then((response) => {
           this.tipos_documento = response.data;
           this.buscarComprobante();
         })
-        .catch(error => {
+        .catch((error) => {
           this.$message({
             message: "Error al consultar los tipos de documento: " + error,
-            type: "error"
+            type: "error",
           });
         });
     },
@@ -907,28 +1080,28 @@ export default {
       ) {
         this.nuevo = false;
         obtenerComprobante(this.$route.params.tp, this.$route.params.id)
-          .then(response => {
+          .then((response) => {
             this.comprobante = response.data[0];
             obtenerAuxiliar(this.$route.params.tp, this.$route.params.id)
-              .then(response => {
+              .then((response) => {
                 this.auxiliares = response.data;
-                this.auxiliares.foreach(a => {
+                this.auxiliares.forEach((a) => {
                   this.csc += 1;
-                  this.$set(a, 'CSC', this.csc);
-                })
+                  this.$set(a, "CSC", this.csc);
+                });
               })
-              .catch(error => {
+              .catch((error) => {
                 this.$message({
                   message:
                     "Error al buscar los auxiliares del comprobante: " + error,
-                  type: "error"
+                  type: "error",
                 });
               });
           })
-          .catch(error => {
+          .catch((error) => {
             this.$message({
               message: "Error al buscar el comprobante: " + error,
-              type: "error"
+              type: "error",
             });
           });
       } else {
@@ -950,11 +1123,11 @@ export default {
       const loading = this.$loading({
         lock: true,
         text: "Cargando...",
-        background: "rgba(0, 0, 0, 0.7)"
+        background: "rgba(0, 0, 0, 0.7)",
       });
       this.limpiarTablas();
       obtenerPersona(this.aux.ID_IDENTIFICACION, this.aux.ID_PERSONA)
-        .then(response => {
+        .then((response) => {
           loading.close();
           if (response.status === 200) {
             this.aux.PERSONA =
@@ -977,38 +1150,45 @@ export default {
       this.validarCodigo();
     },
     validarCodigo() {
-      if (this.aux.CODIGO.length < 18) {
+      if (
+        this.aux !== null &&
+        this.aux.CODIGO !== null &&
+        this.aux.CODIGO.length < 18
+      ) {
         this.aux.CODIGO =
           this.aux.CODIGO +
           "000000000000000000".substring(0, 18 - this.aux.CODIGO.length);
       }
-      esDeMovimiento(this.aux.CODIGO)
-        .then(response => {
-          if (response.data.movimiento) {
-            this.cuenta = response.data.cuenta;
-            this.aux.CUENTA = response.data.cuenta.NOMBRE;
-          } else {
-            this.$refs["codigo"].focus();
+      if (this.aux !== null && this.aux.CODIGO !== null) {
+        esDeMovimiento(this.aux.CODIGO)
+          .then((response) => {
+            if (response.data.movimiento) {
+              this.cuenta = response.data.cuenta;
+              this.aux.CUENTA = response.data.cuenta.NOMBRE;
+              this.informe = this.tipo_informe(this.cuenta.INFORME);
+            } else {
+              this.$refs["codigo"].focus();
+              this.$message({
+                message:
+                  "Cuenta PUC " +
+                  response.data.cuenta.NOMBRE +
+                  " con Código: " +
+                  response.data.cuenta.CODIGO +
+                  ", no es de movimiento",
+                type: "error",
+              });
+            }
+          })
+          .catch(() => {
             this.$message({
               message:
-                "Cuenta PUC " +
-                response.data.cuenta.NOMBRE +
-                " con Código: " +
-                response.data.cuenta.CODIGO +
-                ", no es de movimiento",
-              type: "error"
+                "Cuenta PUC con Código: " + this.aux.CODIGO + ", no existe",
+              type: "error",
             });
-          }
-        })
-        .catch(() => {
-          this.$message({
-            message:
-              "Cuenta PUC con Código: " + this.aux.CODIGO + ", no existe",
-            type: "error"
           });
-        });
-    }
-  }
+      }
+    },
+  },
 };
 </script>
 <style lang="css" scoped>

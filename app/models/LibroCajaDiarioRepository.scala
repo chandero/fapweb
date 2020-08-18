@@ -167,7 +167,7 @@ object LibroCajaDiarioResumen {
 
 class LibroCajaDiarioRepository @Inject()(dbapi: DBApi, conf: Configuration)(implicit ec: DatabaseExecutionContext) {
     // private val db = dbapi.database("default")
-    private val REPORT_DEFINITION_PATH = System.getProperty("user.dir") + "/app/resources/"
+    private val REPORT_DEFINITION_PATH = System.getProperty("user.dir") + "/resources/"
 
     def consultar(anho: Int): Future[Iterable[LCDRelacion]] = Future[Iterable[LCDRelacion]] {
       var base = "default"

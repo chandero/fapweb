@@ -14,7 +14,7 @@ const contabilidadRouter = {
       path: 'menu2proceso',
       component: () => import('@/views/contabilidad/menu2proceso/index'), // Parent router-view
       name: 'menu_contabilidad_menu2proceso',
-      meta: { title: 'menu_contabilidad_menu2proceso', icon: 'process-1', roles: ['admin', 'contabilidad', 'revisor'] },
+      meta: { title: 'menu_contabilidad_menu2proceso', icon: 'process1', roles: ['admin', 'contabilidad', 'revisor'] },
       redirect: '/contabilidad/menu2proceso/menu2-1list',
       children: [
         {

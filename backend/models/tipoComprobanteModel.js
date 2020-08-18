@@ -8,6 +8,8 @@ var factory = require('./firebird.js');
 const Auxiliar = require('./auxiliarModel.js');
 var conn = factory.getConnection();
 
+var firebird = require('./connection');
+
 var item = {};
 
 var TipoComprobante = function (item) {
@@ -35,5 +37,24 @@ TipoComprobante.getAll = function (result) {
         }
     });    
 }
+
+TipoComprobante.getConsecutivo = (id, result) => {
+    var query = `SELECT t.LLAVECSC FROM "con$tipocomprobante" t WHERE t.ID = ?`;
+    firebird.executeQueryWithParams(query, [id], (err, res) => {
+        if (err)
+          result(err, null);
+        var _csc = res[0].LLAVECSC;
+        _csc += 1;
+        // actualizar a siguiente consecutivo
+        var query = `UPDATE "con$tipocomprobante" SET LLAVECSC = ? WHERE ID = ?`;
+        firebird.executeQueryWithParams(query, [_csc, id], (err, res) => {
+            if (err)
+              result(err, null);
+            result(null, _csc);
+        });
+    });
+}
+
+
 
 module.exports = TipoComprobante;

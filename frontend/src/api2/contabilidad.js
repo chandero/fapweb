@@ -98,3 +98,28 @@ export function guardarComprobante(comprobante) {
         data: data.comprobante
     })
 }
+
+export function anularComprobante(tp, id, texto) {
+    const data = {
+        tp,
+        id,
+        texto
+    }
+    return request({
+        url: '/contable/nullify',
+        method: 'post',
+        data: data
+    })
+}
+
+export function obtenerNotaPdf(tp, id) {
+    const data = {
+        tp,
+        id
+    }
+    return request({
+        url: '/contable/gnota/' + data.tp + '/' + data.id,
+        method: 'get',
+        responseType: 'arraybuffer'
+    })
+}

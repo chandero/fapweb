@@ -2,8 +2,11 @@ var express = require('express');
 var router = express.Router();
 var model = require('../controllers/contabilidadController');
 
-router.route('/add')
-    .get(model.create);
+router.route('/save')
+    .post(model.save);
+
+router.route('/nullify')
+    .post(model.nullify);
 
 router.route('/gtpc')
     .get(model.getTypes);
@@ -21,7 +24,7 @@ router.route('/gpuc')
     .get(model.getPucAll);
 
 router.route('/vcod/:id')
-    .get(model.getIsValid2Mov)
+    .get(model.getIsValid2Mov);
 
 router.route('/gpbi/:id')
     .get(model.getPucById);
@@ -36,6 +39,9 @@ router.route('/gcom/:tp/:id')
     .get(model.readComp)
 
 router.route('/gaux/:tp/:id')
-    .get(model.readAux)
+    .get(model.readAux);
+
+router.route('/gnota/:tp/:id')
+    .get(model.pdfNota);
 
 module.exports = router;    
