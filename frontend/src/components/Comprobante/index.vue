@@ -481,7 +481,7 @@
         <el-row :gutter="4">
           <el-col :xs="12" :sm="12" :md="4" :lg="4" :xl="4">
             <el-button
-              :disabled="totaldebito !== totalcredito"
+              :disabled="totaldebito !== totalcredito || comprobante.ESTADO != 'O'"
               type="primary"
               mini
               @click="handleSave"
@@ -493,7 +493,7 @@
           </el-col>
           <el-col :xs="12" :sm="12" :md="4" :lg="4" :xl="4">
             <el-button
-              :disabled="totaldebito !== totalcredito"
+              :disabled="comprobante.ESTADO != 'O'"
               type="warning"
               mini
               @click="handleNullify"
@@ -504,12 +504,25 @@
             </el-button>
           </el-col>
           <el-col :xs="12" :sm="12" :md="4" :lg="4" :xl="4">
-            <el-button :disabled="totaldebito !== totalcredito" type="info" mini @click="handlePdf">
+            <el-button :disabled="totaldebito !== totalcredito" 
+              type="info" 
+              mini 
+              @click="handlePdf">
               <i>
                 <svg-icon icon-class="pdf" />
               </i> Imprimir
             </el-button>
           </el-col>
+          <el-col :xs="12" :sm="12" :md="4" :lg="4" :xl="4">
+            <el-button :disabled="comprobante.ESTADO === 'O'" 
+              type="success" 
+              mini 
+              @click="handleRecover">
+              <i>
+                <svg-icon icon-class="data-recover" />
+              </i> Recuperar
+            </el-button>
+          </el-col>          
         </el-row>
       </el-form>
     </el-main>
@@ -541,6 +554,13 @@
         <el-button type="primary" @click="anular">Anular</el-button>
       </span>
     </el-dialog>
+    <el-dialog title="Confirmación" :visible.sync="showRecuperarDlg" width="50%">
+      <span>Seguro de recuperar el comprobante?</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="showRecuperarDlg = false">No</el-button>
+        <el-button type="primary" @click="recuperar">Sí</el-button>
+      </span>
+    </el-dialog>    
   </el-container>
 </template>
 <script>
@@ -549,7 +569,7 @@ import BuscarPersonaComponent from "@/components/BuscarPersonaNombre";
 import PucTree from "@/components/PucTree";
 import { CurrencyDirective } from "vue-currency-input";
 import { PercentDirective } from "vue-percent-input";
-
+import { mapGetters } from 'vuex'
 import { esDeMovimiento } from "@/api2/puc";
 
 import {
@@ -562,6 +582,7 @@ import {
   obtenerAuxiliar,
   guardarComprobante,
   anularComprobante,
+  recuperarComprobante,
   obtenerNotaPdf,
 } from "@/api2/contabilidad";
 
@@ -588,12 +609,17 @@ export default {
     puctree: PucTree,
     "buscar-por-nombre": BuscarPersonaComponent,
   },
-  computed: {},
+  computed: {
+    ...mapGetters([
+      'id_empleado'
+    ])
+  },
   data() {
     return {
       showBuscarPersonaDlg: false,
       showGuardarDlg: false,
       showAnularDlg: false,
+      showRecuperarDlg: false,
       tipos_comprobante: [],
       tipos_operacion: [],
       tipos_documento: [],
@@ -645,9 +671,6 @@ export default {
     },
   },
   beforeMount() {
-    this.comprobante = this.comprobanteVacio();
-    this.aux = this.auxiliarVacio();
-    this.informe = this.informeVacio();
     this.listaTipoComprobante();
   },
   methods: {
@@ -704,6 +727,9 @@ export default {
     handleAdd() {
       this.csc += 1;
       this.aux.CSC = this.csc;
+      if (!this.aux.DETALLE || this.aux.DETALLE === '') {
+        this.aux.DETALLE = this.comprobante.DESCRIPCION;
+      }
       var lastaux = {
         CSC: this.aux.CSC,
         ID_AGENCIA: this.aux.ID_AGENCIA,
@@ -801,6 +827,9 @@ export default {
     handleNullify() {
       this.showAnularDlg = true;
     },
+    handleRecover() {
+      this.showRecuperarDlg = true;
+    },
     handlePdf() {
       obtenerNotaPdf(
         this.comprobante.TIPO_COMPROBANTE,
@@ -856,10 +885,10 @@ export default {
         DESCRIPCION: null,
         TOTAL_DEBITO: null,
         TOTAL_CREDITO: null,
-        ESTADO: "O",
-        IMPRESO: false,
+        ESTADO: 'O',
+        IMPRESO: 0,
         ANULACION: null,
-        ID_EMPLEADO: null,
+        ID_EMPLEADO: this.id_empleado,
       };
     },
     auxiliarVacio() {
@@ -880,8 +909,8 @@ export default {
         TASA_RETENCION: null,
         ESTADOAUX: null,
         ID_CLASE_OPERACION: null,
-        TIPO_COMPROBANTE: null,
-        ID_COMPROBANTE: null,
+        TIPO_COMPROBANTE: this.comprobante.TIPO_COMPROBANTE,
+        ID_COMPROBANTE: this.comprobante.ID_COMPROBANTE,
         ID: null,
         DETALLE: null,
         CHEQUE: null,
@@ -984,6 +1013,7 @@ export default {
           message: "Comprobante Guardado: " + response.data,
           type: "success",
         });
+        this.buscarComprobante();
       });
     },
     anular() {
@@ -998,6 +1028,7 @@ export default {
             message: "Comprobante Anulado",
             type: "success",
           });
+          this.buscarComprobante();
         })
         .catch((err) => {
           this.$message({
@@ -1006,6 +1037,26 @@ export default {
           });
         });
     },
+    recuperar() {
+      this.showRecuperarDlg = false;
+      recuperarComprobante(
+        this.comprobante.TIPO_COMPROBANTE,
+        this.comprobante.ID_COMPROBANTE
+      )
+        .then(() => {
+          this.$message({
+            message: "Comprobante Recuperado",
+            type: "success",
+          });
+          this.buscarComprobante();
+        })
+        .catch((err) => {
+          this.$message({
+            message: "Error al recuperar el comprobante: " + err,
+            type: "error",
+          });
+        });
+    },    
     listaTipoComprobante() {
       obtenerTiposComprobante()
         .then((response) => {
@@ -1062,7 +1113,7 @@ export default {
       obtenerListaTipoIdentificacion()
         .then((response) => {
           this.tipos_documento = response.data;
-          this.buscarComprobante();
+          this.buscoComprobante();
         })
         .catch((error) => {
           this.$message({
@@ -1071,18 +1122,24 @@ export default {
           });
         });
     },
-    buscarComprobante() {
+    buscoComprobante() {
+      this.comprobante = this.comprobanteVacio();
       this.comprobante.TIPO_COMPROBANTE = parseInt(this.$route.params.tp, 10);
       this.comprobante.ID_COMPROBANTE = parseInt(this.$route.params.id, 10);
+      this.buscarComprobante();
+    },
+    buscarComprobante() {
+      this.aux = this.auxiliarVacio();
+      this.informe = this.informeVacio();
       if (
         this.comprobante.TIPO_COMPROBANTE &&
         this.comprobante.ID_COMPROBANTE
       ) {
         this.nuevo = false;
-        obtenerComprobante(this.$route.params.tp, this.$route.params.id)
+        obtenerComprobante(this.comprobante.TIPO_COMPROBANTE, this.comprobante.ID_COMPROBANTE)
           .then((response) => {
             this.comprobante = response.data[0];
-            obtenerAuxiliar(this.$route.params.tp, this.$route.params.id)
+            obtenerAuxiliar(this.comprobante.TIPO_COMPROBANTE, this.comprobante.ID_COMPROBANTE)
               .then((response) => {
                 this.auxiliares = response.data;
                 this.auxiliares.forEach((a) => {

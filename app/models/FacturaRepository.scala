@@ -868,20 +868,28 @@ class FacturaRepository @Inject()(dbapi: DBApi, personaService: PersonaRepositor
                             WHERE f.FACT_NUMERO = {fact_numero}""").on('fact_numero -> fact_numero).as(Factura._set.singleOpt) */
         println("Factura: " + f)
         val persona = personaService.obtenerDirecto(f.id_identificacion.get, f.id_persona.get)
-                          val _parseAutorizacion = int("faau_id") ~ 
-                                                   date("faau_fechafinal") ~ 
-                                                   date("faau_fechainicio") ~ 
-                                                   str("faau_numautorizacion") ~
-                                                   str("faau_prefijo").? ~
-                                                   str("faau_secuenciafinal") ~
-                                                   str("faau_secuenciainicial") map { case a ~ b ~ c ~ d ~ e ~ f ~ g => (a,b,c,d,e,f,g)}
                           val direccion = persona.direcciones(0)
                           val cod_municipio = direccion.cod_municipio.get
                           val depa_id = cod_municipio.toString.substring(0,2)
                           println("cod_municipio: " + cod_municipio)
                           println("depa_id :" + depa_id)
-                          val autorizacion = SQL("""SELECT * FROM FAC_AUTORIZACION""").as(_parseAutorizacion.single)
-                          println("Autorizacion")
+                          val _parseAutorizacion = int("FAAU_ID") ~ 
+                                                   date("FAAU_FECHAFINAL") ~ 
+                                                   date("FAAU_FECHAINICIO") ~ 
+                                                   str("FAAU_NUMAUTORIZACION") ~
+                                                   str("FAAU_PREFIJO").? ~
+                                                   int("FAAU_SECUENCIAFINAL") ~
+                                                   int("FAAU_SECUENCIAINICIAL") map { case a ~ b ~ c ~ d ~ e ~ f ~ g => (a,b,c,d,e,f,g)}
+                          println("Buscando Autorización para Factura No. " + fact_numero)                                                   
+                          val autorizacion = SQL("""
+                                SELECT * FROM FAC_AUTORIZACION 
+                                WHERE {fact_numero} BETWEEN FAAU_SECUENCIAINICIAL AND FAAU_SECUENCIAFINAL
+                                ORDER BY FAAU_ID DESC""")
+                          .on(
+                            'fact_numero -> fact_numero
+                          )
+                          .as(_parseAutorizacion.single)
+                          println("Autorizacion Recibida: " + autorizacion._4)
                           val _parseDepartamento = str("depa_id") ~ str("depa_nombre") map { case a ~ b => (a,b) }
                           val departamento = SQL("""SELECT * FROM DEPARTAMENTO WHERE DEPA_ID = {depa_id}""").on('depa_id -> depa_id).as(_parseDepartamento.singleOpt)
                           println("Departamento: " + departamento)
@@ -892,7 +900,11 @@ class FacturaRepository @Inject()(dbapi: DBApi, personaService: PersonaRepositor
                           val tipoper = SQL("""SELECT FATP_ID FROM FAC_TIPO_PERSONA WHERE FATP_RELACION CONTAINING {fati_relacion}""").on('fati_relacion -> persona.a.get.id_tipo_persona).as(_parseTipoPer.single)
                           println("Tipo Persona")
                           val _parseSoftwareSeguridad = str("clave_tecnica") ~ str("guid_empresa") ~ str("guid_origen") ~ str("hash_seguridad") map { case a ~ b ~ c ~ d => (a,b,c,d) }
-                          val _sSeguridad = SQL("SELECT * FROM FAC_SOFTWARE_SEGURIDAD").as(_parseSoftwareSeguridad.single)
+                          val _sSeguridad = SQL("SELECT * FROM FAC_SOFTWARE_SEGURIDAD WHERE FAAU_ID = {faau_id}")
+                          .on(
+                            'faau_id -> autorizacion._1
+                          )
+                          .as(_parseSoftwareSeguridad.single)
                           println("Seguridad")
                           val sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
                           val sdd = new SimpleDateFormat("yyyy-MM-dd")
@@ -905,8 +917,8 @@ class FacturaRepository @Inject()(dbapi: DBApi, personaService: PersonaRepositor
                                                                            Some(sdd.format(autorizacion._3)), 
                                                                            Some(autorizacion._4),
                                                                            Some(prefijo),
-                                                                           Some(autorizacion._6),
-                                                                           Some(autorizacion._7))
+                                                                           Some(autorizacion._6.toString()),
+                                                                           Some(autorizacion._7.toString()))
 
                           val _encabezadoData = new _EncabezadoData(Some("10"), None, None, Some(sdf.format(f.fact_fecha.get.toDate)), None, None, Some("01"), None)
 

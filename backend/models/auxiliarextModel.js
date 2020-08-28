@@ -4,9 +4,6 @@ const util = require('util');
 const df = require('dateformat');
 var SqlString = require('sqlstring');
 
-var factory = require('./firebird.js');
-var conn = factory.getConnection();
-
 var firebird = require('./connection');
 const Auxiliar = require('./auxiliarModel.js');
 
@@ -25,72 +22,36 @@ class AuxiliarExt {
         return [this.DETALLE, this.CHEQUE, this.ID_AGENCIA, this.TIPO_COMPROBANTE, this.ID_COMPROBANTE, this.ID];
     }
 
-    create(db) {
-        console.log("guardando Auxiliar Ext...");
+    toArrayI() {
+        return [this.DETALLE, this.CHEQUE, this.ID_AGENCIA, this.TIPO_COMPROBANTE, this.ID_COMPROBANTE];
+    }
+
+    getInsert() {
+        var sql;
+        var queryU = `INSERT INTO "con$auxiliarext" (
+            DETALLE,
+            CHEQUE,
+            ID_AGENCIA,
+            TIPO_COMPROBANTE,
+            ID_COMPROBANTE,
+            ID
+        ) VALUES (?,?,?,?,?,?);`;
         var queryI = `INSERT INTO "con$auxiliarext" (
-        DETALLE,
-        CHEQUE,
-        ID_AGENCIA,
-        TIPO_COMPROBANTE,
-        ID_COMPROBANTE,
-        ID
-    ) VALUES (?,?,?,?,?,?);`;
-        return new Promise(resolve => {
-            db.transaction(db.ISOLATION_READ_COMMITED, (err, transaction) => {
-                transaction.query(queryI, this.toArray(), (err, res) => {
-                    if (err) {
-                        transaction.rollback();
-                        resolve({ err, res: null });
-                    } else {
-                        transaction.commit();
-                        resolve({ err: null, res });
-                    }
-                });
-            });
-        });
+            DETALLE,
+            CHEQUE,
+            ID_AGENCIA,
+            TIPO_COMPROBANTE,
+            ID_COMPROBANTE,
+            ID
+        ) VALUES (?,?,?,?,?,:id);`;        
+        if (this.ID) {
+            sql = SqlString.format(queryU, this.toArray());
+        } else {
+            sql = SqlString.format(queryI, this.toArrayI());
+        }
+        return sql;
     }
 
-    static createSync(conn) {
-        var sql = SqlString.format(`INSERT INTO "con$auxiliarext" (
-        DETALLE,
-        CHEQUE,
-        ID_AGENCIA,
-        TIPO_COMPROBANTE,
-        ID_COMPROBANTE,
-        ID
-) VALUES (?,?,?,?,?,?)`, this.toArray());
-        try {
-            var res = conn.querySync(sql);
-            return true;
-        }
-        catch (error) {
-            return false;
-        }
-    }
-    static getByIdSync(cxion, id) {
-        console.log('en AuxiliarExt get By Id');
-        var sql = SqlString.format(`
-                        SELECT 
-                         a.ID, 
-                         a.DETALLE,
-                         a.CHEQUE,
-                         a.ID_COMPROBANTE,
-                         a.TIPO_COMPROBANTE,
-                         a.ID_AGENCIA
-                        FROM "con$auxiliarext" a
-                        WHERE a.ID = ?`, [id]);
-        if (!cxion.inTransaction) {
-            cxion.startNewTransactionSync();
-        }
-        var AuxiliarExt = cxion.querySync(sql);
-        return AuxiliarExt;
-    }
 }
-
-
-
-
-
-
 
 module.exports = AuxiliarExt;

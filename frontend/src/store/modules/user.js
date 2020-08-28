@@ -8,6 +8,7 @@ const user = {
     code: '',
     token: getToken(),
     name: '',
+    id_empleado: '',
     avatar: '',
     introduction: '',
     roles: [],
@@ -41,6 +42,9 @@ const user = {
     },
     SET_ROLES: (state, roles) => {
       state.roles = roles
+    },
+    SET_ID_EMPLEADO: (state, id_empleado) => {
+      state.id_empleado = id_empleado
     }
   },
 
@@ -78,6 +82,7 @@ const user = {
 
           commit('SET_NAME', data.usua_nombre + ' ' + data.usua_apellido)
           // commit('SET_AVATAR', data.avatar)
+          commit('SET_ID_EMPLEADO', data.id_empleado)
           commit('SET_AVATAR', require('@/assets/default-user.png'))
           commit('SET_INTRODUCTION', data.introduction)
           resolve(response)

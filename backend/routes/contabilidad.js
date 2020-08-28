@@ -8,6 +8,9 @@ router.route('/save')
 router.route('/nullify')
     .post(model.nullify);
 
+router.route('/recover')
+    .post(model.recover);
+
 router.route('/gtpc')
     .get(model.getTypes);
 

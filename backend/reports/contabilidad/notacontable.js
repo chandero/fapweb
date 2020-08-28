@@ -31,8 +31,11 @@ class Reporte {
 
             // Confidential text, we need this first because everything else prints on top of it
             // Imprime una marca de agua
-            // rpt.print(empresa, { x: 40, y: 610, rotate: 310, opacity: 0.5, textColor: '#eeeeee', width: 1000, fontSize: 127 });
-
+            console.log("data:", data);
+            if (data.ESTADO.trim() === 'N') {
+                console.log("colocando anulado");
+                rpt.print('ANULADO', { x: 40, y: 610, rotate: 310, opacity: 0.7, textColor: '#eeeeee', width: 1000, fontSize: 127 });
+            }
             // Company Info - Top Left
             rpt.setCurrentY(14);
 

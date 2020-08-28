@@ -7,7 +7,7 @@
         <el-row>
           <el-col :span="24">
             <query-builder :labels="qlabels" :rules="qrules" :styled="qstyled" :maxDepth="3" v-model="qbquery"></query-builder>
-            <el-button type="warning" icon="el-icon-search" circle @click="actualizar()" title="Actualizar Aplicando el Filtro"></el-button>
+            <!-- <el-button type="warning" icon="el-icon-search" circle @click="actualizar()" title="Actualizar Aplicando el Filtro"></el-button> -->
         </el-col>
       </el-row>
       <el-row :gutter="4">
@@ -95,6 +95,7 @@ import VueQueryBuilder from 'vue-query-builder';
 import {
   obtenerTiposComprobante,
   obtenerComprobantesPage,
+  obtenerNotaPdf  
 } from "@/api2/contabilidad";
 import { obtenerTiposDocumento } from '@/api2/persona'
 
@@ -180,6 +181,13 @@ export default {
       qstyled: true      
     };
   },
+  watch: {
+    qbquery: {
+      handler() {
+        this.current_page = 1;
+      },
+    },
+  },  
   beforeMount() {
     this.listaTipoComprobante();
   },
@@ -199,6 +207,9 @@ export default {
     handleCurrentChange(val) {
       this.current_page = val;
       this.listaComprobante();
+    },
+    handlePdf() {
+
     },
     listaTipoComprobante() {
       obtenerTiposComprobante()
@@ -274,7 +285,21 @@ export default {
       this.$router.push({ path: '/contabilidad/menu2proceso/menu2-1comprobante/menu2-1-2gestion/' + parseInt(row.TIPO_COMPROBANTE) + '/' + row.ID_COMPROBANTE });
     },
     handlePrint (row) {
-      console.log('imprimir: ' + JSON.stringify(row))
+      obtenerNotaPdf(
+        row.TIPO_COMPROBANTE,
+        row.ID_COMPROBANTE
+      ).then((response) => {
+        let blob = new Blob([response.data], { type: "application/pdf" });
+        let link = document.createElement("a");
+        link.href = window.URL.createObjectURL(blob);
+        link.download =
+          "nota_" +
+          this.tipo(row.TIPO_COMPROBANTE).replace(/\s/g, "_") +
+          "_" +
+          row.ID_COMPROBANTE +
+          ".pdf";
+        link.click();
+      });
     }    
   }
 };

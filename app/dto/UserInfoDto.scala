@@ -8,7 +8,8 @@ import play.api.libs.functional.syntax._
 case class UserInfoDto(usua_id: Long, 
                        usua_email: String, 
                        usua_nombre: String, 
-                       usua_apellido: String, 
+                       usua_apellido: String,
+                       id_empleado: String,
                        empr_id: Long, 
                        empr_descripcion: String, 
                        token: String, 
@@ -25,6 +26,7 @@ object UserInfoDto {
             "usua_email" -> userinfo.usua_email,
             "usua_nombre" -> userinfo.usua_nombre,
             "usua_apellido" -> userinfo.usua_apellido,
+            "id_empleado" -> userinfo.id_empleado,
             "empr_id" -> userinfo.empr_id,
             "empr_descripcion" -> userinfo.empr_descripcion,
             "token" -> userinfo.token,
@@ -37,7 +39,8 @@ object UserInfoDto {
         (__ \ "usua_id").read[Long] and
         (__ \ "usua_email").read[String] and
         (__ \ "usua_nombre").read[String] and
-        (__ \ "usua_apellido").read[String] and        
+        (__ \ "usua_apellido").read[String] and
+        (__ \ "id_empleado").read[String] and
         (__ \ "empr_id").read[Long] and
         (__ \ "empr_descripcion").read[String] and
         (__ \ "token").read[String] and

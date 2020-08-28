@@ -69,16 +69,9 @@ class Connection {
                         transaction.rollback();
                         response(err, null);
                     }
-                    transaction.commit(function (err) {
-                        if (err) {
-                            transaction.rollback();
-                            response(err, null);
-                        }
-                        else {
-                            db.detach();
-                            response(null, rs);
-                        }
-                    });
+                    transaction.commit()
+                    db.detach();
+                    response(null, rs);
                 });
             });
         });

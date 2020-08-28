@@ -90,10 +90,14 @@ class UsuarioController @Inject()(
             Forbidden("No hay registro activo.")
           
           case Some(usuario) => 
-            val uep = perfilService.buscarPorId(usuario.perf_id.get)
-            val empresa = empresaService.buscarPorId(empr_id.get)
             val perfil = new ListBuffer[String]()
-            perfil += uep.get.perf_abreviatura
+            val listperfil = perfilService.buscarPorEmpleadoId(usuario.id.get);
+            println("list_perfil:" + listperfil.toString());
+            listperfil.foreach(
+              perfil += _.perf_abreviatura
+            )
+            println("buscando empresa...");
+            val empresa = empresaService.buscarPorId(empr_id.get)
             empresa match {
                 case None => 
                   Forbidden("No hay registro activo.")
@@ -108,6 +112,7 @@ class UsuarioController @Inject()(
                     usuario.email.get,
                     usuario.nombre.get,
                     usuario.primer_apellido.get,
+                    usuario.id_empleado.get,
                     empresa.empr_id.get,
                     empresa.empr_descripcion,
                     newtoken,

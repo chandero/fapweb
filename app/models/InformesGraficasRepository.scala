@@ -206,7 +206,7 @@ class InformesGraficasRepository @Inject()(dbapi: DBApi, config: Configuration)(
                 INNER JOIN "con$puc" p ON p.CODIGO = d.CODIGO_PUC
                 INNER JOIN "col$colocacion" c ON c.ID_COLOCACION = d.ID_COLOCACION
                 INNER JOIN "gen$persona" r ON r.ID_IDENTIFICACION = c.ID_IDENTIFICACION AND r.ID_PERSONA = c.ID_PERSONA
-                WHERE d.FECHA_EXTRACTO BETWEEN {fecha_inicial} AND {fecha_final} AND g.ESTADO = 0 AND d.CODIGO_PUC LIKE '1345%' AND g.FECHA_REGISTRO <= d.FECHA_EXTRACTO
+                WHERE d.FECHA_EXTRACTO BETWEEN {fecha_inicial} AND {fecha_final} AND g.ESTADO <> 9 AND d.CODIGO_PUC LIKE '1345%' AND g.FECHA_REGISTRO <= d.FECHA_EXTRACTO
                 GROUP BY d.ID_COLOCACION, c.ID_PERSONA, r.NOMBRE, r.PRIMER_APELLIDO, r.SEGUNDO_APELLIDO, d.FECHA_EXTRACTO, d.CODIGO_PUC, p.NOMBRE
                 ORDER BY d.ID_COLOCACION """).
                 on(

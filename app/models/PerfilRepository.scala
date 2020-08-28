@@ -72,6 +72,22 @@ class PerfilRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutionCon
     }
 
     /**
+    * Recuperar un Perfil dado su empl_id
+    * @param perf_id: Long
+    */
+    def buscarPorEmpleadoId(empl_id: Long) : List[Perfil] = {
+        db.withConnection { implicit connection => 
+            SQL("""SELECT * FROM GEN_EMPLEADO_PERFIL e 
+                    LEFT JOIN perfil p ON p.PERF_ID = e.PERF_ID
+                    WHERE EMPL_ID = {empl_id}""").
+            on(
+                'empl_id -> empl_id
+            ).as(simple *)
+        }
+    }
+
+
+    /**
     * Recuperar Perfil dado su perf_descripcion
     * @param perf_descripcion: String
     * @param empr_id: Long

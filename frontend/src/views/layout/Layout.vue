@@ -1,79 +1,75 @@
 <template>
-<el-container v-loading="loading"
-		:element-loading-text="$t('lostserverconnection')"
-    element-loading-spinner="el-icon-loading"
-    element-loading-background="rgba(0, 0, 0, 0.8)"
-		>
-	<div class="app-wrapper" :class="{hideSidebar:!sidebar.opened}">
-		<sidebar class="sidebar-container"></sidebar>
-		<div class="main-container">
-			<navbar></navbar>
-			<tags-view><span>Is Idle - {{ isIdle }}</span></tags-view>
-			<app-main></app-main>
-		</div>
-	</div>
-  <ModalIdle v-if="isIdle"/>
-</el-container>
+  <el-container>
+    <div class="app-wrapper" :class="{hideSidebar:!sidebar.opened}">
+      <sidebar class="sidebar-container"></sidebar>
+      <div class="main-container">
+        <offline @detected-condition="handleConnectivityChange">
+          <!-- Only renders when the device is online -->
+          <div slot="online">
+            <el-alert title="En Línea" type="success" center show-icon></el-alert>
+          </div>
+          <!-- Only renders when the device is offline -->
+          <div slot="offline">
+            <el-alert title="Fuera de Línea" type="warning" center show-icon></el-alert>
+          </div>
+        </offline>
+        <span>Is Idle - {{ isIdle }}</span>
+        <navbar></navbar>
+        <tags-view></tags-view>
+        <app-main></app-main>
+      </div>
+    </div>
+    <ModalIdle v-if="isIdle" />
+  </el-container>
 </template>
 <script>
-import { isReachable } from '@/api2/isreachable'
-import { Navbar, Sidebar, AppMain, TagsView } from './components'
-import ModalIdle from '@/components/ModalIdle'
+import offline from "v-offline";
+import { Navbar, Sidebar, AppMain, TagsView } from "./components";
+import ModalIdle from "@/components/ModalIdle";
 
 export default {
-  name: 'layout',
+  name: "layout",
   components: {
+    offline,
     ModalIdle,
     Navbar,
     Sidebar,
     AppMain,
-    TagsView
+    TagsView,
   },
-  timers: {
-    checkServer: { name: 'checkServer', time: 5000, autostart: true, repeat: true }
-  },
-  data () {
+  data() {
     return {
-      loading: false
-    }
+      loading: false,
+    };
   },
   computed: {
-    sidebar () {
-      return this.$store.state.app.sidebar
+    sidebar() {
+      return this.$store.state.app.sidebar;
     },
-    isIdle () {
-      return this.$store.state.idleVue.isIdle
-    }
+    isIdle() {
+      return this.$store.state.idleVue.isIdle;
+    },
   },
   methods: {
-    checkServer () {
-      isReachable().then(reachable => {
-        if (reachable) {
-          this.loading = false
-        } else {
-          this.loading = true
-        }
-      }).catch(error => {
-        this.loading = true
-        console.log(error)
-      })
-    }
-  }
-}
+    handleConnectivityChange(status) {
+      console.log(status);
+    }    
+  },
+};
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
-	@import "src/styles/mixin.scss";
-	.app-wrapper {
-    @include clearfix;
-    position: relative;
-    height: 100%;
-    width: 100%;
-  }
-  .app_main {
-    max-height: 800px;
-  }
-  .sidebar-container {
-    max-height: 800px;
-  }
+@import "src/styles/mixin.scss";
+.app-wrapper {
+  @include clearfix;
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+.app_main {
+  max-height: 800px;
+}
+.sidebar-container {
+  max-height: 800px;
+}
 </style>

@@ -112,6 +112,18 @@ export function anularComprobante(tp, id, texto) {
     })
 }
 
+export function recuperarComprobante(tp, id) {
+    const data = {
+        tp,
+        id
+    }
+    return request({
+        url: '/contable/recover',
+        method: 'post',
+        data: data
+    })
+}
+
 export function obtenerNotaPdf(tp, id) {
     const data = {
         tp,

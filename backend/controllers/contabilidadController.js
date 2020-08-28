@@ -11,7 +11,7 @@ var TipoComprobante = require("../models/tipoComprobanteModel");
 var Agencia = require("../models/agenciaModel");
 var TipoOperacion = require("../models/tipoOperacionModel");
 var InformeContable = require("../models/informeContableModel");
-const Reporte = require("../reports/contabilidad/notacontable");
+const NotaContableReporte = require("../reports/contabilidad/notacontable");
 
 exports.getTypes = function (req, res) {
   TipoComprobante.getAll(function (err, items) {
@@ -103,7 +103,8 @@ exports.list_all_page = function (req, res) {
   const page_size = req.body.page_size;
   const order_by = req.body.order_by;
   var filter = parsefilter(req.body.filter);
-  if (filter === "()") {
+  console.log("filtro antes: ", filter);
+  if (filter === "()" || filter === ")") {
     filter = null;
   }
   console.log("filtro: " + filter);
@@ -140,6 +141,15 @@ exports.nullify = function (req, res) {
   });
 };
 
+exports.recover = function (req, res) {
+  const tp = req.body.tp;
+  const id = req.body.id;
+  Comprobante.recover(tp, id, function(err, items) {
+    if (err) res.status(400).send(err);
+    res.json(items);
+  });
+};
+
 exports.pdfNota = function (req, res) {
   const tp = req.params.tp;
   const id = req.params.id;
@@ -147,7 +157,7 @@ exports.pdfNota = function (req, res) {
   Comprobante.getByIdAll(tp, id, function (err, result) {
     if (err)
       result(err);
-    Reporte.printreport({
+      NotaContableReporte.printreport({
       image: imgLoc,
       data: result
     }, function (err, report) {
