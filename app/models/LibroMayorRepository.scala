@@ -163,22 +163,9 @@ class LibroMayorRepository @Inject()(dbapi: DBApi, conf: Configuration)(implicit
     private val REPORT_DEFINITION_PATH = System.getProperty("user.dir") + "/app/resources/"
 
     def consultar(anho: Int): Future[Iterable[LMRelacion]] = Future[Iterable[LMRelacion]] {
-      var base = ""
-      anho match {
-        case 2019 =>  //println("en 2019") 
-                      base = "db2019"        
-        case 2018 =>  //println("en 2018") 
-                      base = "db2018"
-        case 2017 =>  //println("en 2017")
-                      base = "db2017"
-        case 2016 =>  //println("en 2016")
-                      base = "db2016"
-        case _ => //println("en __")
-                  base = "default"
-      }
-      val db = dbapi.database(base)
+      val dbdefault = dbapi.database("default"); 
       var _listData = ListBuffer[LibroMayor]()      
-      db.withConnection { implicit connection =>
+      dbdefault.withConnection { implicit connection =>
         SQL("""SELECT * FROM CON$HISTORIALIBROREGISTRADO WHERE LIRE_ANHO = {lire_anho}""").
         on(
           'lire_anho -> anho
@@ -199,6 +186,12 @@ class LibroMayorRepository @Inject()(dbapi: DBApi, conf: Configuration)(implicit
                         base = "db2017"
           case 2016 =>  //println("en 2016")
                         base = "db2016"
+          case 2015 =>  //println("en 2015")
+                        base = "db2015"    
+          case 2014 =>  //println("en 2014")
+                        base = "db2014" 
+          case 2013 =>  //println("en 2013")
+                        base = "db2013"                                                                     
           case _ => //println("en __")
                     base = "default"
         }

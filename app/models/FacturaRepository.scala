@@ -923,24 +923,29 @@ class FacturaRepository @Inject()(dbapi: DBApi, personaService: PersonaRepositor
                           val _encabezadoData = new _EncabezadoData(Some("10"), None, None, Some(sdf.format(f.fact_fecha.get.toDate)), None, None, Some("01"), None)
 
                           var _sendemail = persona.d.get.email.exists(_.trim.nonEmpty)
+                          var (_ident, _dv) = tipoiden match {
+                            case 31 => var _id = f.id_persona.get.split("-");
+                                       (_id(0), _id(1))
+                            case _ => (f.id_persona.get, "") 
+                          }
                           val _compradorData = new _CompradorFactura(persona.a.get.primer_apellido,
                                                                      direccion.municipio,
                                                                      Some(direccion.cod_municipio.get.toString),
                                                                      Some(depa_id.toString),
                                                                      Some(depa_id.toString+"0001"),
                                                                      persona.d.get.email,
-                                                                     None,
+                                                                     Some(_dv),
                                                                      Some(departamento.get._2),
                                                                      direccion.direccion,
                                                                      Some(_sendemail),
-                                                                     f.id_persona,
+                                                                     Some(_ident),
                                                                      None,
                                                                      Some(persona.a.get.nombre.get.concat(" ".concat(persona.a.get.primer_apellido.get.concat(" ".concat(persona.a.get.segundo_apellido.get))))),
                                                                      Some("COLOMBIA"),
                                                                      Some(f.id_comprobante.toString()),
                                                                      Some("CO"),
-                                                                     persona.a.get.nombre,
-                                                                     None,
+                                                                     tipoiden match { case 31 => None case _ => persona.a.get.nombre },
+                                                                     tipoiden match { case 31 => persona.a.get.nombre case _ => None },
                                                                      Some("R-99-PN"),
                                                                      direccion.barrio,
                                                                      None,
