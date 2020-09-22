@@ -870,7 +870,8 @@ class FacturaRepository @Inject()(dbapi: DBApi, personaService: PersonaRepositor
         val persona = personaService.obtenerDirecto(f.id_identificacion.get, f.id_persona.get)
                           val direccion = persona.direcciones(0)
                           val cod_municipio = direccion.cod_municipio.get
-                          val depa_id = cod_municipio.toString.substring(0,2)
+                          val codigo_municipio = "%05d".format(cod_municipio);
+                          val depa_id = codigo_municipio.toString.substring(0,2)
                           println("cod_municipio: " + cod_municipio)
                           println("depa_id :" + depa_id)
                           val _parseAutorizacion = int("FAAU_ID") ~ 
