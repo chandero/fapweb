@@ -244,6 +244,9 @@ export default {
       tableData: []
     }
   },
+  beforeMount () {
+    console.log("Colocacion: " + JSON.stringify(this.colocacion))
+  },
   methods: {
     Cerrar() {
       this.$emit('cerrarLiquidacionDePruebaEvent')
