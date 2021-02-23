@@ -43,7 +43,8 @@ libraryDependencies ++= Seq(
   "org.firebirdsql.jdbc" % "jaybird" % "4.0.0.java8",
 
   // JSON
-  "net.liftweb" %% "lift-json" % "3.4.1"
+  "net.liftweb" %% "lift-json" % "3.4.1",
+  "net.liftweb" %% "lift-json-ext" % "3.4.1"
 )
 
 // Play framework hooks for development

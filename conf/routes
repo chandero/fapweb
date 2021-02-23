@@ -127,6 +127,11 @@ POST   /api/soex/                       controllers.SolicitudExternaController.c
 # Factura
 GET    /api/fact/bpn/:n                 controllers.FacturaController.buscarPorNumero(n: Long)
 GET    /api/fact/epn/:n                 controllers.FacturaController.enviarFactura(n: Long)
+GET    /api/fact/end/:n                 controllers.FacturaController.enviarNotaDebito(n: Long)
+GET    /api/fact/enc/:n                 controllers.FacturaController.enviarNotaCredito(n: Long)
+POST   /api/fact/fcget                  controllers.FacturaController.todosFactura
+POST   /api/fact/ndget                  controllers.FacturaController.todosNotaDebito
+POST   /api/fact/ncget                  controllers.FacturaController.todosNotaCredito
 
 # Extracto
 GET    /api/exco/oec/:i                 controllers.ExtractoColocacionController.obtener(i: String)

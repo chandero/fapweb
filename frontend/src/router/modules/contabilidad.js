@@ -98,19 +98,55 @@ const contabilidadRouter = {
       component: () => import('@/views/contabilidad/menu4facturaelectronica/index'), // Parent router-view
       name: 'menu_contabilidad_menu4facturaelectronica',
       meta: { title: 'menu_contabilidad_menu4facturaelectronica', icon: 'qrcode4', roles: ['admin', 'contabilidad', 'revisor'] },
-      redirect: '/contabilidad/menu4facturaelectronica/menu4-1list',
+      redirect: '/contabilidad/menu4facturaelectronica/menu4-1factura',
       children: [
         {
-          path: 'menu4-1list',
-          component: () => import('@/views/contabilidad/menu4facturaelectronica/menu4-1list'),
-          name: 'menu_contabilidad_menu4facturaelectronica_menu4-1list',
-          meta: { title: 'menu_contabilidad_menu4facturaelectronica_menu4-1list', icon: 'el-icon-view', roles: ['admin', 'contabilidad', 'revisor'] }
+          path: 'menu4-1factura',
+          component: () => import('@/views/contabilidad/menu4facturaelectronica/menu4-1factura'),
+          name: 'menu_contabilidad_menu4facturaelectronica_menu4-1factura',
+          meta: { title: 'menu_contabilidad_menu4facturaelectronica_menu4-1factura', icon: 'el-icon-view', roles: ['admin', 'contabilidad', 'revisor'] },
+          children: [
+            {
+              path: 'menu4-1-1list',
+              component: () => import('@/views/contabilidad/menu4facturaelectronica/menu4-1factura/menu4-1-1list'),
+              name: 'menu_contabilidad_menu4facturaelectronica_menu4-1factura_menu4-1-1list',
+              meta: { title: 'menu_contabilidad_menu4facturaelectronica_menu4-1factura_menu4-1-1list', icon: 'el-icon-view', roles: ['admin', 'contabilidad', 'revisor'] }
+            },
+            {
+              path: 'menu4-1-4reprocesar',
+              component: () => import('@/views/contabilidad/menu4facturaelectronica/menu4-1factura/menu4-1-4reprocesar'),
+              name: 'menu_contabilidad_menu4facturaelectronica_menu4-1factura_menu4-1-4reprocesar',
+              meta: { title: 'menu_contabilidad_menu4facturaelectronica_menu4-1factura_menu4-1-4reprocesar', icon: 'process1', roles: ['admin', 'contabilidad'] }
+            }            
+          ]
         },
         {
-          path: 'menu4-4reprocesar',
-          component: () => import('@/views/contabilidad/menu4facturaelectronica/menu4-4reprocesar'),
-          name: 'menu_contabilidad_menu4facturaelectronica_menu4-4reprocesar',
-          meta: { title: 'menu_contabilidad_menu4facturaelectronica_menu4-4reprocesar', icon: 'process1', roles: ['admin', 'contabilidad'] }
+          path: 'menu4-2nd',
+          component: () => import('@/views/contabilidad/menu4facturaelectronica/menu4-2nd'),
+          name: 'menu_contabilidad_menu4facturaelectronica_menu4-2nd',
+          meta: { title: 'menu_contabilidad_menu4facturaelectronica_menu4-2nd', icon: 'el-icon-view', roles: ['admin', 'contabilidad', 'revisor'] },
+          children: [
+            {
+              path: 'menu4-2-1list',
+              component: () => import('@/views/contabilidad/menu4facturaelectronica/menu4-2nd/menu4-2-1list'),
+              name: 'menu_contabilidad_menu4facturaelectronica_menu4-2nd_menu4-2-1list',
+              meta: { title: 'menu_contabilidad_menu4facturaelectronica_menu4-2nd_menu4-2-1list', icon: 'el-icon-view', roles: ['admin', 'contabilidad', 'revisor'] }
+            },
+          ]
+        },
+        {
+          path: 'menu4-3nc',
+          component: () => import('@/views/contabilidad/menu4facturaelectronica/menu4-3nc'),
+          name: 'menu_contabilidad_menu4facturaelectronica_menu4-3nc',
+          meta: { title: 'menu_contabilidad_menu4facturaelectronica_menu4-3nc', icon: 'el-icon-view', roles: ['admin', 'contabilidad', 'revisor'] },
+          children: [
+            {
+              path: 'menu4-3-1list',
+              component: () => import('@/views/contabilidad/menu4facturaelectronica/menu4-3nc/menu4-3-1list'),
+              name: 'menu_contabilidad_menu4facturaelectronica_menu4-3nc_menu4-3-1list',
+              meta: { title: 'menu_contabilidad_menu4facturaelectronica_menu4-3nc_menu4-3-1list', icon: 'el-icon-view', roles: ['admin', 'contabilidad', 'revisor'] }
+            },
+          ]
         }
       ]
     }

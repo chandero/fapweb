@@ -23,192 +23,225 @@ import org.joda.time.DateTime
 import org.joda.time.LocalDate
 
 case class FacturaItem(
-  fait_id: Option[Long],
-  fact_numero: Option[Long],
-  fait_detalle: Option[String],
-  fait_cantidad: Option[Int],
-  fait_valorunitario: Option[BigDecimal],
-  fait_tasaiva: Option[BigDecimal],
-  fait_valoriva: Option[BigDecimal],
-  fait_total: Option[BigDecimal]
+    fait_id: Option[Long],
+    fact_numero: Option[Long],
+    fait_detalle: Option[String],
+    fait_cantidad: Option[Int],
+    fait_valorunitario: Option[Double],
+    fait_tasaiva: Option[Double],
+    fait_valoriva: Option[Double],
+    fait_total: Option[Double]
 )
 
 case class Factura(
-  fact_numero: Option[Long],
-  fact_fecha: Option[DateTime],
-  fact_descripcion: Option[String],
-  tipo_comprobante: Option[String],
-  id_comprobante: Option[Int],
-  fecha_comprobante: Option[DateTime],
-  id_identificacion: Option[Int],
-  id_persona: Option[String],
-  id_empleado: Option[String],
-  fact_estado: Option[Int],
-  items: Option[Seq[FacturaItem]]
+    fact_numero: Option[Long],
+    fact_fecha: Option[DateTime],
+    fact_descripcion: Option[String],
+    tipo_comprobante: Option[String],
+    id_comprobante: Option[Int],
+    fecha_comprobante: Option[DateTime],
+    id_identificacion: Option[Int],
+    id_persona: Option[String],
+    id_empleado: Option[String],
+    fact_estado: Option[Int],
+    items: Option[Seq[FacturaItem]],
+    primer_apellido: Option[String],
+    segundo_apellido: Option[String],
+    nombre: Option[String],    
+    fact_total: Option[Double]
 )
 
-case class _AutorizacionFactura (
-  AutFechaFinal: Option[String],
-  AutFechaInicio: Option[String],
-  AutNumAutorizacion: Option[String],
-  AutPrefijo: Option[String],
-  AutSecuenciaFinal: Option[String],
-  AutSecuenciaInicio: Option[String]
+case class FacturaNotaItem(
+    fanoit_id: Option[Long],
+    fact_nota_tipo: Option[String],
+    fact_nota_numero: Option[Long],
+    fanoit_detalle: Option[String],
+    fanoit_cantidad: Option[Int],
+    fanoit_valorunitario: Option[Double],
+    fanoit_tasaiva: Option[Double],
+    fanoit_valoriva: Option[Double],
+    fanoit_total: Option[Double]
 )
 
-case class _CompradorFactura (
-  CompradorApellidos: Option[String],
-  CompradorCiudad: Option[String],
-  CompradorCodCiudad: Option[String],
-  CompradorCodDepartamento: Option[String],
-  CompradorCodPostal: Option[String],
-  CompradorCorreoElectronico: Option[String],
-  CompradorDVIdentificacion: Option[String],
-  CompradorDepartamento: Option[String],
-  CompradorDireccion: Option[String],
-  CompradorEnviarCorreo: Option[Boolean],
-  CompradorIdentificacion: Option[String],
-  CompradorImpuesto: Option[String],
-  CompradorNombreCompleto: Option[String],
-  CompradorNombrePais: Option[String],
-  CompradorNotaCont: Option[String],
-  CompradorPais: Option[String],
-  CompradorPrimerNombre: Option[String],
-  CompradorRazonSocial: Option[String],
-  CompradorRespFiscal: Option[String],
-  CompradorSector: Option[String],
-  CompradorSegundoNombre: Option[String],
-  CompradorTelefonoCont: Option[String],
-  CompradorTipoIdentificacion: Option[String],
-  CompradorTipoPersona: Option[String],
-  CompradorTipoRegimen: Option[String]
+case class FacturaNota(
+    fact_nota_tipo: Option[String],
+    fact_nota_numero: Option[Long],
+    fact_nota_fecha: Option[DateTime],
+    fact_nota_descripcion: Option[String],
+    fact_numero: Option[Int],
+    id_identificacion: Option[Int],
+    id_persona: Option[String],
+    id_empleado: Option[String],
+    fact_estado: Option[Int],
+    items: Option[Seq[FacturaNotaItem]],
+    primer_apellido: Option[String],
+    segundo_apellido: Option[String],
+    nombre: Option[String],
+    fact_total: Option[Double]
 )
 
-case class _EmisorData (
-  EmiDVIdentificacion: Option[String],
-  EmiIdentificacion: Option[String],
-  EmiTipoIdentificacion: Option[Int],
-  EmiTipoPersona: Option[Int]
+case class _AutorizacionFactura(
+    AutFechaFinal: Option[String],
+    AutFechaInicio: Option[String],
+    AutNumAutorizacion: Option[String],
+    AutPrefijo: Option[String],
+    AutSecuenciaFinal: Option[String],
+    AutSecuenciaInicio: Option[String]
 )
 
-case class _EncabezadoData (
-  FacCodOperacion: Option[String],
-  FacFechaContingencia: Option[String],
-  FacFechaFin: Option[String],
-  FacFechaHoraFactura: Option[String],
-  FacFechaIni: Option[String],
-  FacRefContigencia: Option[String],
-  FacTipoFactura: Option[String],
-  FacTipoRefContigencia: Option[String]
+case class _CompradorFactura(
+    CompradorApellidos: Option[String],
+    CompradorCiudad: Option[String],
+    CompradorCodCiudad: Option[String],
+    CompradorCodDepartamento: Option[String],
+    CompradorCodPostal: Option[String],
+    CompradorCorreoElectronico: Option[String],
+    CompradorDVIdentificacion: Option[String],
+    CompradorDepartamento: Option[String],
+    CompradorDireccion: Option[String],
+    CompradorEnviarCorreo: Option[Boolean],
+    CompradorIdentificacion: Option[String],
+    CompradorImpuesto: Option[String],
+    CompradorNombreCompleto: Option[String],
+    CompradorNombrePais: Option[String],
+    CompradorNotaCont: Option[String],
+    CompradorPais: Option[String],
+    CompradorPrimerNombre: Option[String],
+    CompradorRazonSocial: Option[String],
+    CompradorRespFiscal: Option[String],
+    CompradorSector: Option[String],
+    CompradorSegundoNombre: Option[String],
+    CompradorTelefonoCont: Option[String],
+    CompradorTipoIdentificacion: Option[String],
+    CompradorTipoPersona: Option[String],
+    CompradorTipoRegimen: Option[String]
 )
 
-case class _InfoMonetarioData (
-  FacCodMoneda: Option[String],
-  FacTotalAnticipos: Option[String],
-  FacTotalBaseImponible: Option[String],
-  FacTotalBrutoMasImp: Option[String],
-  FacTotalCargos: Option[String],
-  FacTotalDescuentos: Option[String],
-  FacTotalFactura: Option[String],
-  FacTotalImporteBruto: Option[String]
+case class _EmisorData(
+    EmiDVIdentificacion: Option[String],
+    EmiIdentificacion: Option[String],
+    EmiTipoIdentificacion: Option[Int],
+    EmiTipoPersona: Option[Int]
 )
 
-case class _LsAnticipos (
-  FacAnticipoFecha: Option[String],
-  FacAnticipoSec: Option[String],
-  FacAnticipoTotal: Option[String]
+case class _EncabezadoData(
+    FacCodOperacion: Option[String],
+    FacFechaContingencia: Option[String],
+    FacFechaFin: Option[String],
+    FacFechaHoraFactura: Option[String],
+    FacFechaIni: Option[String],
+    FacRefContigencia: Option[String],
+    FacTipoFactura: Option[String],
+    FacTipoRefContigencia: Option[String]
 )
 
-case class _LsCargos (
-  FacCargoBase: Option[String],
-  FacCargoPorc: Option[String],
-  FacCargoRazon: Option[String],
-  FacCargoSecuencia: Option[String],
-  FacCargoTipo: Option[String],
-  FacCargoTotal: Option[String],
-  FacCodDescuento: Option[String]
+case class _InfoMonetarioData(
+    FacCodMoneda: Option[String],
+    FacTotalAnticipos: Option[String],
+    FacTotalBaseImponible: Option[String],
+    FacTotalBrutoMasImp: Option[String],
+    FacTotalCargos: Option[String],
+    FacTotalDescuentos: Option[String],
+    FacTotalFactura: Option[String],
+    FacTotalImporteBruto: Option[String]
 )
 
-case class _LsDetalle (
-  Cantidad: Option[String],
-  Codificacion: Option[String],
-  Codigo: Option[String],
-  CodigoEstandar: Option[String],
-  Descripcion: Option[String],
-  DetFacConsecutivo: Option[Int],
-  PrecioSinImpuestos: Option[String],
-  PrecioTotal: Option[String],
-  PrecioUnitario: Option[String],
-  TamañoPaquete: Option[String],
-  UnidadMedida: Option[String]
+case class _LsAnticipos(
+    FacAnticipoFecha: Option[String],
+    FacAnticipoSec: Option[String],
+    FacAnticipoTotal: Option[String]
 )
 
-case class _LsDetalleCargos (
-  DetSecuencia: Option[String],
-  FacCargoBase: Option[String],
-  FacCargoPorc: Option[String],
-  FacCargoRazon: Option[String],
-  FacCargoSecuencia: Option[String],
-  FacCargoTipo: Option[String],
-  FacCargoTotal: Option[String]
+case class _LsCargos(
+    FacCargoBase: Option[String],
+    FacCargoPorc: Option[String],
+    FacCargoRazon: Option[String],
+    FacCargoSecuencia: Option[String],
+    FacCargoTipo: Option[String],
+    FacCargoTotal: Option[String],
+    FacCodDescuento: Option[String]
 )
 
-case class _LsDetalleImpuesto (
-  BaseImponible: Option[String],
-  CodigoImpuesto: Option[String],
-  EsRetencionImpuesto: Option[Boolean],
-  NombreImpuesto: Option[String],
-  Porcentaje: Option[String],
-  Secuencia: Option[Int],
-  ValorImpuesto: Option[String]
+case class _LsDetalle(
+    Cantidad: Option[String],
+    Codificacion: Option[String],
+    Codigo: Option[String],
+    CodigoEstandar: Option[String],
+    Descripcion: Option[String],
+    DetFacConsecutivo: Option[Int],
+    PrecioSinImpuestos: Option[String],
+    PrecioTotal: Option[String],
+    PrecioUnitario: Option[String],
+    TamañoPaquete: Option[String],
+    UnidadMedida: Option[String]
 )
 
-case class _LsFormaPago (
-  FacFormaPago: Option[String],
-  FacMetodoPago: Option[String],
-  FacVencimientoFac: Option[String]
+case class _LsDetalleCargos(
+    DetSecuencia: Option[String],
+    FacCargoBase: Option[String],
+    FacCargoPorc: Option[String],
+    FacCargoRazon: Option[String],
+    FacCargoSecuencia: Option[String],
+    FacCargoTipo: Option[String],
+    FacCargoTotal: Option[String]
 )
 
-case class _LsImpuestos (
-  BaseImponible: Option[String],
-  CodigoImpuesto: Option[String],
-  EsRetencionImpuesto: Option[Boolean],
-  NombreImpuesto: Option[String],
-  Porcentaje: Option[String],
-  ValorImpuesto: Option[String]
+case class _LsDetalleImpuesto(
+    BaseImponible: Option[String],
+    CodigoImpuesto: Option[String],
+    EsRetencionImpuesto: Option[Boolean],
+    NombreImpuesto: Option[String],
+    Porcentaje: Option[String],
+    Secuencia: Option[Int],
+    ValorImpuesto: Option[String]
 )
 
-case class _LsNota (
-   DescripcionCabecera: Option[String],
-   Consecutivo: Option[Int]
+case class _LsFormaPago(
+    FacFormaPago: Option[String],
+    FacMetodoPago: Option[String],
+    FacVencimientoFac: Option[String]
 )
 
-case class _SoftwareSeguridad (
-  ClaveTecnica: Option[String],
-  CodigoErp: Option[String],
-  GuidEmpresa: Option[String],
-  GuidOrigen: Option[String],
-  HashSeguridad: Option[String],
-  NumeroDocumento: Option[String],
-  TipoDocumento: Option[String]
+case class _LsImpuestos(
+    BaseImponible: Option[String],
+    CodigoImpuesto: Option[String],
+    EsRetencionImpuesto: Option[Boolean],
+    NombreImpuesto: Option[String],
+    Porcentaje: Option[String],
+    ValorImpuesto: Option[String]
 )
 
-case class _RootInterface (
-  AutorizacionFactura: Option[_AutorizacionFactura],
-  CompradorFactura: Option[_CompradorFactura],
-  EmisorData: Option[_EmisorData],
-  EncabezadoData: Option[_EncabezadoData],
-  InfoMonetarioData: Option[_InfoMonetarioData],
-  LsDetalle: Option[Seq[_LsDetalle]],
-  LsDetalleCargos: Option[Seq[_LsDetalleCargos]],
-  LsDetalleImpuesto: Option[Seq[_LsDetalleImpuesto]],
-  LsImpuestos: Option[Seq[_LsImpuestos]],
-  ReferenciaFactura: Option[String],
-  SoftwareSeguridad: Option[_SoftwareSeguridad],
-  lsAnticipos: Option[Seq[_LsAnticipos]],
-  lsCargos: Option[Seq[_LsCargos]],
-  lsFormaPago: Option[Seq[_LsFormaPago]],
-  lsNotas: Option[Seq[_LsNota]]
+case class _LsNota(
+    DescripcionCabecera: Option[String],
+    Consecutivo: Option[Int]
+)
+
+case class _SoftwareSeguridad(
+    ClaveTecnica: Option[String],
+    CodigoErp: Option[String],
+    GuidEmpresa: Option[String],
+    GuidOrigen: Option[String],
+    HashSeguridad: Option[String],
+    NumeroDocumento: Option[String],
+    TipoDocumento: Option[String]
+)
+
+case class _RootInterface(
+    AutorizacionFactura: Option[_AutorizacionFactura],
+    CompradorFactura: Option[_CompradorFactura],
+    EmisorData: Option[_EmisorData],
+    EncabezadoData: Option[_EncabezadoData],
+    InfoMonetarioData: Option[_InfoMonetarioData],
+    LsDetalle: Option[Seq[_LsDetalle]],
+    LsDetalleCargos: Option[Seq[_LsDetalleCargos]],
+    LsDetalleImpuesto: Option[Seq[_LsDetalleImpuesto]],
+    LsImpuestos: Option[Seq[_LsImpuestos]],
+    ReferenciaFactura: Option[String],
+    SoftwareSeguridad: Option[_SoftwareSeguridad],
+    lsAnticipos: Option[Seq[_LsAnticipos]],
+    lsCargos: Option[Seq[_LsCargos]],
+    lsFormaPago: Option[Seq[_LsFormaPago]],
+    lsNotas: Option[Seq[_LsNota]]
 )
 
 /*
@@ -225,7 +258,7 @@ object _AutorizacionFactura {
       "AutNumAutorizacion" -> r.AutNumAutorizacion,
       "AutPrefijo" -> r.AutPrefijo,
       "AutSecuenciaFinal" -> r.AutSecuenciaFinal,
-      "AutSecuenciaInicio" -> r.AutSecuenciaInicio            
+      "AutSecuenciaInicio" -> r.AutSecuenciaInicio
     )
   }
 
@@ -235,7 +268,7 @@ object _AutorizacionFactura {
     (__ \ "AutNumAutorizacion").readNullable[String] and
     (__ \ "AutPrefijo").readNullable[String] and
     (__ \ "AutSecuenciaFinal").readNullable[String] and
-    (__ \ "AutSecuenciaInicio").readNullable[String] 
+    (__ \ "AutSecuenciaInicio").readNullable[String]
   )(_AutorizacionFactura.apply _)
 }
 
@@ -268,11 +301,11 @@ object _CompradorFactura {
       "CompradorRazonSocial" -> r.CompradorRazonSocial,
       "CompradorRespFiscal" -> r.CompradorRespFiscal,
       "CompradorSector" -> r.CompradorSector,
-      "CompradorSegundoNombre" -> r.CompradorSegundoNombre,                                    
-      "CompradorTelefonoCont" -> r.CompradorTelefonoCont,                                    
-      "CompradorTipoIdentificacion" -> r.CompradorTipoIdentificacion,                                    
-      "CompradorTipoPersona" -> r.CompradorTipoPersona,                                    
-      "CompradorTipoRegimen" -> r.CompradorTipoRegimen                                    
+      "CompradorSegundoNombre" -> r.CompradorSegundoNombre,
+      "CompradorTelefonoCont" -> r.CompradorTelefonoCont,
+      "CompradorTipoIdentificacion" -> r.CompradorTipoIdentificacion,
+      "CompradorTipoPersona" -> r.CompradorTipoPersona,
+      "CompradorTipoRegimen" -> r.CompradorTipoRegimen
     )
   }
 
@@ -296,13 +329,13 @@ object _CompradorFactura {
     (__ \ "CompradorPrimerNombre").readNullable[String] and
     (__ \ "CompradorRazonSocial").readNullable[String] and
     (__ \ "CompradorRespFiscal").readNullable[String] and
-    (__ \ "CompradorSector").readNullable[String] and                                                
-    (__ \ "CompradorSegundoNombre").readNullable[String] and                                                
-    (__ \ "CompradorTelefonoCont").readNullable[String] and      
+    (__ \ "CompradorSector").readNullable[String] and
+    (__ \ "CompradorSegundoNombre").readNullable[String] and
+    (__ \ "CompradorTelefonoCont").readNullable[String] and
     (__ \ "CompradorTipoIdentificacion").readNullable[String] and
     (__ \ "CompradorTipoPersona").readNullable[String] and
-    (__ \ "CompradorTipoRegimen").readNullable[String]            
-  )(_CompradorFactura.apply _) 
+    (__ \ "CompradorTipoRegimen").readNullable[String]
+  )(_CompradorFactura.apply _)
 }
 
 object _EmisorData {
@@ -324,7 +357,7 @@ object _EmisorData {
     (__ \ "EmiDVIdentificacion").readNullable[String] and
     (__ \ "EmiIdentificacion").readNullable[String] and
     (__ \ "EmiTipoIdentificacion").readNullable[Int] and
-    (__ \ "EmiTipoPersona").readNullable[Int]   
+    (__ \ "EmiTipoPersona").readNullable[Int]
   )(_EmisorData.apply _)
 }
 
@@ -355,7 +388,7 @@ object _EncabezadoData {
     (__ \ "FacFechaIni").readNullable[String] and
     (__ \ "FacRefContigencia").readNullable[String] and
     (__ \ "FacTipoFactura").readNullable[String] and
-    (__ \ "FacTipoRefContigencia").readNullable[String]    
+    (__ \ "FacTipoRefContigencia").readNullable[String]
   )(_EncabezadoData.apply _)
 }
 
@@ -386,7 +419,7 @@ object _InfoMonetarioData {
     (__ \ "FacTotalCargos").readNullable[String] and
     (__ \ "FacTotalDescuentos").readNullable[String] and
     (__ \ "FacTotalFactura").readNullable[String] and
-    (__ \ "FacTotalImporteBruto").readNullable[String]    
+    (__ \ "FacTotalImporteBruto").readNullable[String]
   )(_InfoMonetarioData.apply _)
 }
 
@@ -400,7 +433,7 @@ object _LsAnticipos {
     def writes(r: _LsAnticipos) = Json.obj(
       "FacAnticipoFecha" -> r.FacAnticipoFecha,
       "FacAnticipoSec" -> r.FacAnticipoSec,
-      "FacAnticipoTotal" -> r.FacAnticipoTotal                          
+      "FacAnticipoTotal" -> r.FacAnticipoTotal
     )
   }
 
@@ -459,7 +492,7 @@ object _LsDetalle {
       "PrecioTotal" -> r.PrecioTotal,
       "PrecioUnitario" -> r.PrecioUnitario,
       "TamañoPaquete" -> r.TamañoPaquete,
-      "UnidadMedida" -> r.UnidadMedida                             
+      "UnidadMedida" -> r.UnidadMedida
     )
   }
 
@@ -473,8 +506,8 @@ object _LsDetalle {
     (__ \ "PrecioSinImpuestos").readNullable[String] and
     (__ \ "PrecioTotal").readNullable[String] and
     (__ \ "PrecioUnitario").readNullable[String] and
-    (__ \ "TamañoPaquete").readNullable[String] and   
-    (__ \ "UnidadMedida").readNullable[String]     
+    (__ \ "TamañoPaquete").readNullable[String] and
+    (__ \ "UnidadMedida").readNullable[String]
   )(_LsDetalle.apply _)
 }
 
@@ -492,7 +525,7 @@ object _LsDetalleCargos {
       "FacCargoRazon" -> r.FacCargoRazon,
       "FacCargoSecuencia" -> r.FacCargoSecuencia,
       "FacCargoTipo" -> r.FacCargoTipo,
-      "FacCargoTotal" -> r.FacCargoTotal                  
+      "FacCargoTotal" -> r.FacCargoTotal
     )
   }
 
@@ -521,7 +554,7 @@ object _LsDetalleImpuesto {
       "NombreImpuesto" -> r.NombreImpuesto,
       "Porcentaje" -> r.Porcentaje,
       "Secuencia" -> r.Secuencia,
-      "ValorImpuesto" -> r.ValorImpuesto                  
+      "ValorImpuesto" -> r.ValorImpuesto
     )
   }
 
@@ -665,8 +698,8 @@ object _RootInterface {
     (__ \ "CompradorFactura").readNullable[_CompradorFactura] and
     (__ \ "EmisorData").readNullable[_EmisorData] and
     (__ \ "EncabezadoData").readNullable[_EncabezadoData] and
-    (__ \ "InfoMonetarioData").readNullable[_InfoMonetarioData] and    
-    (__ \ "LsDetalle").readNullable[Seq[_LsDetalle]] and    
+    (__ \ "InfoMonetarioData").readNullable[_InfoMonetarioData] and
+    (__ \ "LsDetalle").readNullable[Seq[_LsDetalle]] and
     (__ \ "LsDetalleCargos").readNullable[Seq[_LsDetalleCargos]] and
     (__ \ "LsDetalleImpuesto").readNullable[Seq[_LsDetalleImpuesto]] and
     (__ \ "LsImpuestos").readNullable[Seq[_LsImpuestos]] and
@@ -678,13 +711,13 @@ object _RootInterface {
     (__ \ "lsNotas").readNullable[Seq[_LsNota]]
   )(_RootInterface.apply _)
 }
-*/
+ */
 
 object FacturaItem {
   implicit val yourJodaDateReads =
-  JodaReads.jodaDateReads("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-implicit val yourJodaDateWrites =
-  JodaWrites.jodaDateWrites("yyyy-MM-dd'T'HH:mm:ss.SSSZ'")
+    JodaReads.jodaDateReads("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+  implicit val yourJodaDateWrites =
+    JodaWrites.jodaDateWrites("yyyy-MM-dd'T'HH:mm:ss.SSSZ'")
 
   implicit val Writes = new Writes[FacturaItem] {
     def writes(r: FacturaItem) = Json.obj(
@@ -701,41 +734,43 @@ implicit val yourJodaDateWrites =
 
   implicit val Reads: Reads[FacturaItem] = (
     (__ \ "fait_id").readNullable[Long] and
-    (__ \ "fact_numero").readNullable[Long] and
-    (__ \ "fait_detalle").readNullable[String] and
-    (__ \ "fait_cantidad").readNullable[Int] and
-    (__ \ "fait_valorunitario").readNullable[BigDecimal] and
-    (__ \ "fait_tasaiva").readNullable[BigDecimal] and
-    (__ \ "fait_valoriva").readNullable[BigDecimal] and
-    (__ \ "fait_total").readNullable[BigDecimal]
+      (__ \ "fact_numero").readNullable[Long] and
+      (__ \ "fait_detalle").readNullable[String] and
+      (__ \ "fait_cantidad").readNullable[Int] and
+      (__ \ "fait_valorunitario").readNullable[Double] and
+      (__ \ "fait_tasaiva").readNullable[Double] and
+      (__ \ "fait_valoriva").readNullable[Double] and
+      (__ \ "fait_total").readNullable[Double]
   )(FacturaItem.apply _)
 
   val _set = {
     get[Option[Long]]("fait_id") ~
-    get[Option[Long]]("fact_numero") ~
-    get[Option[String]]("fait_detalle") ~
-    get[Option[Int]]("fait_cantidad") ~
-    get[Option[BigDecimal]]("fait_valorunitario") ~
-    get[Option[BigDecimal]]("fait_tasaiva") ~
-    get[Option[BigDecimal]]("fait_valoriva") ~
-    get[Option[BigDecimal]]("fait_total") map {
+      get[Option[Long]]("fact_numero") ~
+      get[Option[String]]("fait_detalle") ~
+      get[Option[Int]]("fait_cantidad") ~
+      get[Option[Double]]("fait_valorunitario") ~
+      get[Option[Double]]("fait_tasaiva") ~
+      get[Option[Double]]("fait_valoriva") ~
+      get[Option[Double]]("fait_total") map {
       case fait_id ~
-           fact_numero ~
-           fait_detalle ~ 
-           fait_cantidad ~ 
-           fait_valorunitario ~ 
-           fait_tasaiva ~ 
-           fait_valoriva ~ 
-           fait_total =>
-        FacturaItem(fait_id,
-                fact_numero,
-                fait_detalle,
-                fait_cantidad,
-                fait_valorunitario,
-                fait_tasaiva,
-                fait_valoriva,
-                fait_total)
-    }    
+            fact_numero ~
+            fait_detalle ~
+            fait_cantidad ~
+            fait_valorunitario ~
+            fait_tasaiva ~
+            fait_valoriva ~
+            fait_total =>
+        FacturaItem(
+          fait_id,
+          fact_numero,
+          fait_detalle,
+          fait_cantidad,
+          fait_valorunitario,
+          fait_tasaiva,
+          fait_valoriva,
+          fait_total
+        )
+    }
   }
 
 }
@@ -764,16 +799,20 @@ object Factura {
 
   implicit val Reads: Reads[Factura] = (
     (__ \ "fact_numero").readNullable[Long] and
-    (__ \ "fact_fecha").readNullable[DateTime] and
-    (__ \ "fact_descripcion").readNullable[String] and
-    (__ \ "tipo_comprobante").readNullable[String] and
-    (__ \ "id_comprobante").readNullable[Int] and
-    (__ \ "fecha_comprobante").readNullable[DateTime] and
-    (__ \ "id_identificacion").readNullable[Int] and
-    (__ \ "id_persona").readNullable[String] and
-    (__ \ "id_empleado").readNullable[String] and
-    (__ \ "fact_estado").readNullable[Int] and
-    (__ \ "items").readNullable[Seq[FacturaItem]]
+      (__ \ "fact_fecha").readNullable[DateTime] and
+      (__ \ "fact_descripcion").readNullable[String] and
+      (__ \ "tipo_comprobante").readNullable[String] and
+      (__ \ "id_comprobante").readNullable[Int] and
+      (__ \ "fecha_comprobante").readNullable[DateTime] and
+      (__ \ "id_identificacion").readNullable[Int] and
+      (__ \ "id_persona").readNullable[String] and
+      (__ \ "id_empleado").readNullable[String] and
+      (__ \ "fact_estado").readNullable[Int] and
+      (__ \ "items").readNullable[Seq[FacturaItem]] and
+      (__ \ "primer_apellido").readNullable[String] and
+      (__ \ "segundo_apellido").readNullable[String] and
+      (__ \ "nombre").readNullable[String] and      
+      (__ \ "fact_total").readNullable[Double]
   )(Factura.apply _)
 
   val _set = {
@@ -786,278 +825,1290 @@ object Factura {
       get[Option[Int]]("id_identificacion") ~
       get[Option[String]]("id_persona") ~
       get[Option[String]]("id_empleado") ~
-      get[Option[Int]]("fact_estado") map {
-      case fact_numero ~ 
-           fact_fecha ~ 
-           fact_descripcion ~ 
-           tipo_comprobante ~ 
-           id_comprobante ~ 
-           fecha_comprobante ~ 
-           id_identificacion ~ 
-           id_persona ~ 
-           id_empleado ~
-           fact_estado =>
-        Factura(fact_numero,
-                fact_fecha,
-                fact_descripcion,
-                tipo_comprobante,
-                id_comprobante,
-                fecha_comprobante,
-                id_identificacion,
-                id_persona,
-                id_empleado,
-                fact_estado,
-                None)
-    }    
+      get[Option[Int]]("fact_estado") ~ 
+      get[Option[String]]("primer_apellido") ~
+      get[Option[String]]("segundo_apellido") ~
+      get[Option[String]]("nombre") ~
+      get[Option[Double]]("fact_total") map {
+      case fact_numero ~
+            fact_fecha ~
+            fact_descripcion ~
+            tipo_comprobante ~
+            id_comprobante ~
+            fecha_comprobante ~
+            id_identificacion ~
+            id_persona ~
+            id_empleado ~
+            fact_estado ~
+            primer_apellido ~
+            segundo_apellido ~
+            nombre ~
+            fact_total =>
+        Factura(
+          fact_numero,
+          fact_fecha,
+          fact_descripcion,
+          tipo_comprobante,
+          id_comprobante,
+          fecha_comprobante,
+          id_identificacion,
+          id_persona,
+          id_empleado,
+          fact_estado,
+          None,
+          primer_apellido,
+          segundo_apellido,
+          nombre,
+          fact_total
+        )
+    }
   }
 }
 
+object FacturaNota {
+  implicit val yourJodaDateReads =
+    JodaReads.jodaDateReads("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+  implicit val yourJodaDateWrites =
+    JodaWrites.jodaDateWrites("yyyy-MM-dd'T'HH:mm:ss.SSSZ'")
 
-class FacturaRepository @Inject()(dbapi: DBApi, personaService: PersonaRepository)(
-    implicit ec: DatabaseExecutionContext) {
+  val _set = {
+    get[Option[String]]("fact_nota_tipo") ~
+      get[Option[Long]]("fact_nota_numero") ~
+      get[Option[DateTime]]("fact_nota_fecha") ~
+      get[Option[String]]("fact_nota_descripcion") ~
+      get[Option[Int]]("fact_numero") ~
+      get[Option[Int]]("id_identificacion") ~
+      get[Option[String]]("id_persona") ~
+      get[Option[String]]("id_empleado") ~
+      get[Option[Int]]("fact_nota_estado") ~
+      get[Option[String]]("primer_apellido") ~
+      get[Option[String]]("segundo_apellido") ~
+      get[Option[String]]("nombre") ~
+      get[Option[Double]]("fact_nota_total") map {
+      case fact_nota_tipo ~
+            fact_nota_numero ~
+            fact_nota_fecha ~
+            fact_nota_descripcion ~
+            fact_numero ~
+            id_identificacion ~
+            id_persona ~
+            id_empleado ~
+            fact_nota_estado ~
+            primer_apellido ~
+            segundo_apellido ~
+            nombre ~
+            fact_nota_total =>
+        FacturaNota(
+          fact_nota_tipo,
+          fact_nota_numero,
+          fact_nota_fecha,
+          fact_nota_descripcion,
+          fact_numero,
+          id_identificacion,
+          id_persona,
+          id_empleado,
+          fact_nota_estado,
+          None,
+          primer_apellido,
+          segundo_apellido,
+          nombre,
+          fact_nota_total
+        )
+    }
+  }
+}
+
+object FacturaNotaItem {
+  implicit val yourJodaDateReads =
+    JodaReads.jodaDateReads("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+  implicit val yourJodaDateWrites =
+    JodaWrites.jodaDateWrites("yyyy-MM-dd'T'HH:mm:ss.SSSZ'")
+
+  val _set = {
+    get[Option[Long]]("fanoit_id") ~
+      get[Option[String]]("fact_nota_tipo") ~
+      get[Option[Long]]("fact_nota_numero") ~
+      get[Option[String]]("fanoit_detalle") ~
+      get[Option[Int]]("fanoit_cantidad") ~
+      get[Option[Double]]("fanoit_valorunitario") ~
+      get[Option[Double]]("fanoit_tasaiva") ~
+      get[Option[Double]]("fanoit_valoriva") ~
+      get[Option[Double]]("fanoit_total") map {
+      case fanoit_id ~
+            fact_nota_tipo ~
+            fact_nota_numero ~
+            fanoit_detalle ~
+            fanoit_cantidad ~
+            fanoit_valorunitario ~
+            fanoit_tasaiva ~
+            fanoit_valoriva ~
+            fanoit_total =>
+        FacturaNotaItem(
+          fanoit_id,
+          fact_nota_tipo,
+          fact_nota_numero,
+          fanoit_detalle,
+          fanoit_cantidad,
+          fanoit_valorunitario,
+          fanoit_tasaiva,
+          fanoit_valoriva,
+          fanoit_total
+        )
+    }
+  }
+
+}
+
+class FacturaRepository @Inject()(
+    dbapi: DBApi,
+    personaService: PersonaRepository
+)(implicit ec: DatabaseExecutionContext) {
   private val db = dbapi.database("default")
 
   /**
     Recuperar una Factura usando su FACT_NUMERO
     @param fact_numero: Long
     */
-    def buscarPorNumero(fact_numero: Long): Future[Option[Factura]] = Future[Option[Factura]] {
+  def buscarPorNumero(fact_numero: Long): Future[Option[Factura]] =
+    Future[Option[Factura]] {
       db.withConnection { implicit connection =>
-        val f = SQL("SELECT * FROM FACTURA WHERE FACT_NUMERO = {fact_numero} AND FACT_ESTADO <> 9")
-          .on(
+        val f = SQL(
+          "SELECT * FROM FACTURA WHERE FACT_NUMERO = {fact_numero} AND FACT_ESTADO <> 9"
+        ).on(
             'fact_numero -> fact_numero
-          ).as(Factura._set.singleOpt)
+          )
+          .as(Factura._set.singleOpt)
         f match {
-          case Some(f) => 
-                val fis = SQL("SELECT * FROM FACTURA_ITEM WHERE FACT_NUMERO = {fact_numero}").on('fact_numero -> f.fact_numero).as(FacturaItem._set *)
-                var factura = f.copy(items = Some(fis))
-                Some(factura)
+          case Some(f) =>
+            val fis = SQL(
+              "SELECT * FROM FACTURA_ITEM WHERE FACT_NUMERO = {fact_numero}"
+            ).on('fact_numero -> f.fact_numero).as(FacturaItem._set *)
+            var factura = f.copy(items = Some(fis))
+            Some(factura)
           case None => None
         }
       }
     }
 
+  def cuentaFactura(): Long = {
+    db.withConnection { implicit connection =>
+      SQL("""SELECT COUNT(*) FROM FACTURA f1 WHERE f1.FACT_ESTADO <> 9""").as(
+        SqlParser.scalar[Long].single
+      )
+    }
+  }
+
+  def todosFactura(
+      page_size: scala.Long,
+      current_page: scala.Long,
+      empr_id: scala.Long,
+      orderby: String,
+      filter: String
+  ): Future[Iterable[Factura]] = Future[Iterable[Factura]] {
+    var _list = new ListBuffer[Factura]()
+    db.withConnection { implicit connection =>
+      var query = """SELECT FIRST {page_size} SKIP ({page_size} * ({current_page} - 1)) f1.*, gp1.PRIMER_APELLIDO, gp1.SEGUNDO_APELLIDO, gp1.NOMBRE, (SELECT SUM(FAIT_TOTAL) FROM FACTURA_ITEM fi1 WHERE fi1.FACT_NUMERO = f1.FACT_NUMERO) AS FACT_TOTAL FROM FACTURA f1
+                     LEFT JOIN "gen$persona" gp1 ON gp1.ID_IDENTIFICACION = f1.ID_IDENTIFICACION AND gp1.ID_PERSONA = f1.ID_PERSONA
+                     WHERE f1.FACT_ESTADO <> 9"""
+      if (!filter.isEmpty) {
+        query = query + " and " + filter
+      }
+      if (!orderby.isEmpty) {
+        query = query + s" ORDER BY $orderby"
+      } else {
+        query = query + s" ORDER BY FACT_NUMERO DESC"
+      }      
+
+      val facts = SQL(query).on(
+          'page_size -> page_size,
+          'current_page -> current_page
+        )
+        .as(Factura._set *)
+      for(fact <- facts) {
+        val items = SQL("""SELECT * FROM FACTURA_ITEM fi1 WHERE fi1.FACT_NUMERO = {fact_numero}""").
+        on(
+          'fact_numero -> fact.fact_numero
+        ).as(FacturaItem._set *)
+        val factura = fact.copy(items = Some(items))
+        _list += factura
+      }
+      _list.toList
+    }
+  }
+
+ // NOTA DEBITO
+  def cuentaNotaDebito(): Long = {
+    db.withConnection { implicit connection =>
+      SQL("""SELECT COUNT(*) FROM FACTURA_NOTA fn1 WHERE fn1.FACT_NOTA_TIPO = 'D' AND fn1.FACT_NOTA_ESTADO <> 9""").as(
+        SqlParser.scalar[Long].single
+      )
+    }
+  }
+
+  def todosNotaDebito(
+      page_size: scala.Long,
+      current_page: scala.Long,
+      empr_id: scala.Long,
+      orderby: String,
+      filter: String
+  ): Future[Iterable[FacturaNota]] = Future[Iterable[FacturaNota]] {
+    var _list = new ListBuffer[FacturaNota]()
+    db.withConnection { implicit connection =>
+      var query = "SELECT FIRST {page_size} SKIP ({page_size} * ({current_page} - 1)) * FROM FACTURA_NOTA fn1 WHERE fn1.FACT_NOTA_TIPO = 'D' AND fn1.FACT_NOTA_ESTADO <> 9"
+      if (!filter.isEmpty) {
+        query = query + " AND " + filter
+      }
+      if (!orderby.isEmpty) {
+        query = query + s" ORDER BY $orderby"
+      } else {
+        query = query + s" ORDER BY FACT_NOTA_NUMERO DESC"
+      }      
+
+      val notas = SQL(query).on(
+          'page_size -> page_size,
+          'current_page -> current_page
+        )
+        .as(FacturaNota._set *)
+      for(nota <- notas) {
+        val items = SQL("""SELECT * FROM FACTURA_NOTA_ITEM fni1 WHERE fn1.FACT_NOTA_TIPO = 'D' AND fni1.FACT_NOTA_NUMERO = {fact_nota_numero}""").
+        on(
+          'fact_nota_numero -> nota.fact_nota_numero
+        ).as(FacturaNotaItem._set *)
+        val fnota = nota.copy(items = Some(items))
+        _list += fnota
+      }
+      _list.toList
+    }
+  }
+
+ // NOTA CREDITO
+  def cuentaNotaCredito(): Long = {
+    db.withConnection { implicit connection =>
+      SQL("""SELECT COUNT(*) FROM FACTURA f1 WHERE f1.FACT_ESTADO <> 9""").as(
+        SqlParser.scalar[Long].single
+      )
+    }
+  }
+
+  def todosNotaCredito(
+      page_size: scala.Long,
+      current_page: scala.Long,
+      empr_id: scala.Long,
+      orderby: String,
+      filter: String
+  ): Future[Iterable[FacturaNota]] = Future[Iterable[FacturaNota]] {
+    var _list = new ListBuffer[FacturaNota]()
+    db.withConnection { implicit connection =>
+      var query = "SELECT FIRST {page_size} SKIP ({page_size} * ({current_page} - 1)) * FROM FACTURA_NOTA fn1 WHERE fn1.FACT_NOTA_TIPO = 'C' AND fn1.FACT_NOTA_ESTADO <> 9"
+      if (!filter.isEmpty) {
+        query = query + " AND " + filter
+      }
+      if (!orderby.isEmpty) {
+        query = query + s" ORDER BY $orderby"
+      } else {
+        query = query + s" ORDER BY FACT_NOTA_NUMERO DESC"
+      }      
+
+      val notas = SQL(query).on(
+          'page_size -> page_size,
+          'current_page -> current_page
+        )
+        .as(FacturaNota._set *)
+      for(nota <- notas) {
+        val items = SQL("""SELECT * FROM FACTURA_NOTA_ITEM fni1 WHERE fni1.FACT_NOTA_TIPO = 'C' AND fni1.FACT_NOTA_NUMERO = {fact_nota_numero}""").
+        on(
+          'fact_nota_numero -> nota.fact_nota_numero
+        ).as(FacturaNotaItem._set *)
+        val fnota = nota.copy(items = Some(items))
+        _list += fnota
+      }
+      _list.toList
+    }
+  }
+ //
   /**
     Recuperar una Factura usando su FACT_NUMERO
     @param fact_numero: Long
     */
-    def buscarPorNumeroDirecto(fact_numero: Long): Factura = {
-      db.withConnection { implicit connection =>
-        println("Buscando Factura No.:" + fact_numero)
-        val f = SQL("SELECT * FROM FACTURA WHERE FACT_NUMERO = {fact_numero} AND FACT_ESTADO <> 9")
-          .on(
-            'fact_numero -> fact_numero
-          ).as(Factura._set.singleOpt)
-        println("Factura Encontrada: " + f)
-        f match {
-          case Some(f) => 
-                println("Buscando Items")
-                val fis = SQL("SELECT * FROM FACTURA_ITEM WHERE FACT_NUMERO = {fact_numero}").on('fact_numero -> f.fact_numero).as(FacturaItem._set *)
-                var factura = f.copy(items = Some(fis))
-                factura
-          case None => var factura = new Factura(None, None, None, None, None, None, None, None, None, None, None)
-                factura 
-        }
+  def buscarPorNumeroDirecto(fact_numero: Long): Factura = {
+    db.withConnection { implicit connection =>
+      println("Buscando Factura No.:" + fact_numero)
+      val f = SQL(
+        "SELECT * FROM FACTURA WHERE FACT_NUMERO = {fact_numero} AND FACT_ESTADO <> 9"
+      ).on(
+          'fact_numero -> fact_numero
+        )
+        .as(Factura._set.singleOpt)
+      println("Factura Encontrada: " + f)
+      f match {
+        case Some(f) =>
+          println("Buscando Items")
+          val fis = SQL(
+            "SELECT * FROM FACTURA_ITEM WHERE FACT_NUMERO = {fact_numero}"
+          ).on('fact_numero -> f.fact_numero).as(FacturaItem._set *)
+          var factura = f.copy(items = Some(fis))
+          factura
+        case None =>
+          var factura = new Factura(
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None
+          )
+          factura
       }
-    }    
+    }
+  }
 
-    def enviarFactura(fact_numero: Long): Future[_RootInterface] = Future[_RootInterface] {
+  /**
+    Recuperar una Factura usando su FACT_NUMERO
+    @param fact_nota_numero: Long
+    */
+  def buscarNotaDebitoPorNumeroDirecto(fact_nota_numero: Long): FacturaNota = {
+    db.withConnection { implicit connection =>
+      println("Buscando Nota Debito No.:" + fact_nota_numero)
+      val nd = SQL(
+        """SELECT fn.*, f.ID_IDENTIFICACION, f.ID_PERSONA FROM FACTURA_NOTA fn
+                        INNER JOIN FACTURA f ON f.FACT_NUMERO = fn.FACT_NUMERO
+                        WHERE FACT_NOTA_TIPO = 'D' AND FACT_NOTA_NUMERO = {fact_nota_numero} AND FACT_NOTA_ESTADO <> 9"""
+      ).on(
+          'fact_nota_numero -> fact_nota_numero
+        )
+        .as(FacturaNota._set.singleOpt)
+      println("Nota Debito Encontrada: " + nd)
+      nd match {
+        case Some(nd) =>
+          println("Buscando Items")
+          val fnis = SQL(
+            "SELECT * FROM FACTURA_NOTA_ITEM WHERE FACT_NOTA_TIPO = 'D' AND FACT_NOTA_NUMERO = {fact_nota_numero}"
+          ).on('fact_nota_numero -> nd.fact_nota_numero)
+            .as(FacturaNotaItem._set *)
+          var nota = nd.copy(items = Some(fnis))
+          nota
+        case None =>
+          var nota = new FacturaNota(
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None
+          )
+          nota
+      }
+    }
+  }
+
+  /**
+    Recuperar una Factura usando su FACT_NUMERO
+    @param fact_nota_numero: Long
+    */
+  def buscarNotaCreditoPorNumeroDirecto(fact_nota_numero: Long): FacturaNota = {
+    db.withConnection { implicit connection =>
+      println("Buscando Nota Credito No.:" + fact_nota_numero)
+      val nc = SQL(
+        """SELECT fn.*, f.ID_IDENTIFICACION, f.ID_PERSONA FROM FACTURA_NOTA fn
+                        INNER JOIN FACTURA f ON f.FACT_NUMERO = fn.FACT_NUMERO
+                        WHERE FACT_NOTA_TIPO = 'C' AND FACT_NOTA_NUMERO = {fact_nota_numero} AND FACT_NOTA_ESTADO <> 9"""
+      ).on(
+          'fact_nota_numero -> fact_nota_numero
+        )
+        .as(FacturaNota._set.singleOpt)
+      println("Nota Credito Encontrada: " + nc)
+      nc match {
+        case Some(nc) =>
+          println("Buscando Items")
+          val fnis = SQL(
+            "SELECT * FROM FACTURA_NOTA_ITEM WHERE FACT_NOTA_TIPO = 'C' AND FACT_NOTA_NUMERO = {fact_nota_numero}"
+          ).on('fact_nota_numero -> nc.fact_nota_numero)
+            .as(FacturaNotaItem._set *)
+          var nota = nc.copy(items = Some(fnis))
+          nota
+        case None =>
+          var nota = new FacturaNota(
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None
+          )
+          nota
+      }
+    }
+  }
+
+  def enviarFactura(fact_numero: Long): Future[_RootInterface] =
+    Future[_RootInterface] {
       db.withConnection { implicit connection =>
-        var _rootInterface = new _RootInterface(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None)
-        val f = buscarPorNumeroDirecto(fact_numero) /* SQL("""SELECT * FROM FACTURA f 
+        var _rootInterface = new _RootInterface(
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None
+        )
+        val f = buscarPorNumeroDirecto(fact_numero) /* SQL("""SELECT * FROM FACTURA f
                             WHERE f.FACT_NUMERO = {fact_numero}""").on('fact_numero -> fact_numero).as(Factura._set.singleOpt) */
         println("Factura: " + f)
-        val persona = personaService.obtenerDirecto(f.id_identificacion.get, f.id_persona.get)
-                          val direccion = persona.direcciones(0)
-                          val cod_municipio = direccion.cod_municipio.get
-                          val codigo_municipio = "%05d".format(cod_municipio);
-                          val depa_id = codigo_municipio.toString.substring(0,2)
-                          println("cod_municipio: " + cod_municipio)
-                          println("depa_id :" + depa_id)
-                          val _parseAutorizacion = int("FAAU_ID") ~ 
-                                                   date("FAAU_FECHAFINAL") ~ 
-                                                   date("FAAU_FECHAINICIO") ~ 
-                                                   str("FAAU_NUMAUTORIZACION") ~
-                                                   str("FAAU_PREFIJO").? ~
-                                                   int("FAAU_SECUENCIAFINAL") ~
-                                                   int("FAAU_SECUENCIAINICIAL") map { case a ~ b ~ c ~ d ~ e ~ f ~ g => (a,b,c,d,e,f,g)}
-                          println("Buscando Autorización para Factura No. " + fact_numero)                                                   
-                          val autorizacion = SQL("""
+        val persona = personaService.obtenerDirecto(
+          f.id_identificacion.get,
+          f.id_persona.get
+        )
+        val direccion = persona.direcciones(0)
+        val cod_municipio = direccion.cod_municipio.get
+        val codigo_municipio = "%05d".format(cod_municipio);
+        val depa_id = codigo_municipio.toString.substring(0, 2)
+        println("cod_municipio: " + cod_municipio)
+        println("depa_id :" + depa_id)
+        val _parseAutorizacion = int("FAAU_ID") ~
+          date("FAAU_FECHAFINAL") ~
+          date("FAAU_FECHAINICIO") ~
+          str("FAAU_NUMAUTORIZACION") ~
+          str("FAAU_PREFIJO").? ~
+          int("FAAU_SECUENCIAFINAL") ~
+          int("FAAU_SECUENCIAINICIAL") map {
+          case a ~ b ~ c ~ d ~ e ~ f ~ g => (a, b, c, d, e, f, g)
+        }
+        println("Buscando Autorización para Factura No. " + fact_numero)
+        val autorizacion =
+          SQL("""
                                 SELECT * FROM FAC_AUTORIZACION 
                                 WHERE {fact_numero} BETWEEN FAAU_SECUENCIAINICIAL AND FAAU_SECUENCIAFINAL
                                 ORDER BY FAAU_ID DESC""")
-                          .on(
-                            'fact_numero -> fact_numero
-                          )
-                          .as(_parseAutorizacion.single)
-                          println("Autorizacion Recibida: " + autorizacion._4)
-                          val _parseDepartamento = str("depa_id") ~ str("depa_nombre") map { case a ~ b => (a,b) }
-                          val departamento = SQL("""SELECT * FROM DEPARTAMENTO WHERE DEPA_ID = {depa_id}""").on('depa_id -> depa_id).as(_parseDepartamento.singleOpt)
-                          println("Departamento: " + departamento)
-                          val _parseTipoIde = int("fati_id") map { case a => (a) }
-                          val tipoiden = SQL("""SELECT FATI_ID FROM FAC_TIPO_IDENTIFICACION WHERE FATI_RELACION = {fati_relacion}""").on('fati_relacion -> f.id_identificacion).as(_parseTipoIde.single)
-                          println("Tipo Identificacion: " + tipoiden)
-                          val _parseTipoPer = int("fatp_id") map { case a => (a) }
-                          val tipoper = SQL("""SELECT FATP_ID FROM FAC_TIPO_PERSONA WHERE FATP_RELACION CONTAINING {fati_relacion}""").on('fati_relacion -> persona.a.get.id_tipo_persona).as(_parseTipoPer.single)
-                          println("Tipo Persona")
-                          val _parseSoftwareSeguridad = str("clave_tecnica") ~ str("guid_empresa") ~ str("guid_origen") ~ str("hash_seguridad") map { case a ~ b ~ c ~ d => (a,b,c,d) }
-                          val _sSeguridad = SQL("SELECT * FROM FAC_SOFTWARE_SEGURIDAD WHERE FAAU_ID = {faau_id}")
-                          .on(
-                            'faau_id -> autorizacion._1
-                          )
-                          .as(_parseSoftwareSeguridad.single)
-                          println("Seguridad")
-                          val sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-                          val sdd = new SimpleDateFormat("yyyy-MM-dd")
-                          val prefijo = autorizacion._5 match {
-                            case Some(p) => p
-                            case None => ""
-                          }
+            .on(
+              'fact_numero -> fact_numero
+            )
+            .as(_parseAutorizacion.single)
+        println("Autorizacion Recibida: " + autorizacion._4)
+        val _parseDepartamento = str("depa_id") ~ str("depa_nombre") map {
+          case a ~ b => (a, b)
+        }
+        val departamento = SQL(
+          """SELECT * FROM DEPARTAMENTO WHERE DEPA_ID = {depa_id}"""
+        ).on('depa_id -> depa_id).as(_parseDepartamento.singleOpt)
+        println("Departamento: " + departamento)
+        val _parseTipoIde = int("fati_id") map { case a => (a) }
+        val tipoiden = SQL(
+          """SELECT FATI_ID FROM FAC_TIPO_IDENTIFICACION WHERE FATI_RELACION = {fati_relacion}"""
+        ).on('fati_relacion -> f.id_identificacion).as(_parseTipoIde.single)
+        println("Tipo Identificacion: " + tipoiden)
+        val _parseTipoPer = int("fatp_id") map { case a => (a) }
+        val tipoper = SQL(
+          """SELECT FATP_ID FROM FAC_TIPO_PERSONA WHERE FATP_RELACION CONTAINING {fati_relacion}"""
+        ).on('fati_relacion -> persona.a.get.id_tipo_persona)
+          .as(_parseTipoPer.single)
+        println("Tipo Persona")
+        val _parseSoftwareSeguridad = str("clave_tecnica") ~ str("guid_empresa") ~ str(
+          "guid_origen"
+        ) ~ str("hash_seguridad") map { case a ~ b ~ c ~ d => (a, b, c, d) }
+        val _sSeguridad =
+          SQL("SELECT * FROM FAC_SOFTWARE_SEGURIDAD WHERE FAAU_ID = {faau_id}")
+            .on(
+              'faau_id -> autorizacion._1
+            )
+            .as(_parseSoftwareSeguridad.single)
+        println("Seguridad")
+        val sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+        val sdd = new SimpleDateFormat("yyyy-MM-dd")
+        val prefijo = autorizacion._5 match {
+          case Some(p) => p
+          case None    => ""
+        }
 
-                          val _autorizacionData = new _AutorizacionFactura(Some(sdd.format(autorizacion._2)), 
-                                                                           Some(sdd.format(autorizacion._3)), 
-                                                                           Some(autorizacion._4),
-                                                                           Some(prefijo),
-                                                                           Some(autorizacion._6.toString()),
-                                                                           Some(autorizacion._7.toString()))
+        val _autorizacionData = new _AutorizacionFactura(
+          Some(sdd.format(autorizacion._2)),
+          Some(sdd.format(autorizacion._3)),
+          Some(autorizacion._4),
+          Some(prefijo),
+          Some(autorizacion._6.toString()),
+          Some(autorizacion._7.toString())
+        )
 
-                          val _encabezadoData = new _EncabezadoData(Some("10"), None, None, Some(sdf.format(f.fact_fecha.get.toDate)), None, None, Some("01"), None)
+        val _encabezadoData = new _EncabezadoData(
+          Some("10"),
+          None,
+          None,
+          Some(sdf.format(f.fact_fecha.get.toDate)),
+          None,
+          None,
+          Some("01"),
+          None
+        )
 
-                          var _sendemail = persona.d.get.email.exists(_.trim.nonEmpty)
-                          var (_ident, _dv) = tipoiden match {
-                            case 31 => var _id = f.id_persona.get.split("-");
-                                       (_id(0), _id(1))
-                            case _ => (f.id_persona.get, "") 
-                          }
-                          val _compradorData = new _CompradorFactura(persona.a.get.primer_apellido,
-                                                                     direccion.municipio,
-                                                                     Some(direccion.cod_municipio.get.toString),
-                                                                     Some(depa_id.toString),
-                                                                     Some(depa_id.toString+"0001"),
-                                                                     persona.d.get.email,
-                                                                     Some(_dv),
-                                                                     Some(departamento.get._2),
-                                                                     direccion.direccion,
-                                                                     Some(_sendemail),
-                                                                     Some(_ident),
-                                                                     None,
-                                                                     Some(persona.a.get.nombre.get.concat(" ".concat(persona.a.get.primer_apellido.get.concat(" ".concat(persona.a.get.segundo_apellido.get))))),
-                                                                     Some("COLOMBIA"),
-                                                                     Some(f.id_comprobante.toString()),
-                                                                     Some("CO"),
-                                                                     tipoiden match { case 31 => None case _ => persona.a.get.nombre },
-                                                                     tipoiden match { case 31 => persona.a.get.nombre case _ => None },
-                                                                     Some("R-99-PN"),
-                                                                     direccion.barrio,
-                                                                     None,
-                                                                     direccion.telefono1,
-                                                                     Some(tipoiden.toString),
-                                                                     Some(tipoper.toString),
-                                                                     Some("04")
-                                                                     )
-                          val _emisorData = new _EmisorData(
-                                                            //Some("7"),
-                                                            //Some("901180226"),
-                                                            Some("5"), 
-                                                            Some("804015942"), 
-                                                            Some(31), 
-                                                            Some(1))
-                          var _listDetalleData = new ListBuffer[_LsDetalle]()
-                          var _listDetalleImpuestoData = new ListBuffer[_LsDetalleImpuesto]()
-                          var _totalFactura = BigDecimal(0)
-                          var i = 1
-                          println("Items:" + f.items)
-                          f.items.foreach { items =>
-                             items.foreach { item =>
-                             val _detalleData = new _LsDetalle(Some("1"),
-                                                              Some("999"),
-                                                              Some("CARTERA"),
-                                                              Some("CARTERA"),
-                                                              item.fait_detalle,
-                                                              Some(i),
-                                                              Some(item.fait_valorunitario.get.toString),
-                                                              Some(item.fait_valorunitario.get.toString),
-                                                              Some(item.fait_valorunitario.get.toString),
-                                                              None,
-                                                              Some("ZZ")  
-                                                              )
+        var _sendemail = persona.d.get.email.exists(_.trim.nonEmpty)
+        var (_ident, _dv) = tipoiden match {
+          case 31 =>
+            var _id = f.id_persona.get.split("-");
+            (_id(0), _id(1))
+          case _ => (f.id_persona.get, "")
+        }
+        val _compradorData = new _CompradorFactura(
+          persona.a.get.primer_apellido,
+          direccion.municipio,
+          Some(direccion.cod_municipio.get.toString),
+          Some(depa_id.toString),
+          Some(depa_id.toString + "0001"),
+          persona.d.get.email,
+          Some(_dv),
+          Some(departamento.get._2),
+          direccion.direccion,
+          Some(_sendemail),
+          Some(_ident),
+          None,
+          Some(
+            persona.a.get.nombre.get.concat(
+              " ".concat(
+                persona.a.get.primer_apellido.get
+                  .concat(" ".concat(persona.a.get.segundo_apellido.get))
+              )
+            )
+          ),
+          Some("COLOMBIA"),
+          Some(f.id_comprobante.toString()),
+          Some("CO"),
+          tipoiden match {
+            case 31 => None
+            case _  => persona.a.get.nombre
+          },
+          tipoiden match {
+            case 31 => persona.a.get.nombre
+            case _  => None
+          },
+          Some("R-99-PN"),
+          direccion.barrio,
+          None,
+          direccion.telefono1,
+          Some(tipoiden.toString),
+          Some(tipoper.toString),
+          Some("04")
+        )
+        val _emisorData = new _EmisorData(
+          //Some("7"),
+          //Some("901180226"),
+          Some("5"),
+          Some("804015942"),
+          Some(31),
+          Some(1)
+        )
+        var _listDetalleData = new ListBuffer[_LsDetalle]()
+        var _listDetalleImpuestoData = new ListBuffer[_LsDetalleImpuesto]()
+        var _totalFactura = 0D
+        var i = 1
+        println("Items:" + f.items)
+        f.items.foreach { items =>
+          items.foreach { item =>
+            val _detalleData = new _LsDetalle(
+              Some("1"),
+              Some("999"),
+              Some("CARTERA"),
+              Some("CARTERA"),
+              item.fait_detalle,
+              Some(i),
+              Some(item.fait_valorunitario.get.toString),
+              Some(item.fait_valorunitario.get.toString),
+              Some(item.fait_valorunitario.get.toString),
+              None,
+              Some("ZZ")
+            )
 
-                             val _detalleImpuestoData = new _LsDetalleImpuesto(Some(item.fait_valorunitario.get.toString),
-                                                                          Some("01"),
-                                                                          Some(false),
-                                                                          None,
-                                                                          Some("0.0"),
-                                                                          Some(i),
-                                                                          Some("0.0"))
-                                                             
-                              i += 1
-                              _totalFactura = _totalFactura + item.fait_valorunitario.get
-                              _listDetalleData += _detalleData                                
-                             _listDetalleImpuestoData += _detalleImpuestoData
-                            }
-                          }
-                          
-                          val _infoMonetarioData = new _InfoMonetarioData(Some("COP"), 
-                                                                          Some("0"), 
-                                                                          Some(_totalFactura.toString), 
-                                                                          Some(_totalFactura.toString), 
-                                                                          Some("0"), 
-                                                                          Some("0"),
-                                                                          Some(_totalFactura.toString),
-                                                                          Some(_totalFactura.toString)
-                                                                          )
+            val _detalleImpuestoData = new _LsDetalleImpuesto(
+              Some(item.fait_valorunitario.get.toString),
+              Some("01"),
+              Some(false),
+              None,
+              Some("0.0"),
+              Some(i),
+              Some("0.0")
+            )
 
-                          val _softwareSeguridadData = new _SoftwareSeguridad(Some(_sSeguridad._1),
-                                                                              Some(prefijo + f.fact_numero.get.toString),
-                                                                              Some(_sSeguridad._2),
-                                                                              Some(_sSeguridad._3),
-                                                                              Some(_sSeguridad._4),
-                                                                              Some(prefijo + f.fact_numero.get.toString),
-                                                                              Some("FAC")
-                                                                              )
+            i += 1
+            _totalFactura = _totalFactura + item.fait_valorunitario.get
+            _listDetalleData += _detalleData
+            _listDetalleImpuestoData += _detalleImpuestoData
+          }
+        }
 
-                          val _formaPagoData = new _LsFormaPago(Some("10"),
-                                                                Some("1"),
-                                                                None)
+        val _infoMonetarioData = new _InfoMonetarioData(
+          Some("COP"),
+          Some("0"),
+          Some(_totalFactura.toString),
+          Some(_totalFactura.toString),
+          Some("0"),
+          Some("0"),
+          Some(_totalFactura.toString),
+          Some(_totalFactura.toString)
+        )
 
-                          var _listNotasData = new ListBuffer[_LsNota]()
-                          _listNotasData += new _LsNota(Some("OFICINAS"),Some(1))
-                          _listNotasData += new _LsNota(Some(" "),Some(2))
-                          _listNotasData += new _LsNota(Some("PRINCIPAL BUCARAMANGA"),Some(3))
-                          _listNotasData += new _LsNota(Some("Carrera 20 No. 36-06 Edificio Sagrada Familia Of. 407"),Some(4))
-                          _listNotasData += new _LsNota(Some("Teléfonos: 6701000 - 3162854212"),Some(5))
-                          _listNotasData += new _LsNota(Some("Bucaramanga"),Some(6))
-                          _listNotasData += new _LsNota(Some(" "),Some(7))
-                          _listNotasData += new _LsNota(Some("SUCURSAL FLORIDABLANCA"),Some(8))
-                          _listNotasData += new _LsNota(Some("Carrera 8 No. 43-03 Lagos II"),Some(9))
-                          _listNotasData += new _LsNota(Some("Teléfonos: 6750757 - 3173836208"),Some(10))
-                          _listNotasData += new _LsNota(Some("Floridablanca"),Some(11))
-                          _listNotasData += new _LsNota(Some(" "),Some(12))
-                          _listNotasData += new _LsNota(Some("Email: fap@fundacionapoyo.com"),Some(13))
-                          _listNotasData += new _LsNota(Some("www.fundacionapoyo.com"),Some(14))
-                          
-                          val _listFormaPagoData = new ListBuffer[_LsFormaPago]()
-                          _listFormaPagoData += _formaPagoData
-                          _rootInterface = new _RootInterface(
-                            Some(_autorizacionData),
-                            Some(_compradorData),
-                            Some(_emisorData),
-                            Some(_encabezadoData),
-                            Some(_infoMonetarioData),
-                            Some(_listDetalleData),
-                            None,
-                            Some(_listDetalleImpuestoData),
-                            None,
-                            None,
-                            Some(_softwareSeguridadData),
-                            None,
-                            None,
-                            Some(_listFormaPagoData),
-                            Some(_listNotasData)
-                          )
-                          println(_rootInterface)
-                          _rootInterface
+        val _softwareSeguridadData = new _SoftwareSeguridad(
+          Some(_sSeguridad._1),
+          Some(prefijo + f.fact_numero.get.toString),
+          Some(_sSeguridad._2),
+          Some(_sSeguridad._3),
+          Some(_sSeguridad._4),
+          Some(prefijo + f.fact_numero.get.toString),
+          Some("FAC")
+        )
+
+        val _formaPagoData = new _LsFormaPago(Some("10"), Some("1"), None)
+
+        var _listNotasData = new ListBuffer[_LsNota]()
+        _listNotasData += new _LsNota(Some("OFICINAS"), Some(1))
+        _listNotasData += new _LsNota(Some(" "), Some(2))
+        _listNotasData += new _LsNota(Some("PRINCIPAL BUCARAMANGA"), Some(3))
+        _listNotasData += new _LsNota(
+          Some("Carrera 20 No. 36-06 Edificio Sagrada Familia Of. 407"),
+          Some(4)
+        )
+        _listNotasData += new _LsNota(
+          Some("Teléfonos: 6701000 - 3162854212"),
+          Some(5)
+        )
+        _listNotasData += new _LsNota(Some("Bucaramanga"), Some(6))
+        _listNotasData += new _LsNota(Some(" "), Some(7))
+        _listNotasData += new _LsNota(Some("SUCURSAL FLORIDABLANCA"), Some(8))
+        _listNotasData += new _LsNota(
+          Some("Carrera 8 No. 43-03 Lagos II"),
+          Some(9)
+        )
+        _listNotasData += new _LsNota(
+          Some("Teléfonos: 6750757 - 3173836208"),
+          Some(10)
+        )
+        _listNotasData += new _LsNota(Some("Floridablanca"), Some(11))
+        _listNotasData += new _LsNota(Some(" "), Some(12))
+        _listNotasData += new _LsNota(
+          Some("Email: fap@fundacionapoyo.com"),
+          Some(13)
+        )
+        _listNotasData += new _LsNota(Some("www.fundacionapoyo.com"), Some(14))
+
+        val _listFormaPagoData = new ListBuffer[_LsFormaPago]()
+        _listFormaPagoData += _formaPagoData
+        _rootInterface = new _RootInterface(
+          Some(_autorizacionData),
+          Some(_compradorData),
+          Some(_emisorData),
+          Some(_encabezadoData),
+          Some(_infoMonetarioData),
+          Some(_listDetalleData),
+          None,
+          Some(_listDetalleImpuestoData),
+          None,
+          None,
+          Some(_softwareSeguridadData),
+          None,
+          None,
+          Some(_listFormaPagoData),
+          Some(_listNotasData)
+        )
+        println(_rootInterface)
+        _rootInterface
 
       }
     }
+
+  // FIN ENVIAR FACTURA
+
+  // ENVIAR NOTA DEBITO
+  def enviarNotaDebito(fact_nota_numero: Long): Future[_RootInterface] =
+    Future[_RootInterface] {
+      db.withConnection { implicit connection =>
+        var _rootInterface = new _RootInterface(
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None
+        )
+        val nd = buscarNotaDebitoPorNumeroDirecto(fact_nota_numero) /* SQL("""SELECT * FROM FACTURA f
+                            WHERE f.FACT_NUMERO = {fact_numero}""").on('fact_numero -> fact_numero).as(Factura._set.singleOpt) */
+        val f = buscarPorNumeroDirecto(nd.fact_numero.get)
+        println("Nota Débito: " + nd)
+        val persona = personaService.obtenerDirecto(
+          nd.id_identificacion.get,
+          nd.id_persona.get
+        )
+        val direccion = persona.direcciones(0)
+        val cod_municipio = direccion.cod_municipio.get
+        val codigo_municipio = "%05d".format(cod_municipio);
+        val depa_id = codigo_municipio.toString.substring(0, 2)
+        println("cod_municipio: " + cod_municipio)
+        println("depa_id :" + depa_id)
+        val _parseAutorizacion = int("FAAU_ID") ~
+          date("FAAU_FECHAFINAL") ~
+          date("FAAU_FECHAINICIO") ~
+          str("FAAU_NUMAUTORIZACION") ~
+          str("FAAU_PREFIJO").? ~
+          int("FAAU_SECUENCIAFINAL") ~
+          int("FAAU_SECUENCIAINICIAL") map {
+          case a ~ b ~ c ~ d ~ e ~ f ~ g => (a, b, c, d, e, f, g)
+        }
+        println("Buscando Autorización para Factura No. " + nd.fact_numero)
+        val autorizacion =
+          SQL("""
+                                SELECT * FROM FAC_AUTORIZACION 
+                                WHERE {fact_numero} BETWEEN FAAU_SECUENCIAINICIAL AND FAAU_SECUENCIAFINAL
+                                ORDER BY FAAU_ID DESC""")
+            .on(
+              'fact_numero -> nd.fact_numero
+            )
+            .as(_parseAutorizacion.single)
+        println("Autorizacion Recibida: " + autorizacion._4)
+        val _parseDepartamento = str("depa_id") ~ str("depa_nombre") map {
+          case a ~ b => (a, b)
+        }
+        val departamento = SQL(
+          """SELECT * FROM DEPARTAMENTO WHERE DEPA_ID = {depa_id}"""
+        ).on('depa_id -> depa_id).as(_parseDepartamento.singleOpt)
+        println("Departamento: " + departamento)
+        val _parseTipoIde = int("fati_id") map { case a => (a) }
+        val tipoiden = SQL(
+          """SELECT FATI_ID FROM FAC_TIPO_IDENTIFICACION WHERE FATI_RELACION = {fati_relacion}"""
+        ).on('fati_relacion -> f.id_identificacion).as(_parseTipoIde.single)
+        println("Tipo Identificacion: " + tipoiden)
+        val _parseTipoPer = int("fatp_id") map { case a => (a) }
+        val tipoper = SQL(
+          """SELECT FATP_ID FROM FAC_TIPO_PERSONA WHERE FATP_RELACION CONTAINING {fati_relacion}"""
+        ).on('fati_relacion -> persona.a.get.id_tipo_persona)
+          .as(_parseTipoPer.single)
+        println("Tipo Persona")
+        val _parseSoftwareSeguridad = str("clave_tecnica") ~ str("guid_empresa") ~ str(
+          "guid_origen"
+        ) ~ str("hash_seguridad") map { case a ~ b ~ c ~ d => (a, b, c, d) }
+        val _sSeguridad =
+          SQL("SELECT * FROM FAC_SOFTWARE_SEGURIDAD WHERE FAAU_ID = {faau_id}")
+            .on(
+              'faau_id -> autorizacion._1
+            )
+            .as(_parseSoftwareSeguridad.single)
+        println("Seguridad")
+        val sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+        val sdd = new SimpleDateFormat("yyyy-MM-dd")
+        val prefijo = autorizacion._5 match {
+          case Some(p) => p
+          case None    => ""
+        }
+
+        val _autorizacionData = new _AutorizacionFactura(
+          Some(sdd.format(autorizacion._2)),
+          Some(sdd.format(autorizacion._3)),
+          Some(autorizacion._4),
+          Some(prefijo),
+          Some(autorizacion._6.toString()),
+          Some(autorizacion._7.toString())
+        )
+
+        val _encabezadoData = new _EncabezadoData(
+          Some("10"),
+          None,
+          None,
+          Some(sdf.format(f.fact_fecha.get.toDate)),
+          None,
+          None,
+          Some("01"),
+          None
+        )
+
+        var _sendemail = persona.d.get.email.exists(_.trim.nonEmpty)
+        var (_ident, _dv) = tipoiden match {
+          case 31 =>
+            var _id = f.id_persona.get.split("-");
+            (_id(0), _id(1))
+          case _ => (f.id_persona.get, "")
+        }
+        val _compradorData = new _CompradorFactura(
+          persona.a.get.primer_apellido,
+          direccion.municipio,
+          Some(direccion.cod_municipio.get.toString),
+          Some(depa_id.toString),
+          Some(depa_id.toString + "0001"),
+          persona.d.get.email,
+          Some(_dv),
+          Some(departamento.get._2),
+          direccion.direccion,
+          Some(_sendemail),
+          Some(_ident),
+          None,
+          Some(
+            persona.a.get.nombre.get.concat(
+              " ".concat(
+                persona.a.get.primer_apellido.get
+                  .concat(" ".concat(persona.a.get.segundo_apellido.get))
+              )
+            )
+          ),
+          Some("COLOMBIA"),
+          Some(f.id_comprobante.toString()),
+          Some("CO"),
+          tipoiden match {
+            case 31 => None
+            case _  => persona.a.get.nombre
+          },
+          tipoiden match {
+            case 31 => persona.a.get.nombre
+            case _  => None
+          },
+          Some("R-99-PN"),
+          direccion.barrio,
+          None,
+          direccion.telefono1,
+          Some(tipoiden.toString),
+          Some(tipoper.toString),
+          Some("04")
+        )
+        val _emisorData = new _EmisorData(
+          //Some("7"),
+          //Some("901180226"),
+          Some("5"),
+          Some("804015942"),
+          Some(31),
+          Some(1)
+        )
+        var _listDetalleData = new ListBuffer[_LsDetalle]()
+        var _listDetalleImpuestoData = new ListBuffer[_LsDetalleImpuesto]()
+        var _totalFactura = 0D
+        var i = 1
+        println("Items:" + nd.items)
+        nd.items.foreach { items =>
+          items.foreach { item =>
+            val _detalleData = new _LsDetalle(
+              Some("1"),
+              Some("999"),
+              Some("CARTERA"),
+              Some("CARTERA"),
+              item.fanoit_detalle,
+              Some(i),
+              Some(item.fanoit_valorunitario.get.toString),
+              Some(item.fanoit_valorunitario.get.toString),
+              Some(item.fanoit_valorunitario.get.toString),
+              None,
+              Some("ZZ")
+            )
+
+            val _detalleImpuestoData = new _LsDetalleImpuesto(
+              Some(item.fanoit_valorunitario.get.toString),
+              Some("01"),
+              Some(false),
+              None,
+              Some("0.0"),
+              Some(i),
+              Some("0.0")
+            )
+
+            i += 1
+            _totalFactura = _totalFactura + item.fanoit_valorunitario.get
+            _listDetalleData += _detalleData
+            _listDetalleImpuestoData += _detalleImpuestoData
+          }
+        }
+
+        val _infoMonetarioData = new _InfoMonetarioData(
+          Some("COP"),
+          Some("0"),
+          Some(_totalFactura.toString),
+          Some(_totalFactura.toString),
+          Some("0"),
+          Some("0"),
+          Some(_totalFactura.toString),
+          Some(_totalFactura.toString)
+        )
+
+        val _softwareSeguridadData = new _SoftwareSeguridad(
+          Some(_sSeguridad._1),
+          Some("FPND" + nd.fact_nota_numero.get.toString),
+          Some(_sSeguridad._2),
+          Some(_sSeguridad._3),
+          Some(_sSeguridad._4),
+          Some("FPND" + nd.fact_nota_numero.get.toString),
+          Some("NDB")
+        )
+
+        val _formaPagoData = new _LsFormaPago(Some("10"), Some("1"), None)
+
+        var _listNotasData = new ListBuffer[_LsNota]()
+        _listNotasData += new _LsNota(Some("OFICINAS"), Some(1))
+        _listNotasData += new _LsNota(Some(" "), Some(2))
+        _listNotasData += new _LsNota(Some("PRINCIPAL BUCARAMANGA"), Some(3))
+        _listNotasData += new _LsNota(
+          Some("Carrera 20 No. 36-06 Edificio Sagrada Familia Of. 407"),
+          Some(4)
+        )
+        _listNotasData += new _LsNota(
+          Some("Teléfonos: 6701000 - 3162854212"),
+          Some(5)
+        )
+        _listNotasData += new _LsNota(Some("Bucaramanga"), Some(6))
+        _listNotasData += new _LsNota(Some(" "), Some(7))
+        _listNotasData += new _LsNota(Some("SUCURSAL FLORIDABLANCA"), Some(8))
+        _listNotasData += new _LsNota(
+          Some("Carrera 8 No. 43-03 Lagos II"),
+          Some(9)
+        )
+        _listNotasData += new _LsNota(
+          Some("Teléfonos: 6750757 - 3173836208"),
+          Some(10)
+        )
+        _listNotasData += new _LsNota(Some("Floridablanca"), Some(11))
+        _listNotasData += new _LsNota(Some(" "), Some(12))
+        _listNotasData += new _LsNota(
+          Some("Email: fap@fundacionapoyo.com"),
+          Some(13)
+        )
+        _listNotasData += new _LsNota(Some("www.fundacionapoyo.com"), Some(14))
+
+        val _listFormaPagoData = new ListBuffer[_LsFormaPago]()
+        _listFormaPagoData += _formaPagoData
+        _rootInterface = new _RootInterface(
+          Some(_autorizacionData),
+          Some(_compradorData),
+          Some(_emisorData),
+          Some(_encabezadoData),
+          Some(_infoMonetarioData),
+          Some(_listDetalleData),
+          None,
+          Some(_listDetalleImpuestoData),
+          None,
+          None,
+          Some(_softwareSeguridadData),
+          None,
+          None,
+          Some(_listFormaPagoData),
+          Some(_listNotasData)
+        )
+        println(_rootInterface)
+        _rootInterface
+
+      }
+    }
+  // FIN NOTA DEBITO
+  // ENVIAR NOTA CREDITO
+  def enviarNotaCredito(fact_nota_numero: Long): Future[_RootInterface] =
+    Future[_RootInterface] {
+      db.withConnection { implicit connection =>
+        var _rootInterface = new _RootInterface(
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None
+        )
+        val nc = buscarNotaCreditoPorNumeroDirecto(fact_nota_numero) /* SQL("""SELECT * FROM FACTURA f
+                            WHERE f.FACT_NUMERO = {fact_numero}""").on('fact_numero -> fact_numero).as(Factura._set.singleOpt) */
+        val f = buscarPorNumeroDirecto(nc.fact_numero.get)
+        println("Nota Débito: " + nc)
+        val persona = personaService.obtenerDirecto(
+          nc.id_identificacion.get,
+          nc.id_persona.get
+        )
+        val direccion = persona.direcciones(0)
+        val cod_municipio = direccion.cod_municipio.get
+        val codigo_municipio = "%05d".format(cod_municipio);
+        val depa_id = codigo_municipio.toString.substring(0, 2)
+        println("cod_municipio: " + cod_municipio)
+        println("depa_id :" + depa_id)
+        val _parseAutorizacion = int("FAAU_ID") ~
+          date("FAAU_FECHAFINAL") ~
+          date("FAAU_FECHAINICIO") ~
+          str("FAAU_NUMAUTORIZACION") ~
+          str("FAAU_PREFIJO").? ~
+          int("FAAU_SECUENCIAFINAL") ~
+          int("FAAU_SECUENCIAINICIAL") map {
+          case a ~ b ~ c ~ d ~ e ~ f ~ g => (a, b, c, d, e, f, g)
+        }
+        println("Buscando Autorización para Factura No. " + nc.fact_numero)
+        val autorizacion =
+          SQL("""
+                                SELECT * FROM FAC_AUTORIZACION 
+                                WHERE {fact_numero} BETWEEN FAAU_SECUENCIAINICIAL AND FAAU_SECUENCIAFINAL
+                                ORDER BY FAAU_ID DESC""")
+            .on(
+              'fact_numero -> nc.fact_numero
+            )
+            .as(_parseAutorizacion.single)
+        println("Autorizacion Recibida: " + autorizacion._4)
+        val _parseDepartamento = str("depa_id") ~ str("depa_nombre") map {
+          case a ~ b => (a, b)
+        }
+        val departamento = SQL(
+          """SELECT * FROM DEPARTAMENTO WHERE DEPA_ID = {depa_id}"""
+        ).on('depa_id -> depa_id).as(_parseDepartamento.singleOpt)
+        println("Departamento: " + departamento)
+        val _parseTipoIde = int("fati_id") map { case a => (a) }
+        val tipoiden = SQL(
+          """SELECT FATI_ID FROM FAC_TIPO_IDENTIFICACION WHERE FATI_RELACION = {fati_relacion}"""
+        ).on('fati_relacion -> f.id_identificacion).as(_parseTipoIde.single)
+        println("Tipo Identificacion: " + tipoiden)
+        val _parseTipoPer = int("fatp_id") map { case a => (a) }
+        val tipoper = SQL(
+          """SELECT FATP_ID FROM FAC_TIPO_PERSONA WHERE FATP_RELACION CONTAINING {fati_relacion}"""
+        ).on('fati_relacion -> persona.a.get.id_tipo_persona)
+          .as(_parseTipoPer.single)
+        println("Tipo Persona")
+        val _parseSoftwareSeguridad = str("clave_tecnica") ~ str("guid_empresa") ~ str(
+          "guid_origen"
+        ) ~ str("hash_seguridad") map { case a ~ b ~ c ~ d => (a, b, c, d) }
+        val _sSeguridad =
+          SQL("SELECT * FROM FAC_SOFTWARE_SEGURIDAD WHERE FAAU_ID = {faau_id}")
+            .on(
+              'faau_id -> autorizacion._1
+            )
+            .as(_parseSoftwareSeguridad.single)
+        println("Seguridad")
+        val sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+        val sdd = new SimpleDateFormat("yyyy-MM-dd")
+        val prefijo = autorizacion._5 match {
+          case Some(p) => p
+          case None    => ""
+        }
+
+        val _autorizacionData = new _AutorizacionFactura(
+          Some(sdd.format(autorizacion._2)),
+          Some(sdd.format(autorizacion._3)),
+          Some(autorizacion._4),
+          Some(prefijo),
+          Some(autorizacion._6.toString()),
+          Some(autorizacion._7.toString())
+        )
+
+        val _encabezadoData = new _EncabezadoData(
+          Some("10"),
+          None,
+          None,
+          Some(sdf.format(f.fact_fecha.get.toDate)),
+          None,
+          None,
+          Some("01"),
+          None
+        )
+
+        var _sendemail = persona.d.get.email.exists(_.trim.nonEmpty)
+        var (_ident, _dv) = tipoiden match {
+          case 31 =>
+            var _id = f.id_persona.get.split("-");
+            (_id(0), _id(1))
+          case _ => (f.id_persona.get, "")
+        }
+        val _compradorData = new _CompradorFactura(
+          persona.a.get.primer_apellido,
+          direccion.municipio,
+          Some(direccion.cod_municipio.get.toString),
+          Some(depa_id.toString),
+          Some(depa_id.toString + "0001"),
+          persona.d.get.email,
+          Some(_dv),
+          Some(departamento.get._2),
+          direccion.direccion,
+          Some(_sendemail),
+          Some(_ident),
+          None,
+          Some(
+            persona.a.get.nombre.get.concat(
+              " ".concat(
+                persona.a.get.primer_apellido.get
+                  .concat(" ".concat(persona.a.get.segundo_apellido.get))
+              )
+            )
+          ),
+          Some("COLOMBIA"),
+          Some(f.id_comprobante.toString()),
+          Some("CO"),
+          tipoiden match {
+            case 31 => None
+            case _  => persona.a.get.nombre
+          },
+          tipoiden match {
+            case 31 => persona.a.get.nombre
+            case _  => None
+          },
+          Some("R-99-PN"),
+          direccion.barrio,
+          None,
+          direccion.telefono1,
+          Some(tipoiden.toString),
+          Some(tipoper.toString),
+          Some("04")
+        )
+        val _emisorData = new _EmisorData(
+          //Some("7"),
+          //Some("901180226"),
+          Some("5"),
+          Some("804015942"),
+          Some(31),
+          Some(1)
+        )
+        var _listDetalleData = new ListBuffer[_LsDetalle]()
+        var _listDetalleImpuestoData = new ListBuffer[_LsDetalleImpuesto]()
+        var _totalFactura = 0D
+        var i = 1
+        println("Items:" + nc.items)
+        nc.items.foreach { items =>
+          items.foreach { item =>
+            val _detalleData = new _LsDetalle(
+              Some("1"),
+              Some("999"),
+              Some("CARTERA"),
+              Some("CARTERA"),
+              item.fanoit_detalle,
+              Some(i),
+              Some(item.fanoit_valorunitario.get.toString),
+              Some(item.fanoit_valorunitario.get.toString),
+              Some(item.fanoit_valorunitario.get.toString),
+              None,
+              Some("ZZ")
+            )
+
+            val _detalleImpuestoData = new _LsDetalleImpuesto(
+              Some(item.fanoit_valorunitario.get.toString),
+              Some("01"),
+              Some(false),
+              None,
+              Some("0.0"),
+              Some(i),
+              Some("0.0")
+            )
+
+            i += 1
+            _totalFactura = _totalFactura + item.fanoit_valorunitario.get
+            _listDetalleData += _detalleData
+            _listDetalleImpuestoData += _detalleImpuestoData
+          }
+        }
+
+        val _infoMonetarioData = new _InfoMonetarioData(
+          Some("COP"),
+          Some("0"),
+          Some(_totalFactura.toString),
+          Some(_totalFactura.toString),
+          Some("0"),
+          Some("0"),
+          Some(_totalFactura.toString),
+          Some(_totalFactura.toString)
+        )
+
+        val _softwareSeguridadData = new _SoftwareSeguridad(
+          Some(_sSeguridad._1),
+          Some("FPNC" + nc.fact_nota_numero.get.toString),
+          Some(_sSeguridad._2),
+          Some(_sSeguridad._3),
+          Some(_sSeguridad._4),
+          Some("FPNC" + nc.fact_nota_numero.get.toString),
+          Some("NCR")
+        )
+
+        val _formaPagoData = new _LsFormaPago(Some("10"), Some("1"), None)
+
+        var _listNotasData = new ListBuffer[_LsNota]()
+        _listNotasData += new _LsNota(Some("OFICINAS"), Some(1))
+        _listNotasData += new _LsNota(Some(" "), Some(2))
+        _listNotasData += new _LsNota(Some("PRINCIPAL BUCARAMANGA"), Some(3))
+        _listNotasData += new _LsNota(
+          Some("Carrera 20 No. 36-06 Edificio Sagrada Familia Of. 407"),
+          Some(4)
+        )
+        _listNotasData += new _LsNota(
+          Some("Teléfonos: 6701000 - 3162854212"),
+          Some(5)
+        )
+        _listNotasData += new _LsNota(Some("Bucaramanga"), Some(6))
+        _listNotasData += new _LsNota(Some(" "), Some(7))
+        _listNotasData += new _LsNota(Some("SUCURSAL FLORIDABLANCA"), Some(8))
+        _listNotasData += new _LsNota(
+          Some("Carrera 8 No. 43-03 Lagos II"),
+          Some(9)
+        )
+        _listNotasData += new _LsNota(
+          Some("Teléfonos: 6750757 - 3173836208"),
+          Some(10)
+        )
+        _listNotasData += new _LsNota(Some("Floridablanca"), Some(11))
+        _listNotasData += new _LsNota(Some(" "), Some(12))
+        _listNotasData += new _LsNota(
+          Some("Email: fap@fundacionapoyo.com"),
+          Some(13)
+        )
+        _listNotasData += new _LsNota(Some("www.fundacionapoyo.com"), Some(14))
+
+        val _listFormaPagoData = new ListBuffer[_LsFormaPago]()
+        _listFormaPagoData += _formaPagoData
+        _rootInterface = new _RootInterface(
+          Some(_autorizacionData),
+          Some(_compradorData),
+          Some(_emisorData),
+          Some(_encabezadoData),
+          Some(_infoMonetarioData),
+          Some(_listDetalleData),
+          None,
+          Some(_listDetalleImpuestoData),
+          None,
+          None,
+          Some(_softwareSeguridadData),
+          None,
+          None,
+          Some(_listFormaPagoData),
+          Some(_listNotasData)
+        )
+        println(_rootInterface)
+        _rootInterface
+
+      }
+    }
+  // FIN NOTA CREDITO
 }

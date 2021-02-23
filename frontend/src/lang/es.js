@@ -39,8 +39,13 @@ export default {
     'menu_contabilidad_menu3libros_menu3-2cajadiario_menu3-2-1consultar': 'Consultar',
     'menu_contabilidad_menu3libros_menu3-2cajadiario_menu3-2-2generar': 'Generar',
     menu_contabilidad_menu4facturaelectronica: 'Facturación',
-    'menu_contabilidad_menu4facturaelectronica_menu4-1list': 'Facturas',
-    'menu_contabilidad_menu4facturaelectronica_menu4-4reprocesar': 'Reprocesar',
+    'menu_contabilidad_menu4facturaelectronica_menu4-1factura': 'Facturas',
+    'menu_contabilidad_menu4facturaelectronica_menu4-1factura_menu4-1-1list': 'Relación',
+    'menu_contabilidad_menu4facturaelectronica_menu4-1factura_menu4-1-4reprocesar': 'Reprocesar',
+    'menu_contabilidad_menu4facturaelectronica_menu4-2nd': 'Notas Débito',
+    'menu_contabilidad_menu4facturaelectronica_menu4-2nd_menu4-2-1list': 'Relación',
+    'menu_contabilidad_menu4facturaelectronica_menu4-3nc': 'Notas Crédito',
+    'menu_contabilidad_menu4facturaelectronica_menu4-3nc_menu4-3-1list': 'Relación',
     menu_credito: 'Crédito',
     'menu_credito_menu1solicitud': 'Solicitud',
     'menu_credito_menu3informe': 'Informe',
@@ -142,6 +147,21 @@ export default {
     thirdparty: 'Conectar con',
     thirdpartyTips: 'No se puede simular en local, así que combine su propia simulación de negocios. ! !'
   },
+  factura: {
+    title: 'FACTURA ELECTRÓNICA',
+    numero: 'Número',
+    fecha: 'Fecha'
+  },
+  notadebito: {
+    title: 'NOTAS DEBITO',
+    numero: 'Número',
+    fecha: 'Fecha'
+  },
+  notacredito: {
+    title: 'NOTAS CREDITO',
+    numero: 'Número',
+    fecha: 'Fecha'
+  },  
   recovery: {
     title: 'Recuperación de Contraseña',
     username: 'Correo Electrónico',

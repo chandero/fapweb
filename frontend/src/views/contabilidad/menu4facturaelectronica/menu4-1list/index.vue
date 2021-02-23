@@ -1,9 +1,0 @@
-<template>
-  <el-container>
-    <el-header>
-      <h3>Facturas</h3>
-    </el-header>
-    <el-main>
-    </el-main>
-  </el-container>
-</template>
