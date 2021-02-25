@@ -39,7 +39,10 @@ class FacturaController @Inject()(
   def buscarPorNumero(fact_numero: Long): Action[AnyContent] = Action.async {
     request =>
       service.buscarPorNumero(fact_numero).map { factura =>
-        Ok(Json.toJson(factura))
+        factura match {
+          case Some(f) => Ok(write(f))
+          case None => NotFound
+        }
       }
   }
 

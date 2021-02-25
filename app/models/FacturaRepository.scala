@@ -216,6 +216,14 @@ case class _LsNota(
     Consecutivo: Option[Int]
 )
 
+case class _ReferenciaFactura(
+    ConceptoNota: Option[Int],
+    DescNatCorreccion: Option[String],
+    NumeroFactura: Option[String],
+    CufeFactura: Option[String],
+    FechaFactura: Option[String]
+)
+
 case class _SoftwareSeguridad(
     ClaveTecnica: Option[String],
     CodigoErp: Option[String],
@@ -236,7 +244,7 @@ case class _RootInterface(
     LsDetalleCargos: Option[Seq[_LsDetalleCargos]],
     LsDetalleImpuesto: Option[Seq[_LsDetalleImpuesto]],
     LsImpuestos: Option[Seq[_LsImpuestos]],
-    ReferenciaFactura: Option[String],
+    ReferenciaFactura: Option[_ReferenciaFactura],
     SoftwareSeguridad: Option[_SoftwareSeguridad],
     lsAnticipos: Option[Seq[_LsAnticipos]],
     lsCargos: Option[Seq[_LsCargos]],
@@ -973,7 +981,9 @@ class FacturaRepository @Inject()(
     Future[Option[Factura]] {
       db.withConnection { implicit connection =>
         val f = SQL(
-          "SELECT * FROM FACTURA WHERE FACT_NUMERO = {fact_numero} AND FACT_ESTADO <> 9"
+          """SELECT  f1.*, gp1.PRIMER_APELLIDO, gp1.SEGUNDO_APELLIDO, gp1.NOMBRE, (SELECT SUM(FAIT_TOTAL) FROM FACTURA_ITEM fi1 WHERE fi1.FACT_NUMERO = f1.FACT_NUMERO) AS FACT_TOTAL FROM FACTURA f1
+                     LEFT JOIN "gen$persona" gp1 ON gp1.ID_IDENTIFICACION = f1.ID_IDENTIFICACION AND gp1.ID_PERSONA = f1.ID_PERSONA
+                     WHERE f1.FACT_ESTADO <> 9 AND f1.FACT_NUMERO = {fact_numero}"""
         ).on(
             'fact_numero -> fact_numero
           )
@@ -1134,7 +1144,9 @@ class FacturaRepository @Inject()(
     db.withConnection { implicit connection =>
       println("Buscando Factura No.:" + fact_numero)
       val f = SQL(
-        "SELECT * FROM FACTURA WHERE FACT_NUMERO = {fact_numero} AND FACT_ESTADO <> 9"
+        """SELECT  f1.*, gp1.PRIMER_APELLIDO, gp1.SEGUNDO_APELLIDO, gp1.NOMBRE, (SELECT SUM(FAIT_TOTAL) FROM FACTURA_ITEM fi1 WHERE fi1.FACT_NUMERO = f1.FACT_NUMERO) AS FACT_TOTAL FROM FACTURA f1
+                     LEFT JOIN "gen$persona" gp1 ON gp1.ID_IDENTIFICACION = f1.ID_IDENTIFICACION AND gp1.ID_PERSONA = f1.ID_PERSONA
+                     WHERE f1.FACT_ESTADO <> 9 AND f1.FACT_NUMERO = {fact_numero}"""
       ).on(
           'fact_numero -> fact_numero
         )
@@ -1477,6 +1489,14 @@ class FacturaRepository @Inject()(
           Some(_totalFactura.toString)
         )
 
+        val _referenciaFactura = new _ReferenciaFactura(
+          None,
+          None,
+          None,
+          None,
+          None
+        )
+
         val _softwareSeguridadData = new _SoftwareSeguridad(
           Some(_sSeguridad._1),
           Some(prefijo + f.fact_numero.get.toString),
@@ -1532,7 +1552,7 @@ class FacturaRepository @Inject()(
           None,
           Some(_listDetalleImpuestoData),
           None,
-          None,
+          Some(_referenciaFactura),
           Some(_softwareSeguridadData),
           None,
           None,
@@ -1761,6 +1781,14 @@ class FacturaRepository @Inject()(
           Some(_totalFactura.toString)
         )
 
+        val _referenciaFactura = new _ReferenciaFactura(
+          None,
+          None,
+          None,
+          None,
+          None
+        )
+
         val _softwareSeguridadData = new _SoftwareSeguridad(
           Some(_sSeguridad._1),
           Some("FPND" + nd.fact_nota_numero.get.toString),
@@ -1816,7 +1844,7 @@ class FacturaRepository @Inject()(
           None,
           Some(_listDetalleImpuestoData),
           None,
-          None,
+          Some(_referenciaFactura),
           Some(_softwareSeguridadData),
           None,
           None,
@@ -2043,6 +2071,14 @@ class FacturaRepository @Inject()(
           Some(_totalFactura.toString)
         )
 
+        val _referenciaFactura = new _ReferenciaFactura(
+          None,
+          None,
+          None,
+          None,
+          None
+        )
+
         val _softwareSeguridadData = new _SoftwareSeguridad(
           Some(_sSeguridad._1),
           Some("FPNC" + nc.fact_nota_numero.get.toString),
@@ -2098,7 +2134,7 @@ class FacturaRepository @Inject()(
           None,
           Some(_listDetalleImpuestoData),
           None,
-          None,
+          Some(_referenciaFactura),
           Some(_softwareSeguridadData),
           None,
           None,

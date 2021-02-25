@@ -39,7 +39,7 @@ class HttpClientController  @Inject()(service: FacturaRepository, http: HttpClie
 
     def gettransactionbyid(f: String, p: String, d: String) = Action.async {
         println("Estoy en el metodo gettransactionbyid")
-        var url = conf.get[String]("urlFacturacion") + "/GetTransaccionbyIdentificacionJson/"+ f + "/" + p + "/" + d
+        var url = conf.get[String]("urlFacturacion") + "/GetTransaccionbyIdentificacion/"+ f + "/" + p + "/" + d
         println("Cree el cliente http")
         var params = collection.immutable.Map[String, String]()
         http.doGet(url, params).map { response =>

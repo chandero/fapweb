@@ -163,44 +163,28 @@
       </el-row>
     </el-main>
     <el-drawer
-      title="Nueva Nota Débito"
       :visible.sync="drawer"
+      :with-header="false"
+      :show-close="true"
       direction="rtl"
-      :with-header="true"
-      size="50%">
-      <el-container>
-        <el-main>
-          <el-form :inline="true" :model="factura">
-            <el-form-item label="Factura Número">
-              <el-input v-model="factura.fact_numero" />
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" icon="el-icon-search" />
-            </el-form-item>
-          </el-form>
-          <el-row :gutter="4">
-            <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-              <b>Fecha</b>
-            </el-col>
-            <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-              <span>{{ factura.fact_fecha }}</span>
-            </el-col>            
-          </el-row>
-        </el-main>
-      </el-container>
-    </el-drawer>    
+      size="80%"
+      :destroy-on-close="true">
+      <nota-factura :tipo="'D'" />
+    </el-drawer>
   </el-container>
 </template>
 <script>
-import VueQueryBuilder from "vue-query-builder";
-import { mapGetters } from "vuex";
+import VueQueryBuilder from "vue-query-builder"
+import NotaFactura from '@/components/NotaFactura'
+import { mapGetters } from "vuex"
 
-import { currency } from "@/utils/math";
-import { getNotasDebito } from "@/api/factura";
+import { currency } from "@/utils/math"
+import { getNotasDebito } from "@/api/factura"
 
 export default {
   components: {
-    "query-builder": VueQueryBuilder
+    "query-builder": VueQueryBuilder,
+    "nota-factura": NotaFactura
   },
   computed: {
     ...mapGetters(["empresa", "usuario"])
@@ -250,10 +234,7 @@ export default {
       current_page: 1,
       total: 0,
       order: "",
-      filter: "",
-      factura: {
-        fact_numero: null
-      }
+      filter: ""
     };
   },
   beforeMount() {

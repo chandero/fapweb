@@ -112,7 +112,7 @@ GET     /api/ofi/obt                    controllers.OficinaController.obtenerLis
 GET     /api/ase/obt                    controllers.AsesorController.obtenerLista
 GET     /api/tesc/obt                   controllers.TipoEstadoColocacionController.obtenerLista
 GET     /api/tess/obt                   controllers.TipoEstadoSolicitudController.obtenerLista
-
+GET     /api/contable/gtpc              controllers.ContabilidadController.obtenerTiposComprobante
 
 # Persona
 GET     /api/pers/ver/:i/:p             controllers.PersonaController.obtener(i:Int , p:String)
