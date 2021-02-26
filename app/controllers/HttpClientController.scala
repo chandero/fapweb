@@ -64,6 +64,30 @@ class HttpClientController  @Inject()(service: FacturaRepository, http: HttpClie
                                 .getOrElse("application/html")
                 Future.successful(Ok.chunked(response.bodyAsSource).as(contentType))
         }
+    }
+    
+    def setnotadebitobyjson(nd: Long) = Action.async { implicit request =>
+        http.enviarNotaDebito(nd).flatMap { response =>
+//            response.flatMap { response =>
+                println("Result: "+ response)
+                val contentType = response.headers
+                                .get("Content-Type")
+                                .flatMap(_.headOption)
+                                .getOrElse("application/html")
+                Future.successful(Ok.chunked(response.bodyAsSource).as(contentType))
+        }
+    }    
+
+    def setnotacreditobyjson(nc: Long) = Action.async { implicit request =>
+        http.enviarNotaCredito(nc).flatMap { response =>
+//            response.flatMap { response =>
+                println("Result: "+ response)
+                val contentType = response.headers
+                                .get("Content-Type")
+                                .flatMap(_.headOption)
+                                .getOrElse("application/html")
+                Future.successful(Ok.chunked(response.bodyAsSource).as(contentType))
+        }
     }    
 
 }

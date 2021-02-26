@@ -41,6 +41,28 @@ class HttpClient @Inject()(ws: WSClient, service:FacturaRepository, conf: Config
         }
     }
 
+    def setNotaDebito(nd: Long) = {
+        service.enviarNotaDebito(nd).map { rootInterface =>
+            // var jsonString = Json.stringify(Json.toJson(rootInterface))
+            implicit val formats = DefaultFormats
+            var jsonString = write(rootInterface)
+            jsonString = "{\"Documento\":" + jsonString + "}"
+            println("json nota debito: " + jsonString)
+            jsonString
+        }
+    }
+    
+    def setNotaCredito(nc: Long) = {
+        service.enviarNotaCredito(nc).map { rootInterface =>
+            // var jsonString = Json.stringify(Json.toJson(rootInterface))
+            implicit val formats = DefaultFormats
+            var jsonString = write(rootInterface)
+            jsonString = "{\"Documento\":" + jsonString + "}"
+            println("json nota crédito: " + jsonString)
+            jsonString
+        }
+    }    
+
     def setDocumentJson(f: Long) = {
          setDocument(f).map { jsonString =>
             var url = conf.get[String]("urlFacturacion") + "/SetDocument"
@@ -52,9 +74,44 @@ class HttpClient @Inject()(ws: WSClient, service:FacturaRepository, conf: Config
          }
     }
 
+    def setNotaDebitoJson(nd: Long) = {
+         setNotaDebito(nd).map { jsonString =>
+            var url = conf.get[String]("urlFacturacion") + "/SetDocument"
+            var params = collection.immutable.Map[String, String]() 
+            println("Cadena ND a Enviar:" + jsonString)
+            doPost(url, jsonString).map { response =>
+                response
+            }
+         }
+    }
+
+    def setNotaCreditoJson(nc: Long) = {
+         setNotaCredito(nc).map { jsonString =>
+            var url = conf.get[String]("urlFacturacion") + "/SetDocument"
+            var params = collection.immutable.Map[String, String]() 
+            println("Cadena NC a Enviar:" + jsonString)
+            doPost(url, jsonString).map { response =>
+                response
+            }
+         }
+    }    
+
     def enviarDocumento(f: Long) = {
         setDocumentJson(f).flatMap { response =>
             response
         }
     }
+
+    def enviarNotaDebito(nd: Long) = {
+        setNotaDebitoJson(nd).flatMap { response =>
+            response
+        }
+    }
+
+    def enviarNotaCredito(nc: Long) = {
+        setNotaDebitoJson(nc).flatMap { response =>
+            response
+        }
+    }
+
  }
