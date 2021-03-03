@@ -78,6 +78,7 @@ class FacturaController @Inject()(
       val empr_id = Utility.extraerEmpresa(request)
       val total = service.cuentaNotaDebito()
       service.todosNotaDebito(page_size, current_page, empr_id.get, orderby, filtro).map { facturas =>
+        println("notas: " + write(facturas))
         Ok(write(new ResultDto(facturas, total)))
     }
   }
@@ -106,6 +107,19 @@ class FacturaController @Inject()(
       service.enviarFactura(fact_numero).map { rootInterface =>
         implicit val formats = DefaultFormats
         Ok(write(rootInterface))
+      }
+  }
+
+  def crearNotaFactura() = authenticatedUserAction.async { implicit request =>
+      val json = request.body.asJson.get
+      var nota = net.liftweb.json.parse(json.toString()).extract[FacturaNota]
+      val usua_id = Utility.extraerUsuario(request)
+      val empr_id = Utility.extraerEmpresa(request)
+      empr_id match {
+        case Some(e) => service.crearNota(nota, usua_id.get).map { result => 
+                          Ok(write(result))
+                        }
+        case None => Future.successful(NotFound)
       }
   }
 

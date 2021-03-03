@@ -126,6 +126,7 @@ POST   /api/soex/                       controllers.SolicitudExternaController.c
 
 # Factura
 GET    /api/fact/bpn/:n                 controllers.FacturaController.buscarPorNumero(n: Long)
+POST   /api/fact/cnf                    controllers.FacturaController.crearNotaFactura
 GET    /api/fact/epn/:n                 controllers.FacturaController.enviarFactura(n: Long)
 GET    /api/fact/end/:n                 controllers.FacturaController.enviarNotaDebito(n: Long)
 GET    /api/fact/enc/:n                 controllers.FacturaController.enviarNotaCredito(n: Long)
@@ -158,6 +159,8 @@ GET    /api/pegr/upd/:c/:d              controllers.ColPeriodoGraciaController.a
 GET    /api/http/status                 controllers.HttpClientController.status
 GET    /api/http/gtbi/:f/:p/:d          controllers.HttpClientController.gettransactionbyid(f: String, p: String, d:String)
 GET    /api/http/st/:f                  controllers.HttpClientController.setdocumentbyjson(f: Int)
+GET    /api/http/stnd/:f                controllers.HttpClientController.setnotadebitobyjson(f: Int)
+GET    /api/http/stnc/:f                controllers.HttpClientController.setnotacreditobyjson(f: Int)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

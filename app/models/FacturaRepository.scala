@@ -69,15 +69,16 @@ case class FacturaNota(
     fact_nota_fecha: Option[DateTime],
     fact_nota_descripcion: Option[String],
     fact_numero: Option[Int],
+    fact_cufe: Option[String],
     id_identificacion: Option[Int],
     id_persona: Option[String],
     id_empleado: Option[String],
-    fact_estado: Option[Int],
+    fact_nota_estado: Option[Int],
     items: Option[Seq[FacturaNotaItem]],
     primer_apellido: Option[String],
     segundo_apellido: Option[String],
     nombre: Option[String],
-    fact_total: Option[Double]
+    fact_nota_total: Option[Double]
 )
 
 case class _AutorizacionFactura(
@@ -885,6 +886,7 @@ object FacturaNota {
       get[Option[DateTime]]("fact_nota_fecha") ~
       get[Option[String]]("fact_nota_descripcion") ~
       get[Option[Int]]("fact_numero") ~
+      get[Option[String]]("fact_cufe") ~
       get[Option[Int]]("id_identificacion") ~
       get[Option[String]]("id_persona") ~
       get[Option[String]]("id_empleado") ~
@@ -898,6 +900,7 @@ object FacturaNota {
             fact_nota_fecha ~
             fact_nota_descripcion ~
             fact_numero ~
+            fact_cufe ~
             id_identificacion ~
             id_persona ~
             id_empleado ~
@@ -912,6 +915,7 @@ object FacturaNota {
           fact_nota_fecha,
           fact_nota_descripcion,
           fact_numero,
+          fact_cufe,
           id_identificacion,
           id_persona,
           id_empleado,
@@ -969,7 +973,8 @@ object FacturaNotaItem {
 
 class FacturaRepository @Inject()(
     dbapi: DBApi,
-    personaService: PersonaRepository
+    personaService: PersonaRepository,
+    usuarioService: UsuarioRepository
 )(implicit ec: DatabaseExecutionContext) {
   private val db = dbapi.database("default")
 
@@ -1064,23 +1069,25 @@ class FacturaRepository @Inject()(
   ): Future[Iterable[FacturaNota]] = Future[Iterable[FacturaNota]] {
     var _list = new ListBuffer[FacturaNota]()
     db.withConnection { implicit connection =>
-      var query = "SELECT FIRST {page_size} SKIP ({page_size} * ({current_page} - 1)) * FROM FACTURA_NOTA fn1 WHERE fn1.FACT_NOTA_TIPO = 'D' AND fn1.FACT_NOTA_ESTADO <> 9"
+      var query = """SELECT FIRST {page_size} SKIP ({page_size} * ({current_page} - 1)) fn1.*, gp1.ID_IDENTIFICACION, gp1.ID_PERSONA, gp1.PRIMER_APELLIDO, gp1.SEGUNDO_APELLIDO, gp1.NOMBRE, (SELECT SUM(FANOIT_TOTAL) FROM FACTURA_NOTA_ITEM fni1 WHERE fni1.FACT_NOTA_TIPO = 'D' AND fni1.FACT_NOTA_NUMERO = fn1.FACT_NOTA_NUMERO) AS FACT_NOTA_TOTAL FROM FACTURA_NOTA fn1
+                     LEFT JOIN FACTURA f1 ON f1.FACT_NUMERO = fn1.FACT_NUMERO
+                     LEFT JOIN "gen$persona" gp1 ON gp1.ID_IDENTIFICACION = f1.ID_IDENTIFICACION AND gp1.ID_PERSONA = f1.ID_PERSONA
+                     WHERE fn1.FACT_NOTA_ESTADO <> 9 AND fn1.FACT_NOTA_TIPO = 'D'"""
       if (!filter.isEmpty) {
         query = query + " AND " + filter
       }
       if (!orderby.isEmpty) {
         query = query + s" ORDER BY $orderby"
       } else {
-        query = query + s" ORDER BY FACT_NOTA_NUMERO DESC"
-      }      
-
+        query = query + s" ORDER BY fn1.FACT_NOTA_NUMERO DESC"
+      }
       val notas = SQL(query).on(
           'page_size -> page_size,
           'current_page -> current_page
         )
         .as(FacturaNota._set *)
       for(nota <- notas) {
-        val items = SQL("""SELECT * FROM FACTURA_NOTA_ITEM fni1 WHERE fn1.FACT_NOTA_TIPO = 'D' AND fni1.FACT_NOTA_NUMERO = {fact_nota_numero}""").
+        val items = SQL("""SELECT * FROM FACTURA_NOTA_ITEM fni1 WHERE fni1.FACT_NOTA_TIPO = 'D' AND fni1.FACT_NOTA_NUMERO = {fact_nota_numero}""").
         on(
           'fact_nota_numero -> nota.fact_nota_numero
         ).as(FacturaNotaItem._set *)
@@ -1094,7 +1101,7 @@ class FacturaRepository @Inject()(
  // NOTA CREDITO
   def cuentaNotaCredito(): Long = {
     db.withConnection { implicit connection =>
-      SQL("""SELECT COUNT(*) FROM FACTURA f1 WHERE f1.FACT_ESTADO <> 9""").as(
+      SQL("""SELECT COUNT(*) FROM FACTURA_NOTA fn1 WHERE fn1.FACT_NOTA_TIPO = 'C' AND fn1.FACT_NOTA_ESTADO <> 9""").as(
         SqlParser.scalar[Long].single
       )
     }
@@ -1109,7 +1116,10 @@ class FacturaRepository @Inject()(
   ): Future[Iterable[FacturaNota]] = Future[Iterable[FacturaNota]] {
     var _list = new ListBuffer[FacturaNota]()
     db.withConnection { implicit connection =>
-      var query = "SELECT FIRST {page_size} SKIP ({page_size} * ({current_page} - 1)) * FROM FACTURA_NOTA fn1 WHERE fn1.FACT_NOTA_TIPO = 'C' AND fn1.FACT_NOTA_ESTADO <> 9"
+      var query = """SELECT FIRST {page_size} SKIP ({page_size} * ({current_page} - 1)) fn1.*, gp1.ID_IDENTIFICACION, gp1.ID_PERSONA, gp1.PRIMER_APELLIDO, gp1.SEGUNDO_APELLIDO, gp1.NOMBRE, (SELECT SUM(FANOIT_TOTAL) FROM FACTURA_NOTA_ITEM fni1 WHERE fni1.FACT_NOTA_TIPO = 'C' AND fni1.FACT_NOTA_NUMERO = fn1.FACT_NOTA_NUMERO) AS FACT_NOTA_TOTAL FROM FACTURA_NOTA fn1
+                     LEFT JOIN FACTURA f1 ON f1.FACT_NUMERO = fn1.FACT_NUMERO
+                     LEFT JOIN "gen$persona" gp1 ON gp1.ID_IDENTIFICACION = f1.ID_IDENTIFICACION AND gp1.ID_PERSONA = f1.ID_PERSONA
+                     WHERE fn1.FACT_NOTA_ESTADO <> 9 AND fn1.FACT_NOTA_TIPO = 'C'"""
       if (!filter.isEmpty) {
         query = query + " AND " + filter
       }
@@ -1191,9 +1201,10 @@ class FacturaRepository @Inject()(
     db.withConnection { implicit connection =>
       println("Buscando Nota Debito No.:" + fact_nota_numero)
       val nd = SQL(
-        """SELECT fn.*, f.ID_IDENTIFICACION, f.ID_PERSONA FROM FACTURA_NOTA fn
-                        INNER JOIN FACTURA f ON f.FACT_NUMERO = fn.FACT_NUMERO
-                        WHERE FACT_NOTA_TIPO = 'D' AND FACT_NOTA_NUMERO = {fact_nota_numero} AND FACT_NOTA_ESTADO <> 9"""
+        """SELECT  fn1.*, gp1.PRIMER_APELLIDO, gp1.SEGUNDO_APELLIDO, gp1.NOMBRE, (SELECT SUM(FANOIT_TOTAL) FROM FACTURA_NOTA_ITEM fni1 WHERE fni1.FACT_NOTA_NUMERO = fn1.FACT_NOTA_NUMERO) AS FACT_NOTA_TOTAL FROM FACTURA_NOTA fn1
+                     LEFT JOIN FACTURA f1 ON f1.FACT_NUMERO = fn1.FACT_NUMERO
+                     LEFT JOIN "gen$persona" gp1 ON gp1.ID_IDENTIFICACION = f1.ID_IDENTIFICACION AND gp1.ID_PERSONA = f1.ID_PERSONA
+                     WHERE fn1.FACT_NOTA_ESTADO <> 9 AND fn1.FACT_NOTA_TIPO = 'D' AND fn1.FACT_NOTA_NUMERO = {fact_nota_numero}"""
       ).on(
           'fact_nota_numero -> fact_nota_numero
         )
@@ -1223,6 +1234,7 @@ class FacturaRepository @Inject()(
             None,
             None,
             None,
+            None,
             None
           )
           nota
@@ -1238,9 +1250,10 @@ class FacturaRepository @Inject()(
     db.withConnection { implicit connection =>
       println("Buscando Nota Credito No.:" + fact_nota_numero)
       val nc = SQL(
-        """SELECT fn.*, f.ID_IDENTIFICACION, f.ID_PERSONA FROM FACTURA_NOTA fn
-                        INNER JOIN FACTURA f ON f.FACT_NUMERO = fn.FACT_NUMERO
-                        WHERE FACT_NOTA_TIPO = 'C' AND FACT_NOTA_NUMERO = {fact_nota_numero} AND FACT_NOTA_ESTADO <> 9"""
+        """SELECT  fn1.*, gp1.PRIMER_APELLIDO, gp1.SEGUNDO_APELLIDO, gp1.NOMBRE, (SELECT SUM(FANOIT_TOTAL) FROM FACTURA_NOTA_ITEM fni1 WHERE fni1.FACT_NOTA_NUMERO = fn1.FACT_NOTA_NUMERO) AS FACT_NOTA_TOTAL FROM FACTURA_NOTA fn1
+                     LEFT JOIN FACTURA f1 ON f1.FACT_NUMERO = fn1.FACT_NUMERO
+                     LEFT JOIN "gen$persona" gp1 ON gp1.ID_IDENTIFICACION = f1.ID_IDENTIFICACION AND gp1.ID_PERSONA = f1.ID_PERSONA
+                     WHERE fn1.FACT_NOTA_ESTADO <> 9 AND fn1.FACT_NOTA_TIPO = 'C' AND fn1.FACT_NOTA_NUMERO = {fact_nota_numero}"""
       ).on(
           'fact_nota_numero -> fact_nota_numero
         )
@@ -1257,6 +1270,7 @@ class FacturaRepository @Inject()(
           nota
         case None =>
           var nota = new FacturaNota(
+            None,
             None,
             None,
             None,
@@ -1566,6 +1580,99 @@ class FacturaRepository @Inject()(
     }
 
   // FIN ENVIAR FACTURA
+
+  // CREAR NOTA
+
+  def crearNota(nota: FacturaNota, usua_id: Long): Future[Long] = {
+    val hoy = Calendar.getInstance().getTime()
+    db.withConnection { implicit connection =>
+      // Buscar Consecutivo
+      val fact_nota_numero = nota.fact_nota_tipo match {
+        case Some(t) => t match {
+          case "D" => SQL("SELECT GEN_ID(GEN_FACTURA_NOTA_DEBITO_NUMERO, 1) FROM RDB$DATABASE;").as(SqlParser.scalar[Long].single)
+          case "C" => SQL("SELECT GEN_ID(GEN_FACTURA_NOTA_CREDITO_NUMERO, 1) FROM RDB$DATABASE;").as(SqlParser.scalar[Long].single)
+        }
+        case None => -1
+      }
+
+      val queryNota = """INSERT INTO FACTURA_NOTA (
+                    FACT_NOTA_TIPO, 
+                    FACT_NOTA_NUMERO, 
+                    FACT_NOTA_FECHA, 
+                    FACT_NOTA_DESCRIPCION, 
+                    FACT_NUMERO, 
+                    FACT_CUFE, 
+                    FACT_NOTA_ESTADO, 
+                    ID_EMPLEADO) VALUES (
+                    {FACT_NOTA_TIPO},
+                    {FACT_NOTA_NUMERO},
+                    {FACT_NOTA_FECHA},
+                    {FACT_NOTA_DESCRIPCION},
+                    {FACT_NUMERO},
+                    {FACT_CUFE},
+                    {FACT_NOTA_ESTADO},
+                    {ID_EMPLEADO}
+                  ) RETURNING FACT_NUMERO"""
+      val queryItem = """INSERT INTO FACTURA_NOTA_ITEM (
+                      FACT_NOTA_TIPO,
+                      FACT_NOTA_NUMERO,
+                      FANOIT_DETALLE,
+                      FANOIT_CANTIDAD,
+                      FANOIT_VALORUNITARIO,
+                      FANOIT_TASAIVA,
+                      FANOIT_VALORIVA,
+                      FANOIT_TOTAL
+                     ) VALUES (
+                      {FACT_NOTA_TIPO},
+                      {FACT_NOTA_NUMERO},
+                      {FANOIT_DETALLE},
+                      {FANOIT_CANTIDAD},
+                      {FANOIT_VALORUNITARIO},
+                      {FANOIT_TASAIVA},
+                      {FANOIT_VALORIVA},
+                      {FANOIT_TOTAL}
+                     )"""
+        // Buscar Empleado
+        val empleado = usuarioService.buscarPorIdDirecto(usua_id)
+        Future.successful(empleado match {
+            case Some(user) =>
+              // Crear Encabezado Nota
+              val creado = SQL(queryNota)
+              .on(
+                'FACT_NOTA_TIPO -> nota.fact_nota_tipo,
+                'FACT_NOTA_NUMERO -> fact_nota_numero,
+                'FACT_NOTA_FECHA -> hoy,
+                'FACT_NOTA_DESCRIPCION -> nota.fact_nota_descripcion,
+                'FACT_NUMERO -> nota.fact_numero,
+                'FACT_CUFE -> nota.fact_cufe,
+                'FACT_NOTA_ESTADO -> 1,
+                'ID_EMPLEADO -> user.id_empleado
+              ).executeInsert().get > 0
+
+              if (creado) {
+                nota.items match { 
+                  case Some(items) => items.map { item => 
+                                        SQL(queryItem)
+                                        .on(
+                                          'FACT_NOTA_TIPO -> nota.fact_nota_tipo,
+                                          'FACT_NOTA_NUMERO -> fact_nota_numero,
+                                          'FANOIT_DETALLE -> item.fanoit_detalle,
+                                          'FANOIT_CANTIDAD -> item.fanoit_cantidad,
+                                          'FANOIT_VALORUNITARIO -> item.fanoit_valorunitario,
+                                          'FANOIT_TASAIVA -> item.fanoit_tasaiva,
+                                          'FANOIT_VALORIVA -> item.fanoit_valoriva,
+                                          'FANOIT_TOTAL -> item.fanoit_total
+                                        ).executeInsert()
+                                      }
+                  case None => 0L
+
+                }
+              }
+              fact_nota_numero
+            case None => 0L
+          })
+    }
+  }
 
   // ENVIAR NOTA DEBITO
   def enviarNotaDebito(fact_nota_numero: Long): Future[_RootInterface] =

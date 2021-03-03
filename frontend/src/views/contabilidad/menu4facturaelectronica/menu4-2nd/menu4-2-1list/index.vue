@@ -43,9 +43,9 @@
                     :summary-method="getSummaries"
                     show-summary
                   >
-                    <el-table-column label="Detalle">
+                    <el-table-column label="Detalle" width="350">
                       <template slot-scope="item">
-                        <span>{{ item.row.fait_detalle }}</span>
+                        <span>{{ item.row.fanoit_detalle }}</span>
                       </template>
                     </el-table-column>
                     <el-table-column
@@ -55,24 +55,24 @@
                     >
                       <template slot-scope="item">
                         <span>{{
-                          item.row.fait_valorunitario | currency_2("$")
+                          item.row.fanoit_valorunitario | currency_2("$")
                         }}</span>
                       </template>
                     </el-table-column>
                     <el-table-column label="Qty" width="80">
                       <template slot-scope="item">
-                        <span>{{ item.row.fait_cantidad }}</span>
+                        <span>{{ item.row.fanoit_cantidad }}</span>
                       </template>
                     </el-table-column>
                     <el-table-column label="Tasa Iva" width="80">
                       <template slot-scope="item">
-                        <span>{{ item.row.fait_tasaiva }}%</span>
+                        <span>{{ item.row.fanoit_tasaiva }}%</span>
                       </template>
                     </el-table-column>
                     <el-table-column label="Vr. Iva" align="right" width="120">
                       <template slot-scope="item">
                         <span>{{
-                          item.row.fait_valoriva | currency_2("$")
+                          item.row.fanoit_valoriva | currency_2("$")
                         }}</span>
                       </template>
                     </el-table-column>
@@ -83,7 +83,7 @@
                       width="120"
                     >
                       <template slot-scope="item">
-                        <span>{{ item.row.fait_total | currency_2("$") }}</span>
+                        <span>{{ item.row.fanoit_total | currency_2("$") }}</span>
                       </template>
                     </el-table-column>
                   </el-table>
@@ -91,27 +91,22 @@
               </el-table-column>
               <el-table-column label="Número">
                 <template slot-scope="scope">
-                  <span>{{ scope.row.fact_numero }}</span>
+                  <span>{{ scope.row.fact_nota_numero }}</span>
                 </template>
               </el-table-column>
               <el-table-column label="Fecha" width="150">
                 <template slot-scope="scope">
-                  <span>{{ scope.row.fact_fecha | moment("YYYY-MM-DD") }}</span>
+                  <span>{{ scope.row.fact_nota_fecha | moment("YYYY-MM-DD") }}</span>
                 </template>
               </el-table-column>
               <el-table-column label="Descripción" width="350">
                 <template slot-scope="scope">
-                  <span>{{ scope.row.fact_descripcion }}</span>
+                  <span>{{ scope.row.fact_nota_descripcion }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Tp. Compr." width="100">
+              <el-table-column label="Factura" width="100">
                 <template slot-scope="scope">
-                  <span>{{ scope.row.tipo_comprobante }}</span>
-                </template>
-              </el-table-column>
-              <el-table-column label="Comprobante" width="100">
-                <template slot-scope="scope">
-                  <span>{{ scope.row.id_comprobante }}</span>
+                  <span>{{ scope.row.fact_numero }}</span>
                 </template>
               </el-table-column>
               <el-table-column label="Tp. Id.">
@@ -141,9 +136,23 @@
               </el-table-column>
               <el-table-column label="Total" width="120" align="right">
                 <template slot-scope="scope">
-                  <span>{{ scope.row.fact_total | currency_2("$") }}</span>
+                  <span>{{ scope.row.fact_nota_total | currency_2("$") }}</span>
                 </template>
               </el-table-column>
+              <el-table-column
+                fixed="right"
+                label=""
+                width="140">
+                <template slot-scope="scope">
+                  <el-dropdown :split-button="true" size="mini" type="primary" trigger="click">
+                    Acciones
+                    <el-dropdown-menu slot="dropdown">
+                      <el-dropdown-item><div @click="Ver(scope.row.fact_nota_numero)"><i class="el-icon-success" title="Ver Pdf" />Ver Pdf</div></el-dropdown-item>
+                      <el-dropdown-item><div @click="reEnviar(scope.row.fact_nota_numero)"><i class="el-icon-refresh" title="Reenviar a la Dian" />Reenviar</div></el-dropdown-item>
+                    </el-dropdown-menu>
+                  </el-dropdown>
+                </template>
+              </el-table-column>              
             </el-table>
             <el-pagination
               @size-change="handleSizeChange"
@@ -179,7 +188,7 @@ import NotaFactura from '@/components/NotaFactura'
 import { mapGetters } from "vuex"
 
 import { currency } from "@/utils/math"
-import { getNotasDebito } from "@/api/factura"
+import { getNotasDebito, enviarNotaDebito } from "@/api/factura"
 
 export default {
   components: {
@@ -312,6 +321,20 @@ export default {
         this.total = response.data.total;
         this.tableData = response.data.data;
       });
+    },
+    reEnviar(fact_nota_numero) {
+      this.$confirm('Seguro de Reenviar la Nota Débito ' + fact_nota_numero + '?', 'Confirmación', {
+          confirmButtonText: 'Si',
+          cancelButtonText: 'No',
+          type: 'warning'
+        }).then(() => {
+          enviarNotaDebito(fact_nota_numero)
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: 'Reenvio cancelad'
+          });          
+        });
     }
   }
 };

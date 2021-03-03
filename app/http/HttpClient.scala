@@ -15,7 +15,23 @@ import net.liftweb.json.Serialization.write
 
 import models._
 
+import play.api.libs.ws.ahc.AhcWSResponse
+import play.api.libs.ws.ahc.cache.CacheableHttpResponseStatus
+import play.shaded.ahc.org.asynchttpclient.Response
+import play.shaded.ahc.io.netty.handler.codec.http.DefaultHttpHeaders
+import play.api.libs.ws.ahc.cache.CacheableHttpResponseBodyPart
+import play.shaded.ahc.org.asynchttpclient.uri.Uri
+
 class HttpClient @Inject()(ws: WSClient, service:FacturaRepository, conf: Configuration)(implicit ec: ExecutionContext) {
+
+    def testResponse(jsonString: String) = {
+        val respBuilder = new Response.ResponseBuilder()
+        respBuilder.accumulate(new CacheableHttpResponseStatus(Uri.create("http://localhost:9000/api/service"), 202, "status text", "json"))
+        respBuilder.accumulate(new DefaultHttpHeaders().add("Content-Type", "application/json"))
+        respBuilder.accumulate(new CacheableHttpResponseBodyPart(jsonString.getBytes(), true))
+        val resp = new AhcWSResponse(respBuilder.build())
+        resp
+    }
 
     def doGet(url: String, parametros: Map[String,String] ): Future[WSResponse] = {
         //val r = requests.get(url, params = parametros)
@@ -76,23 +92,31 @@ class HttpClient @Inject()(ws: WSClient, service:FacturaRepository, conf: Config
 
     def setNotaDebitoJson(nd: Long) = {
          setNotaDebito(nd).map { jsonString =>
+            // Por el momento No Enviar
+            /*
             var url = conf.get[String]("urlFacturacion") + "/SetDocument"
             var params = collection.immutable.Map[String, String]() 
             println("Cadena ND a Enviar:" + jsonString)
             doPost(url, jsonString).map { response =>
                 response
             }
+            */
+            Future.successful(testResponse(jsonString))
          }
     }
 
     def setNotaCreditoJson(nc: Long) = {
          setNotaCredito(nc).map { jsonString =>
+            // Por el momento No Enviar
+            /*            
             var url = conf.get[String]("urlFacturacion") + "/SetDocument"
             var params = collection.immutable.Map[String, String]() 
             println("Cadena NC a Enviar:" + jsonString)
             doPost(url, jsonString).map { response =>
                 response
             }
+            */
+            Future.successful(testResponse(jsonString))
          }
     }    
 

@@ -163,6 +163,12 @@ class UsuarioRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutionCo
       }
     }
 
+    def buscarPorIdDirecto(id: Long): Option[Usuario] = {
+      db.withConnection { implicit connection => 
+        SQL("SELECT * FROM \"gen$empleado\" u WHERE u.id = {id}").on('id -> id).as(Usuario.usuarioRS.singleOpt)
+      }
+    }
+
     /**
     * Recuperar un usuario por su usua_email
     */

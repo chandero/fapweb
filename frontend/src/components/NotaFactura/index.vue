@@ -6,7 +6,7 @@
     <el-main>
       <el-form :inline="true" :model="factura">
         <el-form-item label="Factura Número">
-          <el-input v-model="factura.fact_numero" />
+          <el-input v-model="factura.fact_numero" @change="factura.fact_numero=parseInt($event)" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" icon="el-icon-search" @click="getFacturaPorNumero" />
@@ -121,8 +121,8 @@
       </el-row>
       <el-row>
         <el-col :span="24">
-          <b>Factura CUFE:</b>{{ this.nota.cufefactura }}
-          <el-button type="success" size="mini" v-if="this.nota.cufefactura" @click="facturaVisible=true">Ver Factura</el-button>
+          <b>Factura CUFE:</b>{{ this.nota.fact_cufe }}
+          <el-button type="success" size="mini" v-if="this.nota.fact_cufe" @click="facturaVisible=true">Ver Factura</el-button>
         </el-col>
       </el-row>
       <el-row>
@@ -143,7 +143,7 @@
               type="textarea"
               :rows="3"
               placeholder="Digite aquí la descripción" 
-              v-model="nota.descnatcorreccion"
+              v-model="nota.fact_nota_descripcion"
               maxlength="250"/>
           </el-form-item>
         </el-col>
@@ -253,7 +253,7 @@
       </el-row>
       <el-row>
         <el-col>
-          <el-button type="primary" icon="el-icon-files">Crear y Enviar Nota</el-button>
+          <el-button type="primary" icon="el-icon-files" @click="crearNota">Crear y Enviar Nota</el-button>
         </el-col>
       </el-row>
       </el-form>
@@ -275,7 +275,7 @@
 </template>
 <script>
 import { currency } from '@/utils/math'
-import { getFactura, getFacturaProveedor } from '@/api/factura'
+import { getFactura, getFacturaProveedor, crearNotaDebito, crearNotaCredito, enviarNotaDebito, enviarNotaCredito } from '@/api/factura'
 import { obtenerTiposComprobante } from '@/api/contabilidad'
 import { obtenerListaTipoIdentificacion } from '@/api/tipos'
 
@@ -306,8 +306,9 @@ export default {
       tipo_identificacion: [],
       nota: {
         fact_nota_tipo: null,
-        descnatcorreccion: null,
-        cufefactura: null,
+        fact_nota_descripcion: null,
+        fact_cufe: null,
+        fact_numero: null,
         items: []
       },
       item: {
@@ -357,6 +358,46 @@ export default {
     })
   },
   methods: {
+    crearNota () {
+      this.$confirm('Seguro de Crear y Enviar la Nueva Nota?', 'Atención', {
+        confirmButtonText: 'Si',
+        cancelButtonText: 'No',
+        type: 'warning'
+      }).then(() => {
+        this.nota.fact_numero = this.factura.fact_numero
+        if (this.nota.fact_nota_tipo === 'D') {
+          crearNotaDebito(this.nota).then(response => {
+            if (response.status === 200) {
+              if (response.data > 0) {
+                enviarNotaDebito(response.data)
+              } else {
+                this.$alert('No se pudo crear la Nota', 'Error', {
+                  confirmButtonText: 'Ok',
+                })
+              }
+            }
+          })
+        } else if (this.nota.fact_nota_tipo === 'C')
+        {
+          crearNotaCredito(this.nota).then(response =>{
+            if (response.status === 200) {
+              if (response.data > 0) {
+                enviarNotaCredito(response.data)
+              } else {
+                this.$alert('No se pudo crear la Nota', 'Error', {
+                  confirmButtonText: 'Ok',
+                })
+              }
+            }
+          })
+        }
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: 'Creación Cancelada'
+        })
+      })
+    },
     getSummaries(param) {
       const { columns, data } = param
       const sums = []
@@ -434,8 +475,8 @@ export default {
     getCufe () {
       const periodo = this.$moment(this.factura.fact_fecha).format('YYYYMM')
       getFacturaProveedor(this.factura.fact_numero, periodo).then(response =>{
-        this.nota.cufefactura = response.data.GetTransaccionbyIdentificacionResult.CodigoTransaccion
-        if (this.nota.cufefactura) {
+        this.nota.fact_cufe = response.data.GetTransaccionbyIdentificacionResult.CodigoTransaccion
+        if (this.nota.fact_cufe) {
           this.factura_pdf = 'data:application/pdf;base64,' + response.data.GetTransaccionbyIdentificacionResult.PDFBase64
         }
       })

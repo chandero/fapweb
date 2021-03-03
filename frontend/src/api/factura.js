@@ -1,5 +1,27 @@
 import request from '@/utils/request'
 
+export function crearNotaDebito (nota) {
+  const data = {
+    nota
+  }
+  return request({
+    url: '/fact/cnf',
+    method: 'post',
+    data: data.nota
+  })
+}
+
+export function crearNotaCredito (nota) {
+  const data = {
+    nota
+  }
+  return request({
+    url: '/fact/cnf',
+    method: 'post',
+    data: data.nota
+  })
+}
+
 export function getFactura(fact_numero) {
     const data = {
         fact_numero
@@ -61,4 +83,24 @@ export function getNotasCredito(page_size, current_page, filter, orderby) {
       method: 'post',
       data: data
     })
+}
+
+export function enviarNotaDebito(fact_nota_numero) {
+  const data = {
+    fact_nota_numero
+  }
+  return request({
+    url: '/http/stnd/' + data.fact_nota_numero,
+    method: 'get'
+  })
+}
+
+export function enviarNotaCredito(fact_nota_numero) {
+  const data = {
+    fact_nota_numero
+  }
+  return request({
+    url: '/http/stnc/' + data.fact_nota_numero,
+    method: 'get'
+  })
 }
