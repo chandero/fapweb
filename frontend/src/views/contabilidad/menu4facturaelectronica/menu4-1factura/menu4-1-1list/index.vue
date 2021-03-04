@@ -16,17 +16,16 @@
           <el-table 
             v-loading="loading" 
             :data="tableData" 
-            highlight-current-row 
+            stripe
             style="width: 100%; font-size: 12px;" 
             max-height="350" 
-            @current-change="handleCurrentChange"
             @sort-change="handleSort"
-            @filter-change="handleFilter">
+            >
             <el-table-column type="selection" width="35" />
             <el-table-column type="expand" width="35">
               <template slot-scope="scope">
-                <el-table :data="scope.row.items" :summary-method="getSummaries" show-summary>
-                  <el-table-column label="Detalle">
+                <el-table :data="scope.row.items" :summary-method="getSummaries" show-summary stripe>
+                  <el-table-column label="Detalle" width="350px">
                     <template slot-scope="item">
                       <span>{{ item.row.fait_detalle }}</span>
                     </template>
@@ -113,7 +112,23 @@
               <template slot-scope="scope">
                 <span>{{ scope.row.fact_total | currency_2('$') }}</span>
               </template>
-            </el-table-column>            
+            </el-table-column>
+            <el-table-column
+              fixed="right"
+              label=""
+              width="120">
+              <template slot-scope="scope">
+                <el-dropdown size="mini" @command="handleCommand">
+                  <el-button size="mini" type="primary">
+                    Acciones<i class="el-icon-arrow-down el-icon--right"></i>
+                  </el-button>
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item icon="el-icon-view" :command="{ 'method': 1, 'param': { 'fact_numero': scope.row.fact_numero, 'fact_fecha': scope.row.fact_fecha } }">Ver Pdf</el-dropdown-item>
+                    <el-dropdown-item icon="el-icon-upload" :command="{ 'method': 2, 'param': scope.row.fact_numero }">Reenviar</el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
+              </template>
+            </el-table-column>
           </el-table>
           <el-pagination
             @size-change="handleSizeChange"
@@ -126,6 +141,17 @@
       </el-row>
       </el-container>
     </el-main>
+    <el-dialog
+      :visible.sync="facturaVisible"
+      :append-to-body="true"
+      width="80%"
+      height="80%"
+    >
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" size="mini" @click="facturaVisible = false">Cerrar</el-button>
+      </div>
+      <iframe :src="factura_pdf" width="100%" height="600px"/>
+    </el-dialog>    
   </el-container>
 </template>
 <script>
@@ -133,7 +159,7 @@ import VueQueryBuilder from 'vue-query-builder'
 import { mapGetters } from 'vuex'
 
 import { currency } from '@/utils/math'
-import { getFacturas } from '@/api/factura'
+import { getFacturas, enviarFactura, getFacturaProveedor } from '@/api/factura'
 
 export default {
   components: {
@@ -189,7 +215,10 @@ export default {
       current_page: 1,
       total: 0,
       order: '',
-      filter: ''
+      filter: '',
+      fact_cufe: null,
+      factura_pdf: null,
+      facturaVisible: false
     }
   },
   beforeMount () {
@@ -197,18 +226,22 @@ export default {
   },
   methods: {
     handleFilter (filters) {
+      console.log('disparando filtro')
       this.filter = JSON.stringify(filters)
       this.getData()
     },    
     handleCurrentChange (val) {
+      console.log('disparando current change')
       this.current_page = val
       this.getData()
     },
     handleSizeChange (val) {
+      console.log('disparando size change')
       this.page_size = val
       this.getData()
     },    
     handleSort ({ column, prop, order }) {
+      console.log('disparando sort')
       console.log('column:' + JSON.stringify(column))
       console.log('prop:' + prop)
       console.log('order:' + order)
@@ -257,7 +290,59 @@ export default {
         this.total = response.data.total
         this.tableData = response.data.data
       })
-    }
+    },
+    reEnviar(fact_numero) {
+      this.$confirm('Seguro de Reenviar la Factura ' + fact_numero + '?', 'Confirmación', {
+          confirmButtonText: 'Si',
+          cancelButtonText: 'No',
+          type: 'warning'
+        }).then(() => {
+          enviarFactura(fact_numero).then(response => {
+            if (response.status === 200) {
+              // se debe verificar la aceptacion
+              this.$notify.info({
+                title: 'Información',
+                message: 'Factura Reenviada'
+              })
+            }
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: 'Reenvio cancelado'
+          });          
+        });
+    },
+    handleCommand(command) {
+      switch (command.method) {
+        case 1: this.verPdf(command.param)
+           break
+        case 2: this.reEnviar(command.param)
+           break
+      }
+    },
+    verPdf (param) {
+      console.log("param:" + JSON.stringify(param))
+      this.$notify.info({
+        title: 'Información',
+        message: 'Estamos contactando con el proveedor tecnológico'
+      })
+      const fact_numero = param.fact_numero
+      const fact_fecha = param.fact_fecha
+      const periodo = this.$moment(fact_fecha).format('YYYYMM')
+      getFacturaProveedor(fact_numero, periodo).then(response => {
+        this.fact_cufe = response.data.GetTransaccionbyIdentificacionResult.CodigoTransaccion
+        if (this.fact_cufe) {
+          this.factura_pdf = 'data:application/pdf;base64,' + response.data.GetTransaccionbyIdentificacionResult.PDFBase64
+          this.facturaVisible = true
+        } else {
+          this.$notify.error({
+            title: 'Error',
+            message: 'Factura No Enviada al Proveedor Tecnológico'
+          })
+        }
+      })
+    }    
   }
 }
 </script>

@@ -1201,7 +1201,7 @@ class FacturaRepository @Inject()(
     db.withConnection { implicit connection =>
       println("Buscando Nota Debito No.:" + fact_nota_numero)
       val nd = SQL(
-        """SELECT  fn1.*, gp1.PRIMER_APELLIDO, gp1.SEGUNDO_APELLIDO, gp1.NOMBRE, (SELECT SUM(FANOIT_TOTAL) FROM FACTURA_NOTA_ITEM fni1 WHERE fni1.FACT_NOTA_NUMERO = fn1.FACT_NOTA_NUMERO) AS FACT_NOTA_TOTAL FROM FACTURA_NOTA fn1
+        """SELECT  fn1.*, gp1.ID_IDENTIFICACION, gp1.ID_PERSONA, gp1.PRIMER_APELLIDO, gp1.SEGUNDO_APELLIDO, gp1.NOMBRE, (SELECT SUM(FANOIT_TOTAL) FROM FACTURA_NOTA_ITEM fni1 WHERE fni1.FACT_NOTA_NUMERO = fn1.FACT_NOTA_NUMERO) AS FACT_NOTA_TOTAL FROM FACTURA_NOTA fn1
                      LEFT JOIN FACTURA f1 ON f1.FACT_NUMERO = fn1.FACT_NUMERO
                      LEFT JOIN "gen$persona" gp1 ON gp1.ID_IDENTIFICACION = f1.ID_IDENTIFICACION AND gp1.ID_PERSONA = f1.ID_PERSONA
                      WHERE fn1.FACT_NOTA_ESTADO <> 9 AND fn1.FACT_NOTA_TIPO = 'D' AND fn1.FACT_NOTA_NUMERO = {fact_nota_numero}"""
@@ -1250,7 +1250,7 @@ class FacturaRepository @Inject()(
     db.withConnection { implicit connection =>
       println("Buscando Nota Credito No.:" + fact_nota_numero)
       val nc = SQL(
-        """SELECT  fn1.*, gp1.PRIMER_APELLIDO, gp1.SEGUNDO_APELLIDO, gp1.NOMBRE, (SELECT SUM(FANOIT_TOTAL) FROM FACTURA_NOTA_ITEM fni1 WHERE fni1.FACT_NOTA_NUMERO = fn1.FACT_NOTA_NUMERO) AS FACT_NOTA_TOTAL FROM FACTURA_NOTA fn1
+        """SELECT  fn1.*, gp1.ID_IDENTIFICACION, gp1.ID_PERSONA, gp1.PRIMER_APELLIDO, gp1.SEGUNDO_APELLIDO, gp1.NOMBRE, (SELECT SUM(FANOIT_TOTAL) FROM FACTURA_NOTA_ITEM fni1 WHERE fni1.FACT_NOTA_NUMERO = fn1.FACT_NOTA_NUMERO) AS FACT_NOTA_TOTAL FROM FACTURA_NOTA fn1
                      LEFT JOIN FACTURA f1 ON f1.FACT_NUMERO = fn1.FACT_NUMERO
                      LEFT JOIN "gen$persona" gp1 ON gp1.ID_IDENTIFICACION = f1.ID_IDENTIFICACION AND gp1.ID_PERSONA = f1.ID_PERSONA
                      WHERE fn1.FACT_NOTA_ESTADO <> 9 AND fn1.FACT_NOTA_TIPO = 'C' AND fn1.FACT_NOTA_NUMERO = {fact_nota_numero}"""
@@ -1464,8 +1464,8 @@ class FacturaRepository @Inject()(
             val _detalleData = new _LsDetalle(
               Some("1"),
               Some("999"),
-              Some("CARTERA"),
-              Some("CARTERA"),
+              Some(item.fait_detalle.get),
+              Some(item.fait_detalle.get),
               item.fait_detalle,
               Some(i),
               Some(item.fait_valorunitario.get.toString),
@@ -1777,10 +1777,10 @@ class FacturaRepository @Inject()(
           Some("10"),
           None,
           None,
-          Some(sdf.format(f.fact_fecha.get.toDate)),
+          Some(sdf.format(nd.fact_nota_fecha.get.toDate)),
           None,
           None,
-          Some("01"),
+          Some("92"),
           None
         )
 
@@ -1849,8 +1849,8 @@ class FacturaRepository @Inject()(
             val _detalleData = new _LsDetalle(
               Some("1"),
               Some("999"),
-              Some("CARTERA"),
-              Some("CARTERA"),
+              Some(item.fanoit_detalle.get),
+              Some(item.fanoit_detalle.get),
               item.fanoit_detalle,
               Some(i),
               Some(item.fanoit_valorunitario.get.toString),
@@ -1889,16 +1889,16 @@ class FacturaRepository @Inject()(
         )
 
         val _referenciaFactura = new _ReferenciaFactura(
-          None,
-          None,
-          None,
-          None,
-          None
+          Some(1),
+          nd.fact_nota_descripcion,
+          Some(nd.fact_numero.get.toString()),
+          nd.fact_cufe,
+          Some(sdd.format(f.fact_fecha.get.toDate))
         )
 
         val _softwareSeguridadData = new _SoftwareSeguridad(
           Some(_sSeguridad._1),
-          Some("FPND" + nd.fact_nota_numero.get.toString),
+          Some(nd.fact_nota_numero.get.toString),
           Some(_sSeguridad._2),
           Some(_sSeguridad._3),
           Some(_sSeguridad._4),
@@ -1942,7 +1942,7 @@ class FacturaRepository @Inject()(
         val _listFormaPagoData = new ListBuffer[_LsFormaPago]()
         _listFormaPagoData += _formaPagoData
         _rootInterface = new _RootInterface(
-          Some(_autorizacionData),
+          None, //Some(_autorizacionData)
           Some(_compradorData),
           Some(_emisorData),
           Some(_encabezadoData),
@@ -1988,7 +1988,7 @@ class FacturaRepository @Inject()(
         val nc = buscarNotaCreditoPorNumeroDirecto(fact_nota_numero) /* SQL("""SELECT * FROM FACTURA f
                             WHERE f.FACT_NUMERO = {fact_numero}""").on('fact_numero -> fact_numero).as(Factura._set.singleOpt) */
         val f = buscarPorNumeroDirecto(nc.fact_numero.get)
-        println("Nota Débito: " + nc)
+        println("Nota Crédito: " + nc)
         val persona = personaService.obtenerDirecto(
           nc.id_identificacion.get,
           nc.id_persona.get
@@ -2067,10 +2067,10 @@ class FacturaRepository @Inject()(
           Some("10"),
           None,
           None,
-          Some(sdf.format(f.fact_fecha.get.toDate)),
+          Some(sdf.format(nc.fact_nota_fecha.get.toDate)),
           None,
           None,
-          Some("01"),
+          Some("91"),
           None
         )
 
@@ -2139,8 +2139,8 @@ class FacturaRepository @Inject()(
             val _detalleData = new _LsDetalle(
               Some("1"),
               Some("999"),
-              Some("CARTERA"),
-              Some("CARTERA"),
+              Some(item.fanoit_detalle.get),
+              Some(item.fanoit_detalle.get),
               item.fanoit_detalle,
               Some(i),
               Some(item.fanoit_valorunitario.get.toString),
@@ -2179,11 +2179,11 @@ class FacturaRepository @Inject()(
         )
 
         val _referenciaFactura = new _ReferenciaFactura(
-          None,
-          None,
-          None,
-          None,
-          None
+          Some(1),
+          nc.fact_nota_descripcion,
+          Some(nc.fact_numero.get.toString()),
+          nc.fact_cufe,
+          Some(sdd.format(f.fact_fecha.get.toDate))
         )
 
         val _softwareSeguridadData = new _SoftwareSeguridad(
@@ -2232,7 +2232,7 @@ class FacturaRepository @Inject()(
         val _listFormaPagoData = new ListBuffer[_LsFormaPago]()
         _listFormaPagoData += _formaPagoData
         _rootInterface = new _RootInterface(
-          Some(_autorizacionData),
+          None, //Some(_autorizacionData),
           Some(_compradorData),
           Some(_emisorData),
           Some(_encabezadoData),

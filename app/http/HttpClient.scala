@@ -81,12 +81,15 @@ class HttpClient @Inject()(ws: WSClient, service:FacturaRepository, conf: Config
 
     def setDocumentJson(f: Long) = {
          setDocument(f).map { jsonString =>
+            /* Por el Momento No Enviar
             var url = conf.get[String]("urlFacturacion") + "/SetDocument"
             var params = collection.immutable.Map[String, String]() 
             println("Cadena a Enviar:" + jsonString)
             doPost(url, jsonString).map { response =>
                 response
             }
+            */
+            Future.successful(testResponse(jsonString))
          }
     }
 
@@ -133,7 +136,7 @@ class HttpClient @Inject()(ws: WSClient, service:FacturaRepository, conf: Config
     }
 
     def enviarNotaCredito(nc: Long) = {
-        setNotaDebitoJson(nc).flatMap { response =>
+        setNotaCreditoJson(nc).flatMap { response =>
             response
         }
     }

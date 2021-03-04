@@ -85,6 +85,16 @@ export function getNotasCredito(page_size, current_page, filter, orderby) {
     })
 }
 
+export function enviarFactura(fact_numero) {
+  const data = {
+    fact_numero
+  }
+  return request({
+    url: '/http/st/' + data.fact_numero,
+    method: 'get'
+  })
+}
+
 export function enviarNotaDebito(fact_nota_numero) {
   const data = {
     fact_nota_numero

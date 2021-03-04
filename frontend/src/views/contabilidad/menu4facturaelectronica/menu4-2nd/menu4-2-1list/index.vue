@@ -28,10 +28,9 @@
             <el-table
               v-loading="loading"
               :data="tableData"
-              highlight-current-row
+              stripe
               style="width: 100%; font-size: 12px;"
               max-height="350"
-              @current-change="handleCurrentChange"
               @sort-change="handleSort"
               @filter-change="handleFilter"
             >
@@ -139,20 +138,22 @@
                   <span>{{ scope.row.fact_nota_total | currency_2("$") }}</span>
                 </template>
               </el-table-column>
-              <el-table-column
-                fixed="right"
-                label=""
-                width="140">
-                <template slot-scope="scope">
-                  <el-dropdown :split-button="true" size="mini" type="primary" trigger="click">
-                    Acciones
-                    <el-dropdown-menu slot="dropdown">
-                      <el-dropdown-item><div @click="Ver(scope.row.fact_nota_numero)"><i class="el-icon-success" title="Ver Pdf" />Ver Pdf</div></el-dropdown-item>
-                      <el-dropdown-item><div @click="reEnviar(scope.row.fact_nota_numero)"><i class="el-icon-refresh" title="Reenviar a la Dian" />Reenviar</div></el-dropdown-item>
-                    </el-dropdown-menu>
-                  </el-dropdown>
-                </template>
-              </el-table-column>              
+            <el-table-column
+              fixed="right"
+              label=""
+              width="120">
+              <template slot-scope="scope">
+                <el-dropdown size="mini" @command="handleCommand">
+                  <el-button size="mini" type="primary">
+                    Acciones<i class="el-icon-arrow-down el-icon--right"></i>
+                  </el-button>
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item icon="el-icon-view" :command="{ 'method': 1, 'param': { 'fact_nota_numero': scope.row.fact_nota_numero, 'fact_nota_fecha': scope.row.fact_fecha } }">Ver Pdf</el-dropdown-item>
+                    <el-dropdown-item icon="el-icon-upload" :command="{ 'method': 2, 'param': scope.row.fact_nota_numero }">Reenviar</el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
+              </template>
+            </el-table-column>
             </el-table>
             <el-pagination
               @size-change="handleSizeChange"
@@ -188,7 +189,7 @@ import NotaFactura from '@/components/NotaFactura'
 import { mapGetters } from "vuex"
 
 import { currency } from "@/utils/math"
-import { getNotasDebito, enviarNotaDebito } from "@/api/factura"
+import { getNotasDebito, enviarNotaDebito, getFacturaProveedor } from "@/api/factura"
 
 export default {
   components: {
@@ -243,7 +244,10 @@ export default {
       current_page: 1,
       total: 0,
       order: "",
-      filter: ""
+      filter: "",
+      fact_cufe:null,
+      factura_pdf: null,
+      facturaVisible: false
     };
   },
   beforeMount() {
@@ -323,19 +327,57 @@ export default {
       });
     },
     reEnviar(fact_nota_numero) {
-      this.$confirm('Seguro de Reenviar la Nota Débito ' + fact_nota_numero + '?', 'Confirmación', {
+      this.$confirm('Seguro de Reenviar la Nota Debito ' + fact_nota_numero + '?', 'Confirmación', {
           confirmButtonText: 'Si',
           cancelButtonText: 'No',
           type: 'warning'
         }).then(() => {
-          enviarNotaDebito(fact_nota_numero)
+          enviarNotaDebito(fact_nota_numero).then(response => {
+            if (response.status === 200) {
+              // se debe verificar la aceptacion
+              this.$notify.info({
+                title: 'Información',
+                message: 'Nota Débito Reenviada'
+              })
+            }
+          })
         }).catch(() => {
           this.$message({
             type: 'info',
-            message: 'Reenvio cancelad'
+            message: 'Reenvio cancelado'
           });          
         });
-    }
-  }
+    },
+    handleCommand(command) {
+      switch (command.method) {
+        case 1: this.verPdf(command.param)
+           break
+        case 2: this.reEnviar(command.param)
+           break
+      }
+    },
+    verPdf (param) {
+      console.log("param:" + JSON.stringify(param))
+      this.$notify.info({
+        title: 'Información',
+        message: 'Estamos contactando con el proveedor tecnológico'
+      })
+      const fact_nota_numero = param.fact_nota_numero
+      const fact_nota_fecha = param.fact_nota_fecha
+      const periodo = this.$moment(fact_nota_fecha).format('YYYYMM')
+      getFacturaProveedor(fact_nota_numero, periodo).then(response => {
+        this.fact_cufe = response.data.GetTransaccionbyIdentificacionResult.CodigoTransaccion
+        if (this.fact_cufe) {
+          this.factura_pdf = 'data:application/pdf;base64,' + response.data.GetTransaccionbyIdentificacionResult.PDFBase64
+          this.facturaVisible = true
+        } else {
+          this.$notify.error({
+            title: 'Error',
+            message: 'Nota Débito NO Está en el Proveedor Tecnológico'
+          })
+        }
+      })
+    }    
+  }    
 };
 </script>
