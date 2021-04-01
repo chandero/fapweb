@@ -139,8 +139,9 @@
       <el-row style="overflow-y: auto;">
         <el-col>
           <el-form-item label="Descripción de la Naturaleza de la Corrección">
-            <el-input   
+            <el-input
               type="textarea"
+              ref="descripcion"
               :rows="3"
               placeholder="Digite aquí la descripción" 
               v-model="nota.fact_nota_descripcion"
@@ -285,6 +286,11 @@ export default {
       type: String,
       required: false,
       default: 'D'
+    },
+    fact_numero: {
+      type: Number,
+      required: false,
+      default: null
     }
   },
   data () {
@@ -354,6 +360,11 @@ export default {
       obtenerListaTipoIdentificacion().then(response => {
         this.tipo_identificacion = response.data
         this.nota.fact_nota_tipo = this.tipo
+        if (this.fact_numero) {
+          this.factura.fact_numero = this.fact_numero
+          this.getFacturaPorNumero()
+          this.$nextTick(() => this.$refs.descripcion.$el.focus())
+        }
       })
     })
   },

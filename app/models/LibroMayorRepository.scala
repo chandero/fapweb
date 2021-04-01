@@ -177,23 +177,10 @@ class LibroMayorRepository @Inject()(dbapi: DBApi, conf: Configuration)(implicit
     def generar(periodo: Int, anho: Int, usua_id: scala.Long): Future[Boolean] = Future[Boolean] {
         var base = ""
         val anho_actual:Int = Calendar.getInstance.get(Calendar.YEAR)
-        anho match {
-          case 2019 =>  //println("en 2019") 
-                        base = "db2019"  
-          case 2018 =>  //println("en 2018") 
-                        base = "db2018"
-          case 2017 =>  //println("en 2017")
-                        base = "db2017"
-          case 2016 =>  //println("en 2016")
-                        base = "db2016"
-          case 2015 =>  //println("en 2015")
-                        base = "db2015"    
-          case 2014 =>  //println("en 2014")
-                        base = "db2014" 
-          case 2013 =>  //println("en 2013")
-                        base = "db2013"                                                                     
-          case _ => //println("en __")
-                    base = "default"
+        if (anho == anho_actual) {
+          base = "default"
+        } else {
+          base = "db"+"%04".format(anho)
         }
         val db = dbapi.database(base)
         val dbdefault = dbapi.database("default")

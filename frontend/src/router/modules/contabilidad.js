@@ -28,6 +28,7 @@ const contabilidadRouter = {
               path: 'menu2-1-1list',
               component: () => import('@/views/contabilidad/menu2proceso/menu2-1comprobante/menu2-1-1list/index'),
               name: 'menu_contabilidad_menu2proceso_menu2-1comprobante_menu2-1-1list',
+              hidden: true,
               meta: { title: 'menu_contabilidad_menu2proceso_menu2-1comprobante_menu2-1-1list', icon: 'note-19', roles: ['admin', 'contabilidad', 'revisor'] }
             },
             {
@@ -116,6 +117,7 @@ const contabilidadRouter = {
               path: 'menu4-1-4reprocesar',
               component: () => import('@/views/contabilidad/menu4facturaelectronica/menu4-1factura/menu4-1-4reprocesar'),
               name: 'menu_contabilidad_menu4facturaelectronica_menu4-1factura_menu4-1-4reprocesar',
+              hidden: true,
               meta: { title: 'menu_contabilidad_menu4facturaelectronica_menu4-1factura_menu4-1-4reprocesar', icon: 'process1', roles: ['admin', 'contabilidad'] }
             }            
           ]

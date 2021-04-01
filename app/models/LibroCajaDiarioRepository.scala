@@ -185,23 +185,10 @@ class LibroCajaDiarioRepository @Inject()(dbapi: DBApi, conf: Configuration)(imp
     def generar(periodo: Int, anho: Int, usua_id: scala.Long): Future[Boolean] = Future[Boolean] {
         var base = ""
         val anho_actual:Int = Calendar.getInstance.get(Calendar.YEAR)
-        anho match {
-          case 2019 =>  //println("en 2019") 
-                        base = "db2019"              
-          case 2018 =>  //println("en 2018") 
-                        base = "db2018"
-          case 2017 =>  //println("en 2017")
-                        base = "db2017"
-          case 2016 =>  //println("en 2016")
-                        base = "db2016"
-          case 2015 =>  //println("en 2015")
-                        base = "db2015"
-          case 2014 =>  //println("en 2014")
-                        base = "db2014"
-          case 2013 =>  //println("en 2013")
-                        base = "db2013"                                                                        
-          case _ => //println("en __")
-                    base = "default"
+        if (anho == anho_actual) {
+          base = "default"
+        } else {
+          base = "db"+"%04".format(anho)
         }
         val db = dbapi.database(base)
         var default = dbapi.database("default")
@@ -261,7 +248,7 @@ class LibroCajaDiarioRepository @Inject()(dbapi: DBApi, conf: Configuration)(imp
                 params.put("PAGINA_LIBRO", (pagina_libro + 1).longValue().asInstanceOf[java.lang.Long])
                 params.put("ANHO", "%d".format(anho))
                 params.put("PERIODO", Utility.mes(periodo))
-                params.put("MES", new Integer(periodo))
+                params.put("MES", Integer.valueOf(periodo))
                 params.put("SUBREPORT_DIR", REPORT_DEFINITION_PATH)
 
                 val handle = AsynchronousFillHandle.createHandle(jasperReport, params, connection)

@@ -16,15 +16,22 @@
           <el-table 
             v-loading="loading" 
             :data="tableData" 
-            stripe
+            :stripe="true"
             style="width: 100%; font-size: 12px;" 
-            max-height="350" 
+            max-height="350"
             @sort-change="handleSort"
             >
             <el-table-column type="selection" width="35" />
             <el-table-column type="expand" width="35">
               <template slot-scope="scope">
-                <el-table :data="scope.row.items" :summary-method="getSummaries" show-summary stripe>
+                <el-row>
+                  <el-col>
+                    <span>Nombre: {{ scope.row.nombre + ' ' + scope.row.primer_apellido + ' ' + scope.row.segundo_apellido }}</span>
+                  </el-col>
+                </el-row>
+                <el-row>
+                  <el-col>
+                <el-table :data="scope.row.items" :summary-method="getSummaries" show-summary stripe style="width: 80%; font-size: 12px;">
                   <el-table-column label="Detalle" width="350px">
                     <template slot-scope="item">
                       <span>{{ item.row.fait_detalle }}</span>
@@ -56,6 +63,8 @@
                     </template>
                   </el-table-column>
                 </el-table>
+                  </el-col>
+                </el-row>
               </template>
             </el-table-column>
             <el-table-column label="Número">
@@ -68,14 +77,14 @@
                 <span>{{ scope.row.fact_fecha | moment('YYYY-MM-DD') }}</span>
               </template>
             </el-table-column>
-            <el-table-column label="Descripción" width="350">
+            <el-table-column label="Descripción" width="250">
               <template slot-scope="scope">
                 <span>{{ scope.row.fact_descripcion }}</span>
               </template>
             </el-table-column>
-            <el-table-column label="Tp. Compr." width="100">
+            <el-table-column label="Tp. Compr." width="200">
               <template slot-scope="scope">
-                <span>{{ scope.row.tipo_comprobante }}</span>
+                <span>{{ comprobante(scope.row.tipo_comprobante) }}</span>
               </template>
             </el-table-column>
             <el-table-column label="Comprobante" width="100">
@@ -93,21 +102,6 @@
                 <span>{{ scope.row.id_persona }}</span>
               </template>
             </el-table-column> 
-            <el-table-column label="Primer Apellido" width="110">
-              <template slot-scope="scope">
-                <span>{{ scope.row.primer_apellido }}</span>
-              </template>
-            </el-table-column>  
-            <el-table-column label="Segundo Apellido" width="125">
-              <template slot-scope="scope">
-                <span>{{ scope.row.segundo_apellido }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column label="Nombre" width="200">
-              <template slot-scope="scope">
-                <span>{{ scope.row.nombre }}</span>
-              </template>
-            </el-table-column>
             <el-table-column label="Total" width="120" align="right">
               <template slot-scope="scope">
                 <span>{{ scope.row.fact_total | currency_2('$') }}</span>
@@ -125,6 +119,8 @@
                   <el-dropdown-menu slot="dropdown">
                     <el-dropdown-item icon="el-icon-view" :command="{ 'method': 1, 'param': { 'fact_numero': scope.row.fact_numero, 'fact_fecha': scope.row.fact_fecha } }">Ver Pdf</el-dropdown-item>
                     <el-dropdown-item icon="el-icon-upload" :command="{ 'method': 2, 'param': scope.row.fact_numero }">Reenviar</el-dropdown-item>
+                    <el-dropdown-item icon="el-icon-minus" :command="{ 'method': 3, 'param': scope.row.fact_numero }">Nota Crédito</el-dropdown-item>
+                    <el-dropdown-item icon="el-icon-plus" :command="{ 'method': 4, 'param': scope.row.fact_numero }">Nota Débito</el-dropdown-item>
                   </el-dropdown-menu>
                 </el-dropdown>
               </template>
@@ -151,19 +147,31 @@
         <el-button type="primary" size="mini" @click="facturaVisible = false">Cerrar</el-button>
       </div>
       <iframe :src="factura_pdf" width="100%" height="600px"/>
-    </el-dialog>    
+    </el-dialog>
+    <el-drawer
+      :visible.sync="drawer"
+      :with-header="false"
+      :show-close="true"
+      direction="rtl"
+      size="80%"
+      :destroy-on-close="true">
+      <nota-factura :tipo="tipo_nota" :fact_numero="fact_numero" />
+    </el-drawer>
   </el-container>
 </template>
 <script>
 import VueQueryBuilder from 'vue-query-builder'
 import { mapGetters } from 'vuex'
-
 import { currency } from '@/utils/math'
+import { obtenerTiposComprobante } from '@/api/contabilidad'
 import { getFacturas, enviarFactura, getFacturaProveedor } from '@/api/factura'
+
+import NotaFactura from '@/components/NotaFactura'
 
 export default {
   components: {
-    'query-builder': VueQueryBuilder
+    'query-builder': VueQueryBuilder,
+    'nota-factura': NotaFactura
   },
   computed: {
     ...mapGetters([
@@ -174,6 +182,7 @@ export default {
   data () {
     return {
       loading: false,
+      drawer: false,
       tableData: [],
       qbquery: {},
       qrules: [
@@ -218,11 +227,17 @@ export default {
       filter: '',
       fact_cufe: null,
       factura_pdf: null,
-      facturaVisible: false
+      facturaVisible: false,
+      tipo_comprobante: [],
+      tipo_nota: null,
+      fact_numero: null
     }
   },
   beforeMount () {
-    this.getData()
+    obtenerTiposComprobante().then(response => {
+      this.tipo_comprobante = response.data
+      this.getData()
+    })
   },
   methods: {
     handleFilter (filters) {
@@ -280,15 +295,29 @@ export default {
       })
 
       return sums
-    },    
+    },
+    comprobante (id) {
+      if (id) {
+        const tipo = this.tipo_comprobante.find(t => parseInt(t.id) === parseInt(id))
+        if (tipo) {
+          return tipo.descripcion
+        } else {
+          return id
+        }
+      }
+    },
     actualizar () {
       this.filter = this.qbquery
       this.getData()
     },
     getData () {
+      this.loading = true
       getFacturas(this.page_size, this.current_page, this.filter, this.order).then(response => {
         this.total = response.data.total
         this.tableData = response.data.data
+        this.loading = false
+      }).catch(() => {
+        this.loading = false
       })
     },
     reEnviar(fact_numero) {
@@ -319,7 +348,21 @@ export default {
            break
         case 2: this.reEnviar(command.param)
            break
+        case 3: this.notaCredito(command.param)
+           break
+        case 4: this.notaDebito(command.param)
+           break
       }
+    },
+    notaCredito (fact_numero) {
+      this.tipo_nota = 'C'
+      this.fact_numero = parseInt(fact_numero)
+      this.drawer = true
+    },
+    notaDebito (fact_numero) {
+      this.tipo_nota = 'D'
+      this.fact_numero = parseInt(fact_numero)
+      this.drawer = true
     },
     verPdf (param) {
       console.log("param:" + JSON.stringify(param))

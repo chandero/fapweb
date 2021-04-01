@@ -1291,6 +1291,100 @@ class FacturaRepository @Inject()(
     }
   }
 
+  // CREAR FACTURA
+
+  def crearFactura(factura: Factura, usua_id: Long): Future[Long] = {
+    val hoy = Calendar.getInstance().getTime()
+    db.withConnection { implicit connection =>
+      // Buscar Consecutivo
+      val fact_numero = SQL("""SELECT CONSECUTIVO FROM "gen$consecutivo" WHERE ID_CONSECUTIVO = 50""").as(SqlParser.scalar[Long].single)
+      SQL("""UPDATE "gen$consecutivo" SET CONSECUTIVO = {csc} WHERE ID_CONSECUTIVO = 50""").
+      on(
+        'csc -> (fact_numero + 1)
+      ).executeUpdate
+
+      val queryNota = """INSERT INTO FACTURA (
+                    FACT_NUMERO,
+                    FACT_FECHA,
+                    FACT_DESCRIPCION,
+                    TIPO_COMPROBANTE,
+                    ID_COMPROBANTE,
+                    FECHA_COMPROBANTE,
+                    ID_IDENTIFICACION,
+                    ID_PERSONA,
+                    ID_EMPLEADO,
+                    FACT_ESTADO) VALUES (
+                    {FACT_NUMERO},
+                    {FACT_FECHA},
+                    {FACT_DESCRIPCION},
+                    {TIPO_COMPROBANTE},
+                    {ID_COMPROBANTE},
+                    {FECHA_COMPROBANTE},
+                    {ID_IDENTIFICACION},
+                    {ID_PERSONA},
+                    {ID_EMPLEADO},
+                    {FACT_ESTADO}
+                  ) RETURNING FACT_NUMERO"""
+      val queryItem = """INSERT INTO FACTURA_ITEM (
+                      FACT_NUMERO,
+                      FAIT_DETALLE,
+                      FAIT_CANTIDAD,
+                      FAIT_VALORUNITARIO,
+                      FAIT_TASAIVA,
+                      FAIT_VALORIVA,
+                      FAIT_TOTAL
+                     ) VALUES (
+                      {FACT_NUMERO},
+                      {FAIT_DETALLE},
+                      {FAIT_CANTIDAD},
+                      {FAIT_VALORUNITARIO},
+                      {FAIT_TASAIVA},
+                      {FAIT_VALORIVA},
+                      {FAIT_TOTAL}
+                     )"""
+        // Buscar Empleado
+        val empleado = usuarioService.buscarPorIdDirecto(usua_id)
+        Future.successful(empleado match {
+            case Some(user) =>
+              // Crear Encabezado Nota
+              val creado = SQL(queryNota)
+              .on(
+                'FACT_NUMERO -> fact_numero,
+                'FACT_FECHA -> hoy,
+                'FACT_DESCRIPCION -> factura.fact_descripcion,
+                'TIPO_COMPROBANTE -> factura.tipo_comprobante,
+                'ID_COMPROBANTE -> factura.id_comprobante,
+                'FECHA_COMPROBANTE -> factura.fecha_comprobante,
+                'ID_IDENTIFICACION -> factura.id_identificacion,
+                'ID_PERSONA -> factura.id_persona,
+                'FACT_ESTADO -> 1,
+                'ID_EMPLEADO -> user.id_empleado
+              ).executeInsert().get > 0
+
+              if (creado) {
+                factura.items match { 
+                  case Some(items) => items.map { item => 
+                                        SQL(queryItem)
+                                        .on(
+                                          'FACT_NOTA_NUMERO -> fact_numero,
+                                          'FANOIT_DETALLE -> item.fait_detalle,
+                                          'FANOIT_CANTIDAD -> item.fait_cantidad,
+                                          'FANOIT_VALORUNITARIO -> item.fait_valorunitario,
+                                          'FANOIT_TASAIVA -> item.fait_tasaiva,
+                                          'FANOIT_VALORIVA -> item.fait_valoriva,
+                                          'FANOIT_TOTAL -> item.fait_total
+                                        ).executeInsert()
+                                      }
+                  case None => 0L
+
+                }
+              }
+              fact_numero
+            case None => 0L
+          })
+    }
+  }
+
   def enviarFactura(fact_numero: Long): Future[_RootInterface] =
     Future[_RootInterface] {
       db.withConnection { implicit connection =>
