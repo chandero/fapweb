@@ -155,6 +155,10 @@ GET    /api/pegr/elim/:c                controllers.ColPeriodoGraciaController.m
 GET    /api/pegr/add/:c/:f/:d           controllers.ColPeriodoGraciaController.agregarPeriodoGracia(c: String, f: Long, d: Int)
 GET    /api/pegr/upd/:c/:d              controllers.ColPeriodoGraciaController.actualizarPeriodoGracia(c: String, d: Int)
 
+# Auxiliar
+POST    /api/auxi/cons                  controllers.AuxiliarController.consultar 
+
+
 # Http
 GET    /api/http/status                 controllers.HttpClientController.status
 GET    /api/http/gtbi/:f/:p/:d          controllers.HttpClientController.gettransactionbyid(f: String, p: String, d:String)

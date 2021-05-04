@@ -151,7 +151,22 @@ const contabilidadRouter = {
           ]
         }
       ]
-    }
+    },
+    {
+      path: 'menu5informe',
+      component: () => import('@/views/contabilidad/menu5informe/index'), // Parent router-view
+      name: 'menu_contabilidad_menu5informe',
+      meta: { title: 'menu_contabilidad_menu5informe', icon: 'qrcode4', roles: ['admin', 'contabilidad', 'revisor'] },
+      redirect: '/contabilidad/menu5informe/menu5-1auxiliar',
+      children: [
+        {
+          path: 'menu5-1auxiliar',
+          component: () => import('@/views/contabilidad/menu5informe/menu5-1auxiliar'),
+          name: 'menu_contabilidad_menu5informe_menu5-1auxiliar',
+          meta: { title: 'menu_contabilidad_menu5informe_menu5-1auxiliar', icon: 'el-icon-view', roles: ['admin', 'contabilidad', 'revisor'] },
+        }
+      ]
+    }    
   ]
 }
 
