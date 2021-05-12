@@ -146,6 +146,7 @@ GET    /api/gare/ogr/:c                 controllers.GarantiaRealController.obten
 
 # Puc
 GET    /api/puc/ocn/:c                  controllers.PucController.obtenerNombre(c: String)
+GET    /api/puc/ol                      controllers.PucController.obtenerLista()
 
 # ColPeriodoGracia
 GET    /api/pegr/get                    controllers.ColPeriodoGraciaController.todos
@@ -157,7 +158,10 @@ GET    /api/pegr/upd/:c/:d              controllers.ColPeriodoGraciaController.a
 
 # Auxiliar
 POST    /api/auxi/cons                  controllers.AuxiliarController.consultar 
+POST    /api/auxi/axls                  controllers.AuxiliarController.aExcel
 
+# Balance
+POST    /api/bala/cons                  controllers.BalanceController.consultar
 
 # Http
 GET    /api/http/status                 controllers.HttpClientController.status

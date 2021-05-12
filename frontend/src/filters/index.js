@@ -55,3 +55,52 @@ export function fm_truncate(value, length) {
     return value
   }
 }
+
+export function codigopuc(value) {
+  if (value.length === 18) {
+    if (value.substring(16) === '00') {
+      value = value.substring(0,16)
+    }
+  }
+  if (value.length === 16) {
+    if (value.substring(14) === '00') {
+      value = value.substring(0,14)
+    }
+  }  
+  if (value.length === 14) {
+    if (value.substring(12) === '00') {
+      value = value.substring(0,12)
+    }
+  }  
+  if (value.length === 12) {
+    if (value.substring(10) === '00') {
+      value = value.substring(0,10)
+    }
+  }
+  if (value.length === 10) {
+    if (value.substring(8) === '00') {
+      value = value.substring(0,8)
+    }
+  }  
+  if (value.length === 8) {
+    if (value.substring(6) === '00') {
+      value = value.substring(0,6)
+    }
+  }  
+  if (value.length === 6) {
+    if (value.substring(4) === '00') {
+      value = value.substring(0,4)
+    }
+  }  
+  if (value.length === 4) {
+    if (value.substring(2) === '00') {
+      value = value.substring(0,2)
+    }
+  }  
+  if (value.length === 2) {
+    if (value.substring(1) === '0') {
+      value = value.substring(0,0)
+    }
+  }  
+  return value;
+}

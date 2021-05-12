@@ -15,3 +15,20 @@ export function consultar(ci, cf, fi, ff, id, ip) {
         data: data
     })
 }
+
+export function aExcel(ci, cf, fi, ff, id, ip) {
+    const data = {
+        ci,
+        cf,
+        fi,
+        ff,
+        id,
+        ip
+    }
+    return request({
+        url: '/auxi/axls',
+        method: 'post',
+        responseType: 'arraybuffer',
+        data: data
+    })
+}

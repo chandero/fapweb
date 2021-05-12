@@ -136,6 +136,12 @@ class PucRepository @Inject()(dbapi: DBApi, colocacionService: ColocacionReposit
     implicit ec: DatabaseExecutionContext) {
   private val db = dbapi.database("default")
 
+    def obtenerLista(): Future[Iterable[Puc]] = Future {
+      db.withTransaction { implicit connection => 
+        SQL("""SELECT * FROM "con$puc" ORDER BY CODIGO ASC""").as(Puc._set *)
+      }
+    }
+
     def obtenerNombre(codigo: String): Future[String] = Future {
         val nombre = db.withConnection { implicit connection =>
             SQL("""SELECT NOMBRE FROM "con$puc" WHERE CODIGO = {codigo}""").

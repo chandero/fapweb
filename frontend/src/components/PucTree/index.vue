@@ -1,6 +1,7 @@
 <template>
   <el-container>
     <el-main>
+      <el-card style="border: 1px solid #b3b0b0;">
       <el-row :gutter="4">
         <el-col :span="24">
           <el-input placeholder="Filtrar por" prefix-icon="el-icon-search" v-model="filterText"></el-input>
@@ -25,11 +26,12 @@
               <el-button :disabled="!selectable" type="primary" icon="el-icon-circle-check" @click="seleccionar()">Seleccionar</el-button>
           </el-col>
       </el-row>
+      </el-card>
     </el-main>
   </el-container>
 </template>
 <script>
-import { obtenerPuc } from "@/api2/puc";
+import { obtenerPuc } from "@/api/puc";
 
 export default {
   watch: {
@@ -77,22 +79,22 @@ export default {
       obtenerPuc().then((response) => {
         this.puc = response.data;
         this.puc.forEach((p) => {
-          if (p.CODIGO === p.CODIGOMAYOR) {
+          if (p.codigo === p.codigomayor) {
             this.pucdata[0].children.push({
-              id: p.CODIGO,
-              label: p.CODIGO + " -> " + p.NOMBRE,
+              id: p.codigo,
+              label: p.codigo + " -> " + p.nombre,
               mayor: null,
-              disabled: p.MOVIMIENTO ? false : true,
+              disabled: p.movimiento ? false : true,
               children: [],
             });
           } else {
-            var n = this.buscarNodo(this.pucdata[0], p.CODIGOMAYOR);
+            var n = this.buscarNodo(this.pucdata[0], p.codigomayor);
             if (n) {
               n.children.push({
-                id: p.CODIGO,
-                label: p.CODIGO + " -> " + p.NOMBRE,
-                mayor: p.CODIGOMAYOR,
-                disabled: p.MOVIMIENTO ? false : true,
+                id: p.codigo,
+                label: p.codigo + " -> " + p.nombre,
+                mayor: p.codigomayor,
+                disabled: p.movimiento ? false : true,
                 children: [],
               });
             }

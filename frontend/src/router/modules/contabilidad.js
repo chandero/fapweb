@@ -156,7 +156,7 @@ const contabilidadRouter = {
       path: 'menu5informe',
       component: () => import('@/views/contabilidad/menu5informe/index'), // Parent router-view
       name: 'menu_contabilidad_menu5informe',
-      meta: { title: 'menu_contabilidad_menu5informe', icon: 'qrcode4', roles: ['admin', 'contabilidad', 'revisor'] },
+      meta: { title: 'menu_contabilidad_menu5informe', icon: 'el-icon-notebook-2', roles: ['admin', 'contabilidad', 'revisor'] },
       redirect: '/contabilidad/menu5informe/menu5-1auxiliar',
       children: [
         {
@@ -164,7 +164,13 @@ const contabilidadRouter = {
           component: () => import('@/views/contabilidad/menu5informe/menu5-1auxiliar'),
           name: 'menu_contabilidad_menu5informe_menu5-1auxiliar',
           meta: { title: 'menu_contabilidad_menu5informe_menu5-1auxiliar', icon: 'el-icon-view', roles: ['admin', 'contabilidad', 'revisor'] },
-        }
+        },
+        {
+          path: 'menu5-2balance',
+          component: () => import('@/views/contabilidad/menu5informe/menu5-2balance'),
+          name: 'menu_contabilidad_menu5informe_menu5-2balance',
+          meta: { title: 'menu_contabilidad_menu5informe_menu5-2balance', icon: 'el-icon-view', roles: ['admin', 'contabilidad', 'revisor'] },
+        }        
       ]
     }    
   ]

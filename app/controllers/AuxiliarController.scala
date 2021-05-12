@@ -44,8 +44,23 @@ class AuxiliarController @Inject()(
     val ff = json.\("ff").as[Long]
     val id = json.\("id").as[Int]
     val ip = json.\("ip").as[String]
-    aService.consultar(ci, cf, fi, ff, Some(id), Some(ip)).map { p =>
-      Ok(write(p))
-    }
+    val p = aService.consultar(ci, cf, fi, ff, id, ip)
+    Future.successful(Ok(write(p)))
   }
+
+  def aExcel() = authenticatedUserAction.async { implicit request: Request[AnyContent] =>
+    val empr_id = Utility.extraerEmpresa(request)
+    val json = request.body.asJson.get
+    val ci = json.\("ci").as[String]
+    val cf = json.\("cf").as[String]
+    val fi = json.\("fi").as[Long]
+    val ff = json.\("ff").as[Long]
+    val id = json.\("id").as[Int]
+    val ip = json.\("ip").as[String]
+    val os = aService.aExcel(empr_id.get, ci, cf, fi, ff, id, ip)
+    val fmt = DateTimeFormat.forPattern("yyyyMMdd")
+    val filename = "FAP101"+"_AUXILIAR_CONTABLE_" + fmt.print(fi) + "_" + fmt.print(ff)  + ".xlsx"
+    val attach = "attachment; filename=" + filename
+    Future.successful(Ok(os).as("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet").withHeaders("Content-Disposition" -> attach ))
+    }
 }
