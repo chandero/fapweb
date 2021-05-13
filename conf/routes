@@ -162,6 +162,7 @@ POST    /api/auxi/axls                  controllers.AuxiliarController.aExcel
 
 # Balance
 POST    /api/bala/cons                  controllers.BalanceController.consultar
+POST    /api/bala/axls                  controllers.BalanceController.aExcel
 
 # Http
 GET    /api/http/status                 controllers.HttpClientController.status

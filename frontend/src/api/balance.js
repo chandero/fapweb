@@ -14,12 +14,13 @@ export function consultar(ci, cf, fc, n) {
     })
 }
 
-export function aExcel(ci, cf, fc, n) {
+export function aExcel(ci, cf, fc, n, cm) {
     const data = {
         ci,
         cf,
         fc,
-        n
+        n,
+        cm
     }
     return request({
         url: '/bala/axls',

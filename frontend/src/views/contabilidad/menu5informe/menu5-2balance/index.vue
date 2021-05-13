@@ -71,16 +71,12 @@
         </el-row>
       </el-form>
     </el-main>
-    <!-- Dialogo Buscar por Apellidos y Nombre -->
-    <el-dialog :visible.sync="showBuscarPersonaDlg" title="Buscar Por Apellidos y Nombre" width="80%">
-      <buscar-por-nombre @selectPersonEvent="setDatosPersonaDesdeElEvento" />
-    </el-dialog>
-    <!-- Dialogo Datos Auxiliar -->
-    <el-dialog :visible.sync="showDatosBalanceDlg" title="Auxiliares" width="80%" height="550">
+    <!-- Dialogo Datos Balance -->
+    <el-dialog :visible.sync="showDatosBalanceDlg" title="Balance General" width="90%" height="550">
       <el-row>
         <el-col :span="24">
           <el-table
-            :data="auxiliarData"
+            :data="balanceData"
             style="width: 100%; font-size: 12px;"
             height="400"
           >
@@ -92,127 +88,75 @@
               </template>
             </el-table-column>
             <el-table-column
-              label="Fecha"
-              width="85">
+              label="Cuenta"
+              width="280">
               <template slot-scope="scope">
-                <span>{{ scope.row.fecha | moment('YYYY-MM-DD') }} </span>
+                <span :title="scope.row.cuenta">{{ scope.row.cuenta | fm_truncate(52)}} </span>
               </template>
             </el-table-column>
             <el-table-column
-              label="Tipo"
-              width="50">
-              <template slot-scope="scope">
-                <span>{{ scope.row.abreviatura }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column
-              label="Número"
-              width="70">
-              <template slot-scope="scope">
-                <span>{{ scope.row.id_comprobante }}</span>
-              </template>
-            </el-table-column>            
-            <el-table-column
-              label="Detalle"
-              width="350">
-              <template slot-scope="scope">
-                <span :title="scope.row.detalle">{{ scope.row.detalle | fm_truncate(45)}} </span>
-              </template>
-            </el-table-column>
-            <el-table-column
-              label="Saldo Anterior"
-              width="120"
-              align="right">
-              <template slot-scope="scope">
-                <span>{{ scope.row.saldo_anterior | currency_2 }} </span>
-              </template>
-            </el-table-column>
-            <el-table-column
-              label="Débito"
-              width="120"
-              align="right">
-              <template slot-scope="scope">
-                <span>{{ scope.row.debito | currency_2 }} </span>
-              </template>
-            </el-table-column>
-            <el-table-column
-              label="Crédito"
-              width="120"
-              align="right">
-              <template slot-scope="scope">
-                <span>{{ scope.row.credito | currency_2 }} </span>
-              </template>
-            </el-table-column> 
-            <el-table-column
-              label="Nuevo Saldo"
-              width="120"
-              align="right">
-              <template slot-scope="scope">
-                <span>{{ scope.row.nuevo_saldo | currency_2 }} </span>
-              </template>
-            </el-table-column>
-            <el-table-column
-              label="Documento"
+              label="Débito Ant."
               width="150"
               align="right">
               <template slot-scope="scope">
-                <span>{{ scope.row.id_persona }} </span>
+                <span>{{ scope.row.debito_ant | currency_2 }}</span>
               </template>
             </el-table-column>
             <el-table-column
-              label="Persona"
-              width="300"
-              align="left">
-              <template slot-scope="scope">
-                <span>{{ scope.row.persona }} </span>
-              </template>
-            </el-table-column>
-            <el-table-column
-              label="Cuenta"
-              width="80"
+              label="Crédito Ant."
+              width="150"
               align="right">
               <template slot-scope="scope">
-                <span>{{ scope.row.id_cuenta }} </span>
+                <span>{{ scope.row.credito_ant | currency_2 }}</span>
+              </template>
+            </el-table-column>            
+            <el-table-column
+              label="Débito Mov"
+              width="150"
+              align="right">
+              <template slot-scope="scope">
+                <span>{{ scope.row.debito_mov | currency_2 }} </span>
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="Crédito Mov"
+              width="150"
+              align="right">
+              <template slot-scope="scope">
+                <span>{{ scope.row.credito_mov | currency_2 }} </span>
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="Débito Act"
+              width="150"
+              align="right">
+              <template slot-scope="scope">
+                <span>{{ scope.row.debito_act | currency_2 }} </span>
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="Crédito Act"
+              width="150"
+              align="right">
+              <template slot-scope="scope">
+                <span>{{ scope.row.credito_act | currency_2 }} </span>
               </template>
             </el-table-column> 
-            <el-table-column
-              label="Colocación"
-              width="100"
-              align="right">
-              <template slot-scope="scope">
-                <span>{{ scope.row.id_colocacion }} </span>
-              </template>
-            </el-table-column>
-            <el-table-column
-              label="Cheque"
-              width="80"
-              align="left">
-              <template slot-scope="scope">
-                <span>{{ scope.row.cheque }} </span>
-              </template>
-            </el-table-column>
-            <el-table-column
-              label="Monto RF"
-              width="100"
-              align="right">
-              <template slot-scope="scope">
-                <span>{{ scope.row.monto_retencion | currency_2 }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column
-              label="% RF"
-              width="80"
-              align="right">
-              <template slot-scope="scope">
-                <span>{{ scope.row.tasa_retencion | currency_2 }}</span>
-              </template>
-            </el-table-column>
           </el-table>
         </el-col>
       </el-row>
       <el-row>
         <el-col>
-          <el-button type="primary" @click="exportarXlsx()">Exportar</el-button>
+          <el-dropdown>
+            <el-button type="primary">
+              Exportar<i class="el-icon-arrow-down el-icon--right"></i>
+            </el-button>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item><span @click="exportarXls(1)">1 Columna</span></el-dropdown-item>
+            <el-dropdown-item><span @click="exportarXls(4)">4 Columnas</span></el-dropdown-item>
+            <el-dropdown-item><span @click="exportarXls(6)">6 Columnas</span></el-dropdown-item>
+          </el-dropdown-menu>
+          </el-dropdown>
         </el-col>
       </el-row>
     </el-dialog>
@@ -292,18 +236,18 @@ export default {
         loading.close()
       })
     },
-    exportarXlsx () {
+    exportarXls (cm) {
       const loading = this.$loading({
           lock: true,
           text: 'Exportando Datos, por favor espere...',
           background: 'rgba(255, 255, 255, 0.7)'
         });
-      aExcel(this.ci, this.cf, this.fi.getTime(), this.ff.getTime(), this.id_identificacion, this.id_persona).then(response => {
+      aExcel(this.ci, this.cf, this.fc.getTime(), this.n, cm).then(response => {
         loading.close()
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', 'fap101_auxiliar_contable.xlsx');
+        link.setAttribute('download', 'fap102_balance_contable.xlsx');
         document.body.appendChild(link);
         link.click();
       }).catch((error) => { 

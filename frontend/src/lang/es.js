@@ -48,6 +48,7 @@ export default {
     'menu_contabilidad_menu4facturaelectronica_menu4-3nc_menu4-3-1list': 'Relación',
     menu_contabilidad_menu5informe: 'Informes',
     'menu_contabilidad_menu5informe_menu5-1auxiliar': 'Auxiliar',
+    'menu_contabilidad_menu5informe_menu5-2balance': 'Balance General',
     menu_credito: 'Crédito',
     'menu_credito_menu1solicitud': 'Solicitud',
     'menu_credito_menu3informe': 'Informe',

@@ -161,7 +161,7 @@ object Auxiliar {
   }
 }
 
-class AuxiliarRepository @Inject()(dbapi: DBApi, _gcon: GlobalesCon, empresaService: EmpresaRepository)(
+class AuxiliarRepository @Inject()(dbapi: DBApi, _gcon: GlobalesCon, _convert: Conversion, empresaService: EmpresaRepository)(
     implicit ec: DatabaseExecutionContext) {
   private val db = dbapi.database("default")
 
@@ -302,7 +302,7 @@ class AuxiliarRepository @Inject()(dbapi: DBApi, _gcon: GlobalesCon, empresaServ
                 CellStyleInheritance.CellThenRowThenColumnThenSheet
               ),
               StringCell(
-                codigo_inicial, 
+                _convert.codigopuc(codigo_inicial), 
                 Some(1),
                         style = Some(
                           CellStyle(dataFormat = CellDataFormat("@"))
@@ -316,7 +316,7 @@ class AuxiliarRepository @Inject()(dbapi: DBApi, _gcon: GlobalesCon, empresaServ
                 CellStyleInheritance.CellThenRowThenColumnThenSheet
               ),              
               StringCell(
-                codigo_final,
+                _convert.codigopuc(codigo_final),
                 Some(3),
                         style = Some(
                           CellStyle(dataFormat = CellDataFormat("@"))
@@ -386,7 +386,7 @@ class AuxiliarRepository @Inject()(dbapi: DBApi, _gcon: GlobalesCon, empresaServ
                 fila += 1
                 _listRow01 += com.norbitltd.spoiwo.model.Row(
                   StringCell(
-                    i.codigo match { case Some(c) => c case None => ""},
+                    i.codigo match { case Some(c) => _convert.codigopuc(c) case None => ""},
                     Some(0),
                     style = Some(CellStyle(dataFormat = CellDataFormat("@"))),
                     CellStyleInheritance.CellThenRowThenColumnThenSheet

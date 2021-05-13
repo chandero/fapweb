@@ -43,22 +43,24 @@ class BalanceController @Inject()(
     val cf = json.\("cf").as[String]
     val fc = json.\("fc").as[Long]
     val n = json.\("n").as[Int]
+    println("Paso a consultar balance")
     val p = aService.consultar(empr_id.get, fc, ci, cf, n)
     Future.successful(Ok(write(p)))
   }
 
-  /* def aExcel() = authenticatedUserAction.async { implicit request: Request[AnyContent] =>
+  def aExcel() = authenticatedUserAction.async { implicit request: Request[AnyContent] =>
     val empr_id = Utility.extraerEmpresa(request)
     val json = request.body.asJson.get
     val ci = json.\("ci").as[String]
     val cf = json.\("cf").as[String]
     val fc = json.\("fc").as[Long]
     val n = json.\("n").as[Int]
-    val os = aService.aExcel(empr_id.get, ci, cf, fi, ff, id, ip)
+    val cm = json.\("cm").as[Int]
+    val os = aService.aExcel(empr_id.get, ci, cf, fc, n, cm)
     val fmt = DateTimeFormat.forPattern("yyyyMMdd")
-    val filename = "FAP101"+"_AUXILIAR_CONTABLE_" + fmt.print(fi) + "_" + fmt.print(ff)  + ".xlsx"
+    val filename = "FAP102"+"_BALANCE_GENERAL_CONTABLE_" + fmt.print(fc) + ".xlsx"
     val attach = "attachment; filename=" + filename
     Future.successful(Ok(os).as("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet").withHeaders("Content-Disposition" -> attach ))
-    } */
+    }
 
 }

@@ -99,7 +99,7 @@ export function codigopuc(value) {
   }  
   if (value.length === 2) {
     if (value.substring(1) === '0') {
-      value = value.substring(0,0)
+      value = value.substring(0,1)
     }
   }  
   return value;

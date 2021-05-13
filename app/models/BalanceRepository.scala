@@ -105,32 +105,39 @@ object Balance {
   }
 }
 
-class BalanceRepository @Inject()(dbapi: DBApi, _gcon: GlobalesCon, empresaService: EmpresaRepository)(
+class BalanceRepository @Inject()(dbapi: DBApi, _gcon: GlobalesCon, _convert: Conversion, empresaService: EmpresaRepository)(
     implicit ec: DatabaseExecutionContext) {
   private val db = dbapi.database("default")
 
-  def consultar(empr_id: Long, fecha_corte: Long, codigo_inicial: String, codigo_final: String, nivel: Int): Future[Iterable[Balance]] = Future {
+  def consultar(empr_id: Long, fecha_corte: Long, codigo_inicial: String, codigo_final: String, nivel: Int): Iterable[Balance] = {
     var _listResult = new ListBuffer[Balance]()
     var _listTabla00 = new ListBuffer[Balance]()
     var _listTabla01 = new ListBuffer[Balance]()
     val fc = new DateTime(fecha_corte)
-    val periodo = fc.getMonthOfYear() + 1
+    val periodo = fc.getMonthOfYear()
     val periodo_ant = periodo - 1
-    var fisi = new DateTime()
-    var ffsi = new DateTime()
-    var fim = new DateTime()
-    var ffm = new DateTime()
+    var fisi = new LocalDate()
+    var ffsi = new LocalDate()
+    var fim = new LocalDate()
+    var ffm = new LocalDate()
     if (periodo == 1) {
-      fisi = new DateTime(0,1,1,0,0,0)      
-      ffsi = new DateTime(0,1,1,0,0,0)
+      fisi = new LocalDate(0,1,1)      
+      ffsi = new LocalDate(0,1,1)
     } else {
-      fisi = new DateTime(fc.year().get(), 1, 1,0,0,0)
-      ffsi = new DateTime(fc.year().get(), periodo_ant, 1,0,0,0)
+      fisi = new LocalDate(fc.year().get(), 1, 1)
+      ffsi = new LocalDate(fc.year().get(), periodo_ant, 1)
       ffsi = ffsi.dayOfMonth().withMaximumValue()
     }
 
-    fim = new DateTime(fc.year(), periodo, 1)
+    fim = new LocalDate(fc.year().get, periodo, 1)
     ffm = fim.dayOfMonth().withMaximumValue()
+
+    println("fisi: " + fisi)
+    println("ffsi: " + ffsi)
+
+
+    println("fim: " + fim)
+    println("ffm: " + ffm)
 
     val queryPuc = """SELECT
           cp1.*,
@@ -138,18 +145,17 @@ class BalanceRepository @Inject()(dbapi: DBApi, _gcon: GlobalesCon, empresaServi
           FROM "con$puc" cp1
           LEFT JOIN "gen$agencia" ga1 ON (ga1.ID_AGENCIA = cp1.ID_AGENCIA)
           WHERE
-          (cp1.NIVEL <= {nivel}
-          AND (cp1.CODIGO >= {codigo_inicial} and cp1.CODIGO <= {codigo_final}
+          cp1.NIVEL <= {nivel}
+          AND (cp1.CODIGO >= {codigo_inicial} and cp1.CODIGO <= {codigo_final})
           ORDER BY cp1.CODIGO"""
 
-    val querySaldo = """SELECT SUM(a.DEBITO) AS DEBITO, SUM(a.CREDITO) AS CREDITO FROM "con$comprobante" cc1
+    val querySaldo = """SELECT SUM(ca1.DEBITO) AS DEBITO, SUM(ca1.CREDITO) AS CREDITO FROM "con$comprobante" cc1
                         INNER JOIN "con$auxiliar" ca1 ON ca1.TIPO_COMPROBANTE = cc1.TIPO_COMPROBANTE and ca1.ID_COMPROBANTE = cc1.ID_COMPROBANTE
                         WHERE cc1.FECHADIA BETWEEN {fecha_inicial} and {fecha_final} and ca1.CODIGO LIKE {codigo}
                         AND cc1.ESTADO = {estado}"""
 
     var longitud = 0
-
-    db.withTransaction { implicit connection =>
+     db.withTransaction { implicit connection =>
         val _resultSetPuc = SQL(queryPuc).
                           on(
                               'codigo_inicial -> codigo_inicial,
@@ -177,15 +183,21 @@ class BalanceRepository @Inject()(dbapi: DBApi, _gcon: GlobalesCon, empresaServi
             var _debito_ant = 0D
             var _credito_ant = 0D
             if (periodo > 1) {
-               val _saldoParse = double("debito") ~ double("credito") map { case a ~ b => (a,b) }
+               val _saldoParse = get[Option[Double]]("debito") ~ get[Option[Double]]("credito") map { case a ~ b => (a,b) }
                val _resultSetSaldo = SQL(querySaldo).on(
                    'fecha_inicial -> fisi,
                    'fecha_final -> ffsi,
-                   'codigo -> codigo,
-                   'estado -> "N"
+                   'codigo -> (codigo + "%"),
+                   'estado -> "C"
                ).as(_saldoParse.single)
-               _debito_ant = _resultSetSaldo._1 
-               _credito_ant = _resultSetSaldo._2
+               _debito_ant = _resultSetSaldo._1 match {
+                 case Some(v) => v
+                 case None => 0D
+               }
+               _credito_ant = _resultSetSaldo._2 match {
+                 case Some(v) => v
+                 case None => 0D
+               }
             } else {
                 _debito_ant = 0D;
                 _credito_ant = 0D;
@@ -199,15 +211,21 @@ class BalanceRepository @Inject()(dbapi: DBApi, _gcon: GlobalesCon, empresaServi
                 _debito_ant = 0D
                 _credito_ant = -_saldo_anterior
             }
-            val _saldoParse = double("debito") ~ double("credito") map { case a ~ b => (a,b) }
+            val _saldoParse = get[Option[Double]]("debito") ~ get[Option[Double]]("credito") map { case a ~ b => (a,b) }
             val _resultSetSaldo = SQL(querySaldo).on(
                    'fecha_inicial -> fim,
                    'fecha_final -> ffm,
-                   'codigo -> codigo,
-                   'estado -> "N"
+                   'codigo -> (codigo + "%"),
+                   'estado -> "C"
                ).as(_saldoParse.single)
-            val _debito_mov = _resultSetSaldo._1
-            val _credito_mov = _resultSetSaldo._2
+            val _debito_mov = _resultSetSaldo._1 match {
+                 case Some(v) => v
+                 case None => 0D
+               }
+            val _credito_mov = _resultSetSaldo._2 match {
+                 case Some(v) => v
+                 case None => 0D
+               }
 
             val _saldo_actual = _debito_ant - _credito_ant + _debito_mov - _credito_mov
             var _debito_act = 0D
@@ -219,20 +237,20 @@ class BalanceRepository @Inject()(dbapi: DBApi, _gcon: GlobalesCon, empresaServi
                 _debito_act = 0D
                 _credito_act = -_saldo_actual
             }
-            _listTabla00 += new Balance(puc.codigo, puc.nombre, Some(_debito_ant), Some(_credito_ant), Some(_debito_mov), Some(_credito_mov), Some(_debito_act), Some(_credito_ant))
+            if (_debito_ant != 0 || _credito_ant != 0 || _debito_mov != 0 || _credito_mov != 0 || _debito_act != 0 || _credito_mov != 0) {
+              _listTabla00 += new Balance(puc.codigo, puc.nombre, Some(_debito_ant), Some(_credito_ant), Some(_debito_mov), Some(_credito_mov), Some(_debito_act), Some(_credito_act))
+            }
         }
-        _listResult = _listTabla00
+
+        _listTabla00.toList
     }
-    _listResult.toList
   }
 
-  /* def aExcel(empr_id: Long, codigo_inicial: String, codigo_final: String, fecha_corte: Long, nivel: Int): Array[Byte] = {
+  def aExcel(empr_id: Long, codigo_inicial: String, codigo_final: String, fecha_corte: Long, nivel: Int, columnas: Int): Array[Byte] = {
     val fmt = DateTimeFormat.forPattern("yyyyMMdd")
     val sdf = new SimpleDateFormat("yyyy-MM-dd")
-    val fi = Calendar.getInstance()
-    fi.setTimeInMillis(fecha_inicial)
-    val ff = Calendar.getInstance()
-    ff.setTimeInMillis(fecha_final)
+    val fc = Calendar.getInstance()
+    fc.setTimeInMillis(fecha_corte)
     empresaService.buscarPorId(empr_id) match {
        case Some(empresa) =>
         var _listRow01 = new ListBuffer[com.norbitltd.spoiwo.model.Row]()
@@ -256,7 +274,7 @@ class BalanceRepository @Inject()(dbapi: DBApi, _gcon: GlobalesCon, empresaServi
                 CellStyleInheritance.CellThenRowThenColumnThenSheet
               ),
               StringCell(
-                codigo_inicial, 
+                _convert.codigopuc(codigo_inicial), 
                 Some(1),
                         style = Some(
                           CellStyle(dataFormat = CellDataFormat("@"))
@@ -270,7 +288,7 @@ class BalanceRepository @Inject()(dbapi: DBApi, _gcon: GlobalesCon, empresaServi
                 CellStyleInheritance.CellThenRowThenColumnThenSheet
               ),              
               StringCell(
-                codigo_final,
+                _convert.codigopuc(codigo_final),
                 Some(3),
                         style = Some(
                           CellStyle(dataFormat = CellDataFormat("@"))
@@ -281,177 +299,219 @@ class BalanceRepository @Inject()(dbapi: DBApi, _gcon: GlobalesCon, empresaServi
             _listRow01 += titleRow3            
             val titleRow4 = com.norbitltd.spoiwo.model.Row(
               StringCell(
-                "Fecha Desde:",
+                "Periodo Corte:",
                 Some(0),
                 style = Some(CellStyle(dataFormat = CellDataFormat("@"))),
                 CellStyleInheritance.CellThenRowThenColumnThenSheet
               ),
               DateCell(
-                fi.getTime(), 
+                fc.getTime(), 
                 Some(1),
                         style = Some(
-                          CellStyle(dataFormat = CellDataFormat("YYYY/MM/DD"))
+                          CellStyle(dataFormat = CellDataFormat("YYYY/MM"))
                         ),
                         CellStyleInheritance.CellThenRowThenColumnThenSheet               
-              ),   
-              StringCell(
-                "Hasta:",
-                Some(2),
-                style = Some(CellStyle(dataFormat = CellDataFormat("@"))),
-                CellStyleInheritance.CellThenRowThenColumnThenSheet
-              ),              
-              DateCell(
-                ff.getTime(), 
-                Some(3),
-                        style = Some(
-                          CellStyle(dataFormat = CellDataFormat("YYYY/MM/DD"))
-                        ),
-                        CellStyleInheritance.CellThenRowThenColumnThenSheet               
-              ),   
+              )
             )   
             _listRow01 += titleRow4
-            val headerRow = com.norbitltd.spoiwo.model
-              .Row()
-              .withCellValues(
-                "Código",
-                "Cuenta",
-                "Fecha",              
-                "Tipo",
-                "Número",
-                "Detalle",
-                "Saldo Anterior",
-                "Débito",
-                "Crédito",
-                "Nuevo Saldo",
-                "Documento",
-                "Persona",
-                "Cuenta",
-                "Colocación",
-                "Cheque",
-                "Monto RF",
-                "% RF"
-              )
-            _listRow01 += headerRow
-            val resultSet = consultar(codigo_inicial, codigo_final, fecha_inicial, fecha_final, id_identificacion, id_persona)
+            if (columnas == 6) {
+              val mergedHeaderRow = com.norbitltd.spoiwo.model
+                .Row()
+                .withCellValues(
+                  "",
+                  "",
+                  "ANTERIOR",
+                  "",
+                  "MOVIMIENTO",              
+                  "",
+                  "ACTUAL"
+                ).withStyle(CellStyle(horizontalAlignment = HA.Center))
+              _listRow01 += mergedHeaderRow
+            }
+            if (columnas == 4) {
+              val mergedHeaderRow = com.norbitltd.spoiwo.model
+                .Row()
+                .withCellValues(
+                  "",
+                  "",
+                  "",
+                  "MOVIMIENTO",              
+                  ""
+                )      
+              _listRow01 += mergedHeaderRow
+            }
+            if (columnas == 1) {
+              val mergedHeaderRow = com.norbitltd.spoiwo.model
+                .Row()
+                .withCellValues(
+                  "",
+                )      
+              _listRow01 += mergedHeaderRow
+            }      
+            if (columnas == 6 ) {
+              val headerRow = com.norbitltd.spoiwo.model
+                .Row()
+                .withCellValues(
+                  "Código",
+                  "Cuenta",
+                  "Débito",              
+                  "Crédito",
+                  "Débito",
+                  "Crédito",
+                  "Débito",
+                  "Crédito"
+                )
+              _listRow01 += headerRow
+              _listMerged01 += CellRange((4,4), (2,3))
+              _listMerged01 += CellRange((4,4), (4,5))
+              _listMerged01 += CellRange((4,4), (6,7))
+            }
+            if (columnas == 4 ) {
+              val headerRow = com.norbitltd.spoiwo.model
+                .Row()
+                .withCellValues(
+                  "Código",
+                  "Cuenta",
+                  "Saldo Anterior",              
+                  "Débito",
+                  "Crédito",
+                  "Saldo Actual"
+                )
+              _listRow01 += headerRow
+              _listMerged01 += CellRange((4,4), (3,4))
+            }
+            if (columnas == 1 ) {
+              val headerRow = com.norbitltd.spoiwo.model
+                .Row()
+                .withCellValues(
+                  "Código",
+                  "Cuenta",
+                  "Saldo Actual",
+                )
+              _listRow01 += headerRow
+            }
+            val resultSet = consultar(empr_id, fecha_corte, codigo_inicial, codigo_final, nivel)
             var _codigo_anterior = ""
             var fila = 4
             val rows = resultSet.flatMap { i =>
-              if (_codigo_anterior != i.codigo.get) {
-                fila += 1
+              if (columnas == 6) {
                 _listRow01 += com.norbitltd.spoiwo.model.Row(
-                  StringCell(
-                    i.codigo match { case Some(c) => c case None => ""},
+                    StringCell(
+                    i.codigo match { case Some(d) => _convert.codigopuc(d) case None => "" },
                     Some(0),
-                    style = Some(CellStyle(dataFormat = CellDataFormat("@"))),
+                    style = Some(CellStyle(dataFormat = CellDataFormat("00"))),
                     CellStyleInheritance.CellThenRowThenColumnThenSheet
                   ),
                   StringCell(
-                    i.cuenta match { case Some(c) => c case None => ""},
+                    i.cuenta match { case Some(a) => a case None => "" },
                     Some(1),
-                    style = Some(CellStyle(dataFormat = CellDataFormat("@"))),
+                            style = Some(
+                              CellStyle(dataFormat = CellDataFormat("@"))
+                            ),
+                            CellStyleInheritance.CellThenRowThenColumnThenSheet               
+                  ),
+                  NumericCell(
+                    i.debito_ant match { case Some(s) => s case None => 0},
+                    Some(2),
+                    style = Some(CellStyle(dataFormat = CellDataFormat("#,#0.00"))),
                     CellStyleInheritance.CellThenRowThenColumnThenSheet
-                  ),                  
+                  ),
+                  NumericCell(
+                    i.credito_ant match { case Some(s) => s case None => 0},
+                    Some(3),
+                    style = Some(CellStyle(dataFormat = CellDataFormat("#,#0.00"))),
+                    CellStyleInheritance.CellThenRowThenColumnThenSheet
+                  ),
+                  NumericCell(
+                    i.debito_mov match { case Some(s) => s case None => 0},
+                    Some(4),
+                    style = Some(CellStyle(dataFormat = CellDataFormat("#,#0.00"))),
+                    CellStyleInheritance.CellThenRowThenColumnThenSheet
+                  ),
+                  NumericCell(
+                    i.credito_mov match { case Some(s) => s case None => 0},
+                    Some(5),
+                    style = Some(CellStyle(dataFormat = CellDataFormat("#,#0.00"))),
+                    CellStyleInheritance.CellThenRowThenColumnThenSheet
+                  ),  
+                  NumericCell(
+                    i.debito_act match { case Some(s) => s case None => 0},
+                    Some(6),
+                    style = Some(CellStyle(dataFormat = CellDataFormat("#,#0.00"))),
+                    CellStyleInheritance.CellThenRowThenColumnThenSheet
+                  ),
+                  NumericCell(
+                    i.credito_act match { case Some(s) => s case None => 0},
+                    Some(7),
+                    style = Some(CellStyle(dataFormat = CellDataFormat("#,#0.00"))),
+                    CellStyleInheritance.CellThenRowThenColumnThenSheet
+                  ),                                  
                 )
-                _listMerged01 += CellRange( (fila, fila), (1,5) )
-                _codigo_anterior = i.codigo.get
-              }
-              fila += 1
-              _listRow01 += com.norbitltd.spoiwo.model.Row(
+              } else if (columnas == 4) {
+                _listRow01 += com.norbitltd.spoiwo.model.Row(
+                    StringCell(
+                    i.codigo match { case Some(d) => _convert.codigopuc(d) case None => "" },
+                    Some(0),
+                    style = Some(CellStyle(dataFormat = CellDataFormat("00"))),
+                    CellStyleInheritance.CellThenRowThenColumnThenSheet
+                  ),
                   StringCell(
-                  i.fecha match { case Some(d) => sdf.format(new Date(d.getMillis())) case None => "" },
-                  Some(2),
-                  style = Some(CellStyle(dataFormat = CellDataFormat("00"))),
-                  CellStyleInheritance.CellThenRowThenColumnThenSheet
-                ),
-                StringCell(
-                  i.abreviatura match { case Some(a) => a case None => "" },
-                  Some(3),
-                          style = Some(
-                            CellStyle(dataFormat = CellDataFormat("@"))
-                          ),
-                          CellStyleInheritance.CellThenRowThenColumnThenSheet               
-                ),
-                StringCell(
-                  i.id_comprobante match { case Some(a) => a.toString case None => "" },
-                  Some(4),
-                          style = Some(
-                            CellStyle(dataFormat = CellDataFormat("#0"))
-                          ),
-                          CellStyleInheritance.CellThenRowThenColumnThenSheet               
-                ),                
-                StringCell(
-                  i.detalle match { case Some(d) => d case None => ""},
-                  Some(5),
-                  style = Some(CellStyle(dataFormat = CellDataFormat("@"))),
-                  CellStyleInheritance.CellThenRowThenColumnThenSheet
-                ),
-                NumericCell(
-                  i.saldo_anterior match { case Some(s) => s case None => 0},
-                  Some(6),
-                  style = Some(CellStyle(dataFormat = CellDataFormat("#,#0.00"))),
-                  CellStyleInheritance.CellThenRowThenColumnThenSheet
-                ),
-                NumericCell(
-                  i.debito match { case Some(s) => s case None => 0},
-                  Some(7),
-                  style = Some(CellStyle(dataFormat = CellDataFormat("#,#0.00"))),
-                  CellStyleInheritance.CellThenRowThenColumnThenSheet
-                ),
-                NumericCell(
-                  i.credito match { case Some(s) => s case None => 0},
-                  Some(8),
-                  style = Some(CellStyle(dataFormat = CellDataFormat("#,#0.00"))),
-                  CellStyleInheritance.CellThenRowThenColumnThenSheet
-                ),
-                NumericCell(
-                  i.nuevo_saldo match { case Some(s) => s case None => 0},
-                  Some(9),
-                  style = Some(CellStyle(dataFormat = CellDataFormat("#,#0.00"))),
-                  CellStyleInheritance.CellThenRowThenColumnThenSheet
-                ),
-                StringCell(
-                  i.id_persona match { case Some(d) => d case None => ""},
-                  Some(10),
-                  style = Some(CellStyle(dataFormat = CellDataFormat("@"))),
-                  CellStyleInheritance.CellThenRowThenColumnThenSheet
-                ),                         
-                StringCell(
-                  i.persona match { case Some(d) => d case None => ""},
-                  Some(11),
-                  style = Some(CellStyle(dataFormat = CellDataFormat("@"))),
-                  CellStyleInheritance.CellThenRowThenColumnThenSheet
-                ),
-                StringCell(
-                  i.id_cuenta match { case Some(d) => d case None => ""},
-                  Some(12),
-                  style = Some(CellStyle(dataFormat = CellDataFormat("@"))),
-                  CellStyleInheritance.CellThenRowThenColumnThenSheet
-                ),
-                StringCell(
-                  i.id_colocacion match { case Some(d) => d case None => ""},
-                  Some(13),
-                  style = Some(CellStyle(dataFormat = CellDataFormat("@"))),
-                  CellStyleInheritance.CellThenRowThenColumnThenSheet
-                ),
-                StringCell(
-                  i.cheque match { case Some(d) => d case None => ""},
-                  Some(14),
-                  style = Some(CellStyle(dataFormat = CellDataFormat("@"))),
-                  CellStyleInheritance.CellThenRowThenColumnThenSheet
-                ),
-                NumericCell(
-                  i.monto_retencion match { case Some(d) => d case None => 0D},
-                  Some(15),
-                  style = Some(CellStyle(dataFormat = CellDataFormat("#,#0.00"))),
-                  CellStyleInheritance.CellThenRowThenColumnThenSheet
-                ),
-                NumericCell(
-                  i.tasa_retencion match { case Some(d) => d case None => 0D},
-                  Some(16),
-                  style = Some(CellStyle(dataFormat = CellDataFormat("#,#0.00"))),
-                  CellStyleInheritance.CellThenRowThenColumnThenSheet
-                ),
-              )
+                    i.cuenta match { case Some(a) => a case None => "" },
+                    Some(1),
+                            style = Some(
+                              CellStyle(dataFormat = CellDataFormat("@"))
+                            ),
+                            CellStyleInheritance.CellThenRowThenColumnThenSheet               
+                  ),
+                  NumericCell(
+                    i.debito_ant.get - i.credito_ant.get,
+                    Some(2),
+                    style = Some(CellStyle(dataFormat = CellDataFormat("#,#0.00"))),
+                    CellStyleInheritance.CellThenRowThenColumnThenSheet
+                  ),
+                  NumericCell(
+                    i.debito_mov match { case Some(s) => s case None => 0},
+                    Some(3),
+                    style = Some(CellStyle(dataFormat = CellDataFormat("#,#0.00"))),
+                    CellStyleInheritance.CellThenRowThenColumnThenSheet
+                  ),
+                  NumericCell(
+                    i.credito_mov match { case Some(s) => s case None => 0},
+                    Some(4),
+                    style = Some(CellStyle(dataFormat = CellDataFormat("#,#0.00"))),
+                    CellStyleInheritance.CellThenRowThenColumnThenSheet
+                  ),
+                  NumericCell(
+                    i.debito_act.get - i.credito_act.get,
+                    Some(5),
+                    style = Some(CellStyle(dataFormat = CellDataFormat("#,#0.00"))),
+                    CellStyleInheritance.CellThenRowThenColumnThenSheet
+                  )
+                )
+              } else {
+                _listRow01 += com.norbitltd.spoiwo.model.Row(
+                    StringCell(
+                    i.codigo match { case Some(d) => _convert.codigopuc(d) case None => "" },
+                    Some(0),
+                    style = Some(CellStyle(dataFormat = CellDataFormat("00"))),
+                    CellStyleInheritance.CellThenRowThenColumnThenSheet
+                  ),
+                  StringCell(
+                    i.cuenta match { case Some(a) => a case None => "" },
+                    Some(1),
+                            style = Some(
+                              CellStyle(dataFormat = CellDataFormat("@"))
+                            ),
+                            CellStyleInheritance.CellThenRowThenColumnThenSheet               
+                  ),
+                  NumericCell(
+                    i.debito_act.get - i.credito_act.get,
+                    Some(2),
+                    style = Some(CellStyle(dataFormat = CellDataFormat("#,#0.00"))),
+                    CellStyleInheritance.CellThenRowThenColumnThenSheet
+                  )
+                )                
+              }
             }
             _listRow01.toList
           },
@@ -467,6 +527,6 @@ class BalanceRepository @Inject()(dbapi: DBApi, _gcon: GlobalesCon, empresaServi
         case None => var os: ByteArrayOutputStream = new ByteArrayOutputStream()
                      os.toByteArray()
       }
-  }  */
+  }
 
 }
