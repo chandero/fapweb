@@ -137,3 +137,17 @@ export function recaudoInteresCausadoPeriodoGracia(fi, ff) {
     method: 'get'
   })
 }
+
+export function informeColocacionSaldadoAsesor(ases_id) {
+  const data = {
+    ases_id
+  }
+  return request({
+    url: 'cred/csxa/' + data.ases_id,
+    headers: {
+      'content-type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8',
+    },
+    responseType: 'blob',
+    method: 'get'
+  })
+}

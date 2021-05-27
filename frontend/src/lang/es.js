@@ -53,6 +53,7 @@ export default {
     'menu_credito_menu1solicitud': 'Solicitud',
     'menu_credito_menu3informe': 'Informe',
     'menu_credito_menu3informe_menu3-5buenpago': 'Cliente Buen Pago',
+    'menu_credito_menu3informe_menu3-6saldadaasesor': 'Colocación Saldada - Asesor',
     menu_cartera: 'Cartera',
     menu_cartera_menu1proceso: 'Proceso',
     'menu_cartera_menu1proceso_menu1-1liquidacionnormal': 'Liquidación Normal',

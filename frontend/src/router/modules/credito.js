@@ -53,7 +53,13 @@ const creditoRouter = {
           component: () => import('@/views/credito/menu3informe/menu3-5buenpago'),
           name: 'menu_credito_menu3informe_menu3-5buenpago',
           meta: { title: 'menu_credito_menu3informe_menu3-5buenpago', icon: 'money', roles: ['admin', 'credito'] }
-        }
+        },
+        {
+          path: 'menu3-6saldadaasesor',
+          component: () => import('@/views/credito/menu3informe/menu3-6saldadaasesor'),
+          name: 'menu_credito_menu3informe_menu3-6saldadaasesor',
+          meta: { title: 'menu_credito_menu3informe_menu3-6saldadaasesor', icon: 'money', roles: ['admin', 'credito'] }
+        }        
       ]      
     }
   ]

@@ -142,7 +142,7 @@ class InformeAsociadoBuenPagoRepository @Inject()(dbapi: DBApi, config: Configur
                 val extractodet = SQL("""SELECT ID_CBTE_COLOCACION, DIAS_APLICADOS FROM "col$extractodet" e 
                                      WHERE e.ID_COLOCACION IN (SELECT c.ID_COLOCACION FROM "col$colocacion" c
                                      WHERE c.ID_IDENTIFICACION = {id_identificacion} and c.ID_PERSONA = {id_persona})
-                                     AND e.CODIGO_PUC = '415020020100000000'
+                                     AND e.CODIGO_PUC IN ('415020020100000000', '415021020100000000', '415022010000000000')
                           """).on(
                             'id_identificacion -> p._1,
                             'id_persona -> p._2

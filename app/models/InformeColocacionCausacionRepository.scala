@@ -34,7 +34,6 @@ import com.norbitltd.spoiwo.model.enums.{CellBorderStyle, CellFill, Pane, CellHo
 
 
 import utilities._
-import java.sql.SQLXML
 
 case class InformeColocacionCausacion(id_colocacion: Option[String], 
                                       id_persona: Option[String], 

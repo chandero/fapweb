@@ -77,6 +77,7 @@ GET     /api/col/busc/:i/:p             controllers.ColocacionController.buscarC
 
 # Creditos
 GET     /api/cred/ldp/:i/:c/:f          controllers.CreditoController.liquidacionDePrueba(i:String, c:Int, f:Long)  
+GET     /api/cred/csxa/:i               controllers.InformeColocacionSaldadaAsesorController.generarXlsx(i: Long)
 
 # Control Cobro
 GET     /api/coco/bpd/:i/:p             controllers.ControlCobroController.obtenerCreditosPorDocumento(i: Int, p: String)
