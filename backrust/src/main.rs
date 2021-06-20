@@ -1,27 +1,23 @@
-#![feature(proc_macro_hygiene, decl_macro)]
+#![allow(unused_variables, unused_mut)]
 
-#[macro_use] extern crate rocket;
+use actix_web::{web, App, HttpServer};
+use api::handler::Handler;
 
-use rocket_contrib::json::Json;
+mod api;
 
-mod modules;
-
-pub use crate::modules::factura;
-
-#[get("/")]
-fn index() -> &'static str {
-    "Hola, mundo!"
-}
-
-#[get("/fact/<id>")]
-fn factura(id: i64) -> Json<factura::Factura> {
-    let fact = factura::from(id);
-    match fact {
-        Ok(v) => return Json(v),
-        Err(e) => return Json(),
-    }
-}
-
-fn main() {
-   rocket::ignite().mount("/", routes![index]).launch();
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    std::env::set_var("RUST_LOG", "actix_web=debug");
+    HttpServer::new(|| {
+        App::new().service(
+            // prefixes all resources and routes attached to it...
+            web::scope("/api")
+                // ...so this handles requests for `GET /api`
+                .route("/",web::get().to(Handler::index))
+                .route("/r01/{id_persona}", web::get().to(Handler::get_persona_by_id))
+        )
+    })
+    .bind("127.0.0.1:8080")?
+    .run()
+    .await
 }
