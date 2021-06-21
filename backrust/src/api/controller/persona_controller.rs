@@ -1,6 +1,8 @@
 use std::result::Result;
 use super::models::Persona;
 
+// r01 -> rutas a persona controller
+
 pub struct PersonaController;
 
 impl PersonaController {

@@ -9,11 +9,11 @@ impl Handler {
     }
 
     pub async fn get_persona_by_id(
-        /*id_identificacion: web::Path<i32>,*/
-        id_persona: web::Path<String>,
+        params: web::Path<(i32,String)>,
     ) -> Result<HttpResponse, Error> {
+        let (id_identificacion, id_persona) = params.into_inner();
         Ok(web::block(move || {
-            PersonaController::get(/*id_identificacion.into_inner()*/ 3, id_persona.into_inner())
+            PersonaController::get(id_identificacion, id_persona)
         })
         .await
         .map(|persona| HttpResponse::Ok().json(persona))

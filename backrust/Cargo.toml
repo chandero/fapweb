@@ -12,6 +12,7 @@ rsfbclient = "0.16.0"
 serde="1.0.126"
 serde_json = "1.0.64"
 dotproperties = "0.1.0"
+chrono = "0.4.19"
 
 [features]
 pure_rust = ["rsfbclient/rsfbclient-rust"]

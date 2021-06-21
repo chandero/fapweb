@@ -14,7 +14,7 @@ async fn main() -> std::io::Result<()> {
             web::scope("/api")
                 // ...so this handles requests for `GET /api`
                 .route("/",web::get().to(Handler::index))
-                .route("/r01/{id_persona}", web::get().to(Handler::get_persona_by_id))
+                .route("/r01/{id_identificacion}/{id_persona}", web::get().to(Handler::get_persona_by_id))
         )
     })
     .bind("127.0.0.1:8080")?
