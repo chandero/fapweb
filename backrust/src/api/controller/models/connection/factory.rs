@@ -1,6 +1,6 @@
 use std::str::FromStr;
 use rsfbclient::SimpleConnection;
-use rsfbclient::{prelude::*, FbError, Charset};
+use rsfbclient::{prelude::*, FbError, Charset, Dialect};
 use std::collections::HashMap;
 
 pub struct Factory;
@@ -25,6 +25,7 @@ impl Factory {
             .user(db_user)
             .pass(db_pass)
             .charset(Charset::from_str(&db_charset[..]).unwrap())
+            .dialect(Dialect::D3)
             .connect()
             .unwrap();
 

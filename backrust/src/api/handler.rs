@@ -9,7 +9,7 @@ impl Handler {
     }
 
     pub async fn get_persona_by_id(
-        params: web::Path<(i32,String)>,
+        params: web::Path<(i64,String)>,
     ) -> Result<HttpResponse, Error> {
         let (id_identificacion, id_persona) = params.into_inner();
         Ok(web::block(move || {

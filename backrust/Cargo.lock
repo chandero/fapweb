@@ -324,6 +324,7 @@ name = "backrust"
 version = "0.1.0"
 dependencies = [
  "actix-web",
+ "base64",
  "chrono",
  "dotproperties",
  "rsfbclient",

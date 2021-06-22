@@ -1,8 +1,6 @@
 use chrono::{NaiveDateTime};
 use serde::{self, Deserialize, Serializer, Deserializer};
 
-const FORMAT: &'static str = "%Y-%m-%d";
-
 // The signature of a serialize_with function must follow the pattern:
 //
 //    fn serialize<S>(&T, S) -> Result<S::Ok, S::Error>
@@ -17,8 +15,10 @@ pub fn serialize<S>(
 where
     S: Serializer,
 {
-    let s = format!("{}", date.format(FORMAT));
-    serializer.serialize_str(&s)
+    //let s = format!("{}", date.format(FORMAT));
+    let s = date.timestamp() * 1000;
+    //serializer.serialize_str(&s)
+    serializer.serialize_i64(s)
 }
 
 // The signature of a deserialize_with function must follow the pattern:
@@ -34,7 +34,11 @@ pub fn deserialize<'de, D>(
 where
     D: Deserializer<'de>,
 {
-    let s = String::deserialize(deserializer)?;
-    NaiveDateTime::parse_from_str(&s, FORMAT).map_err(serde::de::Error::custom)
-    //Utc.datetime_from_str(&s, FORMAT).map_err(serde::de::Error::custom)
+    // let s = String::deserialize(deserializer)?;
+    let s = i64::deserialize(deserializer)?;
+    let date = NaiveDateTime::from_timestamp_opt(s/1000, 999);
+    match date {
+        Some(d) => Ok(d),
+        None => Err(serde::de::Error::custom("Invalid Integer to NaiveDateTime"))
+    }
 }
