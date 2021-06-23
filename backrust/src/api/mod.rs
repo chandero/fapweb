@@ -3,3 +3,4 @@ pub use controller::PersonaController;
 
 pub mod handler;
 pub mod controller;
+pub mod models;

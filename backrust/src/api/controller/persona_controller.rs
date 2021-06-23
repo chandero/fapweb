@@ -1,5 +1,5 @@
 use std::result::Result;
-use super::models::Persona;
+use crate::api::models::persona::Persona;
 
 // r01 -> rutas a persona controller
 
