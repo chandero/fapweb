@@ -10,6 +10,7 @@ pub use linea::Linea;
 pub use tasa_variable::TasaVariable;
 pub use estado_colocacion::EstadoColocacion;
 pub use colocacion::Colocacion;
+pub use extracto::Extracto;
 
 pub mod solicitud;
 pub mod ente_aprobador;
@@ -23,3 +24,4 @@ pub mod linea;
 pub mod tasa_variable;
 pub mod estado_colocacion;
 pub mod colocacion;
+pub mod extracto;

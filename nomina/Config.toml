@@ -1,0 +1,16 @@
+[server]
+ip = "127.0.0.1"
+port = "30080"
+tls = false
+
+[log]
+actix-web = "debug"
+nomina = "trace"
+
+[postgres]
+host = "127.0.0.1"
+port = "5432"
+username = "usernomina"
+password = "Mdn@wW<Bq5~49&EL"
+database = "nomina"
+schema = "nomina"

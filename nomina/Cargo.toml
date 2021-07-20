@@ -1,0 +1,8 @@
+[workspace]
+
+members = [
+  "protocol",
+  "backend",
+  "intermediate",  
+  "frontend",
+]
