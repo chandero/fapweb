@@ -20,6 +20,18 @@ import scala.concurrent.{Await, Future}
 import org.joda.time.DateTime
 import org.joda.time.LocalDate
 
+case class TipoLineaCredito (linea_id: Int, linea_descripcion: String, linea_tasa_efectiva: Double)
+object TipoLineaCredito {
+  var _set = {
+    get[Int]("linea_id") ~
+    get[String]("linea_descripcion") ~
+    get[Double]("linea_tasa_efectiva") map {
+      case linea_id ~ linea_descripcion ~ linea_tasa_efectiva => TipoLineaCredito(linea_id, linea_descripcion, linea_tasa_efectiva)
+    }
+  }
+}
+
+
 class TipoLineaCreditoRepository @Inject()(dbapi: DBApi)(
     implicit ec: DatabaseExecutionContext
 ) {
@@ -44,4 +56,18 @@ class TipoLineaCreditoRepository @Inject()(dbapi: DBApi)(
         )
       }
     }
+
+  /**
+    * obtenerLista
+    * @return Future[Iterable[Tipo]]
+    */
+  def obtenerListaApiRest(): Future[Iterable[TipoLineaCredito]] =
+    Future[Iterable[TipoLineaCredito]] {
+      db.withConnection { implicit connection =>
+        val _lineasResult = SQL("""SELECT id_linea as linea_id, descripcion_linea as linea_descripcion, tasa as linea_tasa_efectiva FROM \"col$lineas\" WHERE ESTADO = 1""")
+        .as(TipoLineaCredito._set *)
+        _lineasResult
+      }
+    }    
+    
 }

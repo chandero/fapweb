@@ -13,6 +13,11 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import pdi.jwt.JwtSession
 
+import net.liftweb.json._
+import net.liftweb.json.Serialization.write
+import net.liftweb.json.Serialization.read
+import net.liftweb.json.parse
+
 import utilities._
 
 @Singleton
@@ -22,6 +27,10 @@ class TipoLineaCreditoController @Inject()(
     authenticatedUserAction: AuthenticatedUserAction
 )(implicit ec: ExecutionContext)
     extends AbstractController(cc) {
+  implicit val formats = Serialization.formats(NoTypeHints) ++ List(
+    DateTimeSerializer
+  )
+
   def obtenerLista() = authenticatedUserAction.async {
     implicit request: Request[AnyContent] =>
       val usua_id = Utility.extraerUsuario(request)
@@ -29,4 +38,12 @@ class TipoLineaCreditoController @Inject()(
         Ok(Json.toJson(lista))
       }
   }
+
+  def obtenerListaApiRest() = Action.async {
+    implicit request: Request[AnyContent] =>
+      val usua_id = Utility.extraerUsuario(request)
+      tiService.obtenerListaApiRest().map { lista =>
+        Ok(write(lista))
+      }
+  }  
 }
