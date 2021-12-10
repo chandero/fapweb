@@ -7,7 +7,7 @@ function resolve(dir) {
   return path.join(__dirname, dir)
 }
 
-const name = defaultSettings.title || 'FAPWEB v.1.0.0' // page title
+const name = defaultSettings.title || 'FAP WEB 1.0' // page title
 
 module.exports = {
   publicPath: '/',
@@ -46,27 +46,29 @@ module.exports = {
     config
       .plugin('html')
       .tap(args => {
-        args[0].title = 'FAP WEB 1.0'
+        args[0].title = name
         return args
-    })    
-    config.plugin('preload').tap(() => [
-      {
-        rel: 'preload',
-        // to ignore runtime.js
-        // https://github.com/vuejs/vue-cli/blob/dev/packages/@vue/cli-service/lib/config/app.js#L171
-        fileBlacklist: [/\.map$/, /hot-update\.js$/, /runtime\..*\.js$/],
-        include: 'initial'
-      }
-    ])
+      }),
+    config
+      .plugin('preload')
+      .tap(() => [
+        {
+          rel: 'preload',
+          // to ignore runtime.js
+          // https://github.com/vuejs/vue-cli/blob/dev/packages/@vue/cli-service/lib/config/app.js#L171
+          fileBlacklist: [/\.map$/, /hot-update\.js$/, /runtime\..*\.js$/],
+          include: 'initial'
+        }
+      ]),
 
     // when there are many pages, it will cause too many meaningless requests
-    config.plugins.delete('prefetch')
+    config.plugins.delete('prefetch'),
 
     // set svg-sprite-loader
     config.module
       .rule('svg')
       .exclude.add(resolve('src/icons'))
-      .end()
+      .end(),
     config.module
       .rule('icons')
       .test(/\.svg$/)
@@ -77,7 +79,7 @@ module.exports = {
       .options({
         symbolId: 'icon-[name]'
       })
-      .end()
+      .end(),
 
     config
       .when(process.env.NODE_ENV !== 'development',
@@ -115,7 +117,7 @@ module.exports = {
                   reuseExistingChunk: true
                 }
               }
-            })
+            }),
           // https:// webpack.js.org/configuration/optimization/#optimizationruntimechunk
           config.optimization.runtimeChunk('single')
         }

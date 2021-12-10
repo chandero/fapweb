@@ -174,7 +174,7 @@ class LibroCajaDiarioRepository @Inject()(dbapi: DBApi, conf: Configuration)(imp
       val db = dbapi.database(base)
       var _listData = ListBuffer[LibroCajaDiario]()      
       db.withConnection { implicit connection =>
-        SQL("""SELECT * FROM CON$HISTORIALIBROREGISTRADO WHERE LIRE_ANHO = {lire_anho}""").
+        SQL("""SELECT * FROM CON$HISTORIALIBROREGISTRADO WHERE LIRE_ANHO = {lire_anho} AND LIRE_ID = 2""").
         on(
           'lire_anho -> anho
         ).as(LCDRelacion._set *)

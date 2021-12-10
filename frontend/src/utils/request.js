@@ -44,10 +44,11 @@ service.interceptors.response.use(
    * 以下代码均为样例，请结合自生需求加以修改，若不需要，则可删除
    */
   // response => {
-  //   const res = response.data
-  //   if (res.code !== 20000) {
+  //  const res = response.data
+  //  console.log("Response: ", response)
+  //  if (response.status !== 200) {
   //     Message({
-  //       message: res.message,
+  //       message: res,
   //       type: 'error',
   //       duration: 5 * 1000
   //     })
@@ -69,7 +70,7 @@ service.interceptors.response.use(
   //   } else {
   //     return response.data
   //   }
-  // },
+  //},
   error => {
     // console.log('err' + error) // for debug
     /* Message({

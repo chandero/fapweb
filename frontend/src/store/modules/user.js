@@ -1,5 +1,6 @@
 import { loginByUsername, logout, getUserInfo } from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
+import { Message } from 'element-ui'
 
 const user = {
   state: {
@@ -59,6 +60,11 @@ const user = {
           setToken(response.data.token)
           resolve()
         }).catch(error => {
+          Message({
+            message: 'Usuario o Contraseña Incorrectos!!',
+            type: 'error',
+            duration: 5 * 1000
+          })
           reject(error)
         })
       })

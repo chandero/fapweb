@@ -166,7 +166,7 @@ class LibroMayorRepository @Inject()(dbapi: DBApi, conf: Configuration)(implicit
       val dbdefault = dbapi.database("default"); 
       var _listData = ListBuffer[LibroMayor]()      
       dbdefault.withConnection { implicit connection =>
-        SQL("""SELECT * FROM CON$HISTORIALIBROREGISTRADO WHERE LIRE_ANHO = {lire_anho}""").
+        SQL("""SELECT * FROM CON$HISTORIALIBROREGISTRADO WHERE LIRE_ANHO = {lire_anho} AND LIRE_ID = 1""").
         on(
           'lire_anho -> anho
         ).as(LMRelacion._set *)
