@@ -180,7 +180,7 @@ class LibroMayorRepository @Inject()(dbapi: DBApi, conf: Configuration)(implicit
         if (anho == anho_actual) {
           base = "default"
         } else {
-          base = "db"+"%04".format(anho)
+          base = "db"+"%04d".format(anho)
         }
         val db = dbapi.database(base)
         val dbdefault = dbapi.database("default")
