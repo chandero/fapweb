@@ -60,7 +60,7 @@ export function verLibroCajaDiario(lire_anho, lire_periodo, lire_consecutivo) {
     lire_periodo,
     lire_consecutivo
   }
-  const url = window.location.protocol + '//' + window.location.host.split('/')[0].split(':')[0] + '/api' + '/info/verlcd/' + data.lire_anho + '/' + data.lire_periodo + '/' + data.lire_consecutivo
+  const url = window.location.protocol + '//' + window.location.host + '/api' + '/info/verlcd/' + data.lire_anho + '/' + data.lire_periodo + '/' + data.lire_consecutivo
   window.open(url, '_blank', 'location=no, menubar=no')
 }
 

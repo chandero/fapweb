@@ -305,7 +305,7 @@ class LibroMayorRepository @Inject()(dbapi: DBApi, conf: Configuration)(implicit
                 params.put("NIT", empresa._2)
                 params.put("ARCHIVO", nombre)
                 params.put("USUARIO", usuario)
-                params.put("PAGINA_LIBRO", (pagina_libro + 1).longValue().asInstanceOf[java.lang.Long])
+                params.put("PAGINA_LIBRO", (pagina_libro).longValue().asInstanceOf[java.lang.Long])
                 params.put("ANHO", "%d".format(anho))
                 params.put("PERIODO", Utility.mes(periodo))
 
@@ -337,7 +337,7 @@ class LibroMayorRepository @Inject()(dbapi: DBApi, conf: Configuration)(implicit
                     SQL("""UPDATE CON$LIBROREGISTRADO SET LIRE_PAGINA = {lire_pagina} WHERE LIRE_ID = {id}""").
                     on(
                       'id -> 1,
-                      'lire_pagina -> (pagina_libro + pagina)
+                      'lire_pagina -> (pagina_libro + (pagina + 1))
                     ).executeUpdate()
                   }
                   val destino = conf.get[String]("reporte_ruta")

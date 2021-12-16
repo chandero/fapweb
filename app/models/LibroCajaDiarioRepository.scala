@@ -188,7 +188,7 @@ class LibroCajaDiarioRepository @Inject()(dbapi: DBApi, conf: Configuration)(imp
         if (anho == anho_actual) {
           base = "default"
         } else {
-          base = "db"+"%04".format(anho)
+          base = "db"+"%04d".format(anho)
         }
         val db = dbapi.database(base)
         var default = dbapi.database("default")
@@ -245,7 +245,7 @@ class LibroCajaDiarioRepository @Inject()(dbapi: DBApi, conf: Configuration)(imp
                 params.put("NIT", empresa._2)
                 params.put("ARCHIVO", nombre)
                 params.put("USUARIO", usuario)
-                params.put("PAGINA_LIBRO", (pagina_libro + 1).longValue().asInstanceOf[java.lang.Long])
+                params.put("PAGINA_LIBRO", (pagina_libro).longValue().asInstanceOf[java.lang.Long])
                 params.put("ANHO", "%d".format(anho))
                 params.put("PERIODO", Utility.mes(periodo))
                 params.put("MES", Integer.valueOf(periodo))
@@ -278,7 +278,7 @@ class LibroCajaDiarioRepository @Inject()(dbapi: DBApi, conf: Configuration)(imp
                     SQL("""UPDATE CON$LIBROREGISTRADO SET LIRE_PAGINA = {lire_pagina} WHERE LIRE_ID = {id}""").
                     on(
                       'id -> 2,
-                      'lire_pagina -> (pagina_libro + pagina)
+                      'lire_pagina -> (pagina_libro + (pagina + 1))
                     ).executeUpdate()
                   }
                   val destino = conf.get[String]("reporte_ruta")
