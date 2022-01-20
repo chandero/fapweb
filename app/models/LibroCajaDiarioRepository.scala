@@ -229,7 +229,10 @@ class LibroCajaDiarioRepository @Inject()(dbapi: DBApi, conf: Configuration)(imp
                 val jasperFile = new java.io.File(REPORT_DEFINITION_PATH + "librocajadiario.jasper")
                 println("ruta: " + template)
                 val jasperReport: JasperReport = JRLoader.loadObject(jasperFile).asInstanceOf[JasperReport]
-                var consecutivo = default.withConnection { implicit connection => SQL("""SELECT COUNT(*) AS LIRE_CONSECUTIVO FROM CON$HISTORIALIBROREGISTRADO WHERE LIRE_ID = 2""").as(SqlParser.scalar[scala.Long].single) }
+                var consecutivo = default.withConnection { implicit connection => SQL("""SELECT COUNT(*) AS LIRE_CONSECUTIVO FROM CON$HISTORIALIBROREGISTRADO WHERE LIRE_ID = 2 AND LIRE_PERIODO = {periodo} and LIRE_ANHO = {anho}""").on(
+                    'periodo -> periodo,
+                    'anho -> anho
+                  ).as(SqlParser.scalar[scala.Long].single) }
                 consecutivo += 1
                 println("linea 01")
                 val pagina_libro = default.withConnection { implicit connection => SQL("""SELECT a.LIRE_PAGINA FROM CON$LIBROREGISTRADO a WHERE a.LIRE_ID = {lire_id}""").

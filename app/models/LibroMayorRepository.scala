@@ -25,6 +25,7 @@ import notifiers._
 import scala.collection.mutable.ListBuffer
 
 import java.util.UUID.randomUUID
+import java.text.SimpleDateFormat
 
 import utilities._
 
@@ -52,7 +53,7 @@ import play.api.Configuration
 
 case class PucLibro(codigo: Option[String], id_agencia: Option[Int], nombre: Option[String], saldo_inicial: Option[BigDecimal], descripcion_agencia: Option[String])
 case class LibroMayor(codigo: Option[String], nombre: Option[String], saldo_inicial: Option[BigDecimal], debito: Option[BigDecimal], credito: Option[BigDecimal], saldo_final: Option[BigDecimal])
-case class Saldo(codigo: Option[String], debito: Option[BigDecimal], credito: Option[BigDecimal])
+case class Saldo(debito: Option[BigDecimal], credito: Option[BigDecimal])
 case class LMRelacion(lire_anho: Option[Int], lire_periodo: Option[Int], lire_consecutivo: Option[Int], lire_fecha: Option[DateTime], lire_hora: Option[DateTime])
 
 object LMRelacion {
@@ -128,13 +129,11 @@ object Saldo {
     implicit val yourJodaDateWrites = JodaWrites.jodaDateWrites("yyyy-MM-dd'T'HH:mm:ss.SSSZ'")
   
     val _set = {
-      get[Option[String]]("CODIGO") ~
       get[Option[BigDecimal]]("DEBITO") ~
       get[Option[BigDecimal]]("CREDITO") map {
-        case codigo ~ 
+        case 
              debito ~ 
              credito => Saldo(
-               codigo,
                debito,
                credito
              )
@@ -185,25 +184,81 @@ class LibroMayorRepository @Inject()(dbapi: DBApi, conf: Configuration)(implicit
         val db = dbapi.database(base)
         val dbdefault = dbapi.database("default")
         var _listData = ListBuffer[LibroMayor]()
+        var _fecha_inicial = Calendar.getInstance()
+        var _fecha_final = Calendar.getInstance()
+        
+        if (periodo == 1) {
+          _fecha_inicial.set(Calendar.YEAR, 1973)
+          _fecha_inicial.set(Calendar.MONTH, 0)
+          _fecha_inicial.set(Calendar.DATE, 1)
+          _fecha_inicial.set(Calendar.HOUR, 0)
+          _fecha_inicial.set(Calendar.MINUTE, 0)
+          _fecha_inicial.set(Calendar.SECOND, 0)
+          _fecha_inicial.set(Calendar.MILLISECOND, 0)
+
+          _fecha_final.set(Calendar.YEAR, 1973)
+          _fecha_final.set(Calendar.MONTH, 0)
+          _fecha_final.set(Calendar.DATE, 31)
+          _fecha_final.set(Calendar.HOUR, 0)
+          _fecha_final.set(Calendar.MINUTE, 0)
+          _fecha_final.set(Calendar.SECOND, 0)
+          _fecha_final.set(Calendar.MILLISECOND, 0)          
+        } else {
+          _fecha_inicial.set(Calendar.YEAR, anho)
+          _fecha_inicial.set(Calendar.MONTH, periodo-2)
+          _fecha_inicial.set(Calendar.DATE, 1)
+          _fecha_inicial.set(Calendar.HOUR, 0)
+          _fecha_inicial.set(Calendar.MINUTE, 0)
+          _fecha_inicial.set(Calendar.SECOND, 0)
+          _fecha_inicial.set(Calendar.MILLISECOND, 0)
+          var _last_day = _fecha_inicial.getActualMaximum(Calendar.DAY_OF_MONTH);        
+          _fecha_final.set(Calendar.YEAR, anho)
+          _fecha_final.set(Calendar.MONTH, periodo-2)
+          _fecha_final.set(Calendar.DATE, _last_day)
+          _fecha_final.set(Calendar.HOUR, 23)
+          _fecha_final.set(Calendar.MINUTE, 59)
+          _fecha_final.set(Calendar.SECOND, 59)
+          _fecha_final.set(Calendar.MILLISECOND, 999)
+        }
+        var _fecha_mov_inicial = Calendar.getInstance()
+        var _fecha_mov_final = Calendar.getInstance()
+        
+        _fecha_mov_inicial.set(Calendar.YEAR, anho)
+        _fecha_mov_inicial.set(Calendar.MONTH, periodo - 1)
+        _fecha_mov_inicial.set(Calendar.DATE, 1)
+        _fecha_mov_inicial.set(Calendar.HOUR, 0)
+        _fecha_mov_inicial.set(Calendar.MINUTE, 0)
+        _fecha_mov_inicial.set(Calendar.SECOND, 0)
+        _fecha_mov_inicial.set(Calendar.MILLISECOND, 0)
+
+        var _last_mov_day = _fecha_mov_inicial.getActualMaximum(Calendar.DAY_OF_MONTH);        
+        _fecha_mov_final.set(Calendar.YEAR, anho)
+        _fecha_mov_final.set(Calendar.MONTH, periodo - 1)
+        _fecha_mov_final.set(Calendar.DATE, _last_mov_day)   
+
+        var sdf = new SimpleDateFormat("yyyy-MM-dd");
+      
         db.withConnection {
             implicit connection =>
             val id_agencia = conf.get[String]("id_agencia")
             val empresa: (String, String) = dbdefault.withConnection { implicit connection =>
               SQL("""SELECT EMPR_DESCRIPCION, EMPR_IDENTIFICACION FROM EMPRESA""").as(SqlParser.str(1) ~ SqlParser.str(2) map (SqlParser.flatten) single)
             }
-            val anterior = """SELECT "con$puc".CODIGO, SUM("con$saldoscuenta".DEBITO) AS DEBITO, SUM("con$saldoscuenta".CREDITO) AS CREDITO
-                              FROM "con$puc"
-                              LEFT JOIN "con$saldoscuenta" ON ("con$puc".CODIGO = "con$saldoscuenta".CODIGO)
-                              WHERE
-                                ("con$puc".CODIGO = {codigo}) and
-                                ("con$saldoscuenta".MES < {mes}) 
-                              GROUP BY "con$puc".CODIGO"""
 
-            val actual = """SELECT "con$puc".CODIGO, "con$saldoscuenta".DEBITO, "con$saldoscuenta".CREDITO
-                            FROM "con$puc"
-                            LEFT JOIN "con$saldoscuenta" ON ("con$puc".CODIGO = "con$saldoscuenta".CODIGO)
-                            WHERE
-                            ("con$puc".CODIGO = {codigo}) and ("con$saldoscuenta".MES = {mes})
+            /* _query_mov = """SELECT SUM(a.DEBITO) AS DEBITO, SUM(a.CREDITO) AS CREDITO FROM "con$comprobante" c
+                               INNER JOIN "con$auxiliar" a ON a.TIPO_COMPROBANTE = c.TIPO_COMPROBANTE and a.ID_COMPROBANTE = c.ID_COMPROBANTE
+                               WHERE a.FECHA BETWEEN :FECHA_INI and :FECHA_FIN and a.CODIGO LIKE :CODIGO
+                               and c.ESTADO = 'C'
+            */
+            val anterior = """SELECT SUM(a.DEBITO) AS DEBITO, SUM(a.CREDITO) AS CREDITO FROM "con$comprobante" c
+                               INNER JOIN "con$auxiliar" a ON a.TIPO_COMPROBANTE = c.TIPO_COMPROBANTE and a.ID_COMPROBANTE = c.ID_COMPROBANTE
+                               WHERE a.FECHA BETWEEN {fecha_inicial} and {fecha_final} and a.CODIGO LIKE {codigo}
+                               and c.ESTADO = 'C'"""
+
+            val actual = """SELECT SUM(a.DEBITO) AS DEBITO, SUM(a.CREDITO) AS CREDITO FROM "con$comprobante" c
+                               INNER JOIN "con$auxiliar" a ON a.TIPO_COMPROBANTE = c.TIPO_COMPROBANTE and a.ID_COMPROBANTE = c.ID_COMPROBANTE
+                               WHERE a.FECHA BETWEEN {fecha_inicial} and {fecha_final} and a.CODIGO LIKE {codigo}
+                               and c.ESTADO = 'C'
                          """
 
             val puc = SQL("""SELECT "con$puc".CODIGO, "con$puc".ID_AGENCIA, "con$puc".NOMBRE, "con$puc".SALDOINICIAL, "gen$agencia".DESCRIPCION_AGENCIA
@@ -222,13 +277,19 @@ class LibroMayorRepository @Inject()(dbapi: DBApi, conf: Configuration)(implicit
               ).as(SqlParser.scalar[String].single)
             }
             puc.map { p =>
+                        val _codigo = p.codigo match {
+                          case Some(c) => c.substring(0,4) + '%'
+                          case None => ""
+                        }
                         val s_ant = SQL(anterior).on(
-                                   'codigo -> p.codigo,
-                                   'mes -> periodo
+                                   'codigo -> _codigo,
+                                   'fecha_inicial -> sdf.format(_fecha_inicial.getTime()),
+                                   'fecha_final -> sdf.format(_fecha_final.getTime())
                                ).as(Saldo._set.singleOpt)
                         val s_act = SQL(actual).on(
-                                    'codigo -> p.codigo,
-                                    'mes -> periodo
+                                    'codigo -> _codigo,
+                                   'fecha_inicial -> sdf.format(_fecha_mov_inicial.getTime()),
+                                   'fecha_final -> sdf.format(_fecha_mov_final.getTime())
                                 ).as(Saldo._set.singleOpt)
                         var saldo_anterior = BigDecimal(0)
                         p.saldo_inicial match {
@@ -269,6 +330,9 @@ class LibroMayorRepository @Inject()(dbapi: DBApi, conf: Configuration)(implicit
                             }
                           case None => None
                         }
+
+                        println("saldo_anterior: " + s_ant);
+                        println("saldo_actual: " + s_act);
 
                         val lm = new LibroMayor(p.codigo, p.nombre, Some(saldo_anterior + debito_ant - credito_ant),  Some(debito_act), Some(credito_act), Some(saldo_anterior + debito_ant - credito_ant + debito_act - credito_act))
                         _listData += lm

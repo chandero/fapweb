@@ -58,14 +58,23 @@ export default {
   },
   methods: {
     generar() {
+      const loading = this.$loading({
+        lock: true,
+        text: 'Generando Libro',
+      });      
       genLibroCajaDiario(this.form.periodo, this.form.anho, this.form.definitivo).then(response => {
-        console.log('resultado: "' + response.data + '"')
+        loading.close()
         if (response.data === true) {
           this.dialogVisible = true
         } else {
           this.dialogVisible = false
         }
-        console.log('data: ' + JSON.stringify(response))
+      }).catch(err => {
+        loading.close()
+        this.$message({
+          type: 'error',
+          message: 'Error al generar el Libro Caja Diario :(' + err + ')'
+        })
       })
     }
   }
