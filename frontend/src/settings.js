@@ -1,5 +1,5 @@
 module.exports = {
-  title: 'FAPWEB v1.0.0',
+  title: 'SIF WEB v1.0.0',
 
   /**
      * @type {boolean} true | false

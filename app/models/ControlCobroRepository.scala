@@ -93,6 +93,7 @@ class ControlCobroRepository @Inject()(dbapi: DBApi, _f: Funcion, _gcol: Globale
                                         c._1._1,
                                         c._1._2, 
                                         nombre, 
+                                        Some(valor),
                                         Some(deuda), 
                                         c._6._1,
                                         c._3._4,
@@ -117,6 +118,7 @@ class ControlCobroRepository @Inject()(dbapi: DBApi, _f: Funcion, _gcol: Globale
                                         c._1._1,
                                         c._1._2, 
                                         nombre, 
+                                        Some(valor),
                                         Some(deuda), 
                                         c._6._1,
                                         c._3._4,
@@ -194,6 +196,7 @@ class ControlCobroRepository @Inject()(dbapi: DBApi, _f: Funcion, _gcol: Globale
                                         c._1._1,
                                         c._1._2, 
                                         nombre, 
+                                        Some(valor),
                                         Some(deuda), 
                                         c._6._1,
                                         c._3._4,
@@ -273,6 +276,7 @@ class ControlCobroRepository @Inject()(dbapi: DBApi, _f: Funcion, _gcol: Globale
                                         c._1._1,
                                         c._1._2, 
                                         nombre, 
+                                        Some(valor),
                                         Some(deuda), 
                                         c._6._1,
                                         c._3._4,
@@ -294,7 +298,7 @@ class ControlCobroRepository @Inject()(dbapi: DBApi, _f: Funcion, _gcol: Globale
       }
       _lista.toList      
   }
-  
+
   def obtenerDireccion(id_identificacion: Int, id_persona: String): Future[Iterable[Direccion]] = Future[Iterable[Direccion]] {
     val direcciones = db.withConnection { implicit connection =>
       SQL(

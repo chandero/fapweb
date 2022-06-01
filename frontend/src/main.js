@@ -14,6 +14,7 @@ import VueCurrencyFilter from "vue-currency-filter";
 import VueCurrencyInput from "vue-currency-input";
 import VuePercentInput from "vue-percent-input";
 import VueMask from "v-mask";
+import VueSSE from "vue-sse";
 
 import App from "./App";
 import store from "./store";
@@ -26,10 +27,15 @@ import "./permission"; // permission control
 // import './mock' // simulation data
 
 import * as filters from "./filters"; // global filters
+// Session Idle
+import IdleVue from "idle-vue";
+
+import { v4 as uuidv4 } from "uuid";
 
 Vue.use(VueMoment);
 Vue.use(VuePercentInput);
 Vue.use(VueMask);
+Vue.use(VueSSE);
 Vue.use(VueCurrencyFilter, [
   {
     // default name 'currency'
@@ -69,6 +75,26 @@ Object.keys(filters).forEach(key => {
 });
 
 Vue.config.productionTip = false;
+
+const eventsHub = new Vue();
+
+Vue.use(IdleVue, {
+  eventEmmiter: eventsHub,
+  store,
+  idleTime: 60000, // 60 segundos
+  startAtIdle: false
+});
+
+const uuid = localStorage.getItem("SessionUUID");
+console.log("Uuid almacenado: " + uuid);
+if (uuid !== undefined && uuid !== null && uuid !== "") {
+  console.log("Usando uuid almacenado: " + uuid);
+  store.dispatch("SetUUID", uuid);
+} else {
+  const nuuid = uuidv4();
+  console.log("Usando uuid NUEVO: " + nuuid);
+  store.dispatch("SetUUID", nuuid);
+}
 
 new Vue({
   router,

@@ -7,7 +7,7 @@ function resolve(dir) {
   return path.join(__dirname, dir)
 }
 
-const name = defaultSettings.title || 'FAP WEB 1.0' // page title
+const name = defaultSettings.title || 'SIF WEB 1.0' // page title
 
 module.exports = {
   publicPath: '/',
@@ -21,8 +21,8 @@ module.exports = {
         target: 'http://localhost:9000',
         secure: false,
         changeOrigin: true,
-        proxyTimeout: 0,
-        timeout: 0,
+        proxyTimeout: 600000,
+        timeout: 600000,
         onProxyReq: (proxyReq, req, res) => req.setTimeout(0)
       },
       '^/ipa': {
@@ -32,8 +32,8 @@ module.exports = {
         },
         secure: false,
         changeOrigin: true,
-        proxyTimeout: 0,
-        timeout: 0,
+        proxyTimeout: 600000,
+        timeout: 600000,
         onProxyReq: (proxyReq, req, res) => req.setTimeout(0)
       }
     },

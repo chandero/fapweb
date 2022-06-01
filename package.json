@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "idle-vue": "^2.0.5",
+    "uuid": "^8.3.2"
+  }
+}

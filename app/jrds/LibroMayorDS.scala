@@ -6,26 +6,26 @@ import net.sf.jasperreports.engine.JRField
 
 import models.LibroMayor
 
-import java.util.{ HashMap, Map }
+import java.util.{HashMap, Map}
 
 class LibroMayorDS(listData: ListBuffer[LibroMayor]) extends JRDataSource {
 
-    var i = -1
+  var i = -1
 
-    override def next(): Boolean = {
-        i += 1
-        i < listData.length
-      }
+  override def next(): Boolean = {
+    i += 1
+    i < listData.length
+  }
 
-    override def getFieldValue(jrField: JRField): AnyRef = {
-        jrField.getName match {
-          case "codigo" ⇒ listData(i).codigo.get.substring(0,4)
-          case "nombre" ⇒ listData(i).nombre.get
-          case "anterior" ⇒ listData(i).saldo_inicial.get.bigDecimal
-          case "debito" ⇒ listData(i).debito.get.bigDecimal
-          case "credito" ⇒ listData(i).credito.get.bigDecimal
-          case "actual" ⇒ listData(i).saldo_final.get.bigDecimal
-          case _ ⇒ None
-        }
-      }
+  override def getFieldValue(jrField: JRField): AnyRef = {
+    jrField.getName match {
+      case "codigo"   => listData(i).codigo.get.substring(0, 4)
+      case "nombre"   => listData(i).nombre.get
+      case "anterior" => listData(i).saldo_inicial.get.bigDecimal
+      case "debito"   => listData(i).debito.get.bigDecimal
+      case "credito"  => listData(i).credito.get.bigDecimal
+      case "actual"   => listData(i).saldo_final.get.bigDecimal
+      case _          => None
+    }
+  }
 }

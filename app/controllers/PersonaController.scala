@@ -15,13 +15,21 @@ import pdi.jwt.JwtSession
 
 import utilities._
 
+import net.liftweb.json._
+import net.liftweb.json.Serialization.write
+import net.liftweb.json.Serialization.read
+import net.liftweb.json.parse
+
 @Singleton
 class PersonaController @Inject()(
     pService: PersonaRepository,
     cc: ControllerComponents,
     authenticatedUserAction: AuthenticatedUserAction
 )(implicit ec: ExecutionContext)
-    extends AbstractController(cc) {
+    extends AbstractController(cc) with ImplicitJsonFormats {
+  implicit val formats = Serialization.formats(NoTypeHints) ++ List(
+    DateTimeSerializer
+  )
         def obtener(id_identificacion: Int, id_persona: String) = authenticatedUserAction.async {
             implicit request: Request[AnyContent] =>
               val usua_id = Utility.extraerUsuario(request)
@@ -32,6 +40,16 @@ class PersonaController @Inject()(
                 }
               }
         }
+
+        def obtenerAction(id_identificacion: Int, id_persona: String) = Action.async {
+            implicit request: Request[AnyContent] =>
+              pService.obtener(id_identificacion, id_persona).map { p =>
+                p.a match {
+                  case Some(a) => Ok(write(p))
+                  case None => NotFound
+                }
+              }
+        }        
 
         def obtenerPorApellidosyNombres() = authenticatedUserAction.async {
             implicit request: Request[AnyContent] =>
@@ -66,4 +84,17 @@ class PersonaController @Inject()(
             }
           }
         }
+
+        def guardarAction() = Action.async {
+          implicit request: Request[AnyContent] =>
+          val json = request.body.asJson.get
+          var p = net.liftweb.json.parse(json.toString()).extract[Persona]
+          pService.guardar(p).map { result =>
+            if (result) {
+              Ok
+            } else {
+              NotModified
+            }
+          }
+        }        
     }

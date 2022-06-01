@@ -29,4 +29,12 @@ class TipoViviendaController @Inject()(
         Ok(Json.toJson(lista))
       }
   }
+
+  def obtenerListaAction() = Action.async {
+    implicit request: Request[AnyContent] =>
+      val usua_id = Utility.extraerUsuario(request)
+      tiService.obtenerLista().map { lista =>
+        Ok(Json.toJson(lista))
+      }
+  }  
 }

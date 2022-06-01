@@ -1,13 +1,13 @@
 <template>
   <el-container>
     <el-dialog
-      title="FAPWEB-Sesión"
+      title="SIFWEB-Sesión"
       :visible.sync="dialogVisible"
       width="50%"
       :close-on-click-modal="false"
       :close-on-press-escape="false"
       :show-close="false">
-      <span>Después de 10 minutos de inactividad, FAPWEB finalizará la sesión.</span>
+      <span>Después de 10 minutos de inactividad, SIF WEB finalizará la sesión.</span>
       <span>Tiempo Faltante {{ hora(time/1000) }} </span>
       <span slot="footer" class="dialog-footer">
   </span>

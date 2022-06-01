@@ -29,4 +29,10 @@ class TipoPersonaController @Inject()(
         Ok(Json.toJson(lista))
       }
   }
+  def obtenerListaAction() = Action.async {
+    implicit request: Request[AnyContent] =>
+      tiService.obtenerLista().map { lista =>
+        Ok(Json.toJson(lista))
+      }
+  }  
 }

@@ -1,3 +1,5 @@
+import parametro from "./modules/parametro";
+
 const getters = {
   sidebar: state => state.app.sidebar,
   language: state => state.app.language,
@@ -16,6 +18,12 @@ const getters = {
   addRouters: state => state.permission.addRouters,
   errorLogs: state => state.errorLog.logs,
   periodos: state => state.app.periodos,
-  id_empleado: state => state.user.id_empleado
-}
-export default getters
+  id_empleado: state => state.user.id_empleado,
+  months: state => state.app.months,
+  secret: state => state.app.secret,
+  baseurl: state => state.app.baseurl,
+  sessionUUID: state => state.app.sessionUUID,
+  ultimaCarga: state => state.user.ultimaCarga,
+  tipo_cartera: state => state.parametro.tipo_cartera
+};
+export default getters;

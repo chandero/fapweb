@@ -81,12 +81,12 @@
             </el-table-column>
             <el-table-column label="Saldo" prop="saldo" align="right" width="110">
               <template slot-scope="scope">
-                <span style="margin-left: 10px">{{ (scope.row.valor_desembolso - scope.row.abonos_capital) | currency }}</span>
+                <span style="margin-left: 10px">{{ (scope.row.saldo) | currency }}</span>
               </template>
             </el-table-column>
             <el-table-column label="Cuota" prop="cuota" align="right" width="110">
               <template slot-scope="scope">
-                <span style="margin-left: 10px">{{ scope.row.valor_cuota | currency }}</span>
+                <span style="margin-left: 10px">{{ scope.row.cuota | currency }}</span>
               </template>
             </el-table-column>
             <el-table-column label="Capital" prop="fecha_capital" width="110">

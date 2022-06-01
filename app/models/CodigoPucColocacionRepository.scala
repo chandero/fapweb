@@ -229,7 +229,7 @@ class CodigoPucColocacionRepository @Inject()(dbapi: DBApi)(
   
   def obtener(id_clasificacion: Int, id_garantia: Int, id_categoria: String): CodigoPucColocacion = {
     db.withConnection { implicit connection => 
-                        SQL("""SELECT * FROM "col$codigospuc" c WHERE 
+                        SQL("""SELECT * FROM col$codigospuc c WHERE 
                                 c.ID_CLASIFICACION = {id_clasificacion} and 
                                 c.ID_GARANTIA = {id_garantia} and
                                 c.ID_CATEGORIA = {id_categoria}""").
@@ -243,7 +243,7 @@ class CodigoPucColocacionRepository @Inject()(dbapi: DBApi)(
 
   def obtenerFacturado(id_clasificacion: Int, id_garantia: Int, id_categoria: String): CodigoPucBasico = {
     db.withConnection { implicit connection => 
-                        SQL("""SELECT * FROM "col$codigospucfacturado" c WHERE 
+                        SQL("""SELECT * FROM col$codigospucfacturado c WHERE 
                                 c.ID_CLASIFICACION = {id_clasificacion} and 
                                 c.ID_GARANTIA = {id_garantia} and
                                 c.ID_CATEGORIA = {id_categoria}""").

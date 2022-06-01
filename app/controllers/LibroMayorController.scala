@@ -32,10 +32,10 @@ class LibroMayorController @Inject()(
       }
     }
 
-    def generar(periodo: Int, anho: Int) = authenticatedUserAction.async { implicit request: Request[AnyContent] =>
+    def generar(periodo: Int, anho: Int, definitivo: Boolean) = authenticatedUserAction.async { implicit request: Request[AnyContent] =>
         val usua_id = Utility.extraerUsuario(request)
-        mayorService.generar(periodo, anho, usua_id.get).map { exito =>
-          Ok(Json.toJson(exito))
+        mayorService.generar(periodo, anho, usua_id.get, definitivo).map { os =>
+          Ok(os).as("application/pdf")
         }
     }
 

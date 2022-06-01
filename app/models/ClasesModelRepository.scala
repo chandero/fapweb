@@ -1011,6 +1011,7 @@ case class ControlCobroVista(
     id_agencia: Option[Int],
     id_colocacion: Option[String],
     nombre: Option[String],
+    valor: Option[BigDecimal],
     saldo: Option[BigDecimal],
     cuota: Option[BigDecimal],
     plazo: Option[Int],
@@ -1063,6 +1064,7 @@ object ControlCobroVista {
         "id_agencia" -> e.id_agencia,
         "id_colocacion" -> e.id_colocacion,
         "nombre" -> e.nombre,
+        "valor" -> e.valor,
         "saldo" -> e.saldo,
         "cuota" -> e.cuota,
         "plazo" -> e.plazo,
@@ -1086,6 +1088,7 @@ object ControlCobroVista {
     (__ \ "id_agencia").readNullable[Int] and
     (__ \ "id_colocacion").readNullable[String] and
     (__ \ "nombre").readNullable[String] and
+    (__ \ "valor").readNullable[BigDecimal] and
     (__ \ "saldo").readNullable[BigDecimal] and
     (__ \ "cuota").readNullable[BigDecimal] and
     (__ \ "plazo").readNullable[Int] and

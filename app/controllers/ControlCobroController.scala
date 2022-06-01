@@ -39,6 +39,14 @@ class ControlCobroController @Inject()(
         }
     }
 
+    def obtenerCreditosPorDocumentoAction(id_identificacion: Int, id_persona: String) = Action.async {
+        implicit request: Request[AnyContent] =>
+              // val usua_id = Utility.extraerUsuario(request)
+        cService.obtenerCreditos(id_identificacion, id_persona).map { p =>
+            Ok(Json.toJson(p))
+        }
+    }    
+
     def obtenerCreditoPorColocacion(id_colocacion: String) = authenticatedUserAction.async {
         implicit request: Request[AnyContent] =>
               // val usua_id = Utility.extraerUsuario(request)

@@ -7,8 +7,9 @@ export function genLibroMayor(periodo, anho, definitivo) {
     definitivo
   }
   return request({
-    url: '/info/genlm/' + data.periodo + '/' + data.anho,
-    method: 'get'
+    url: '/info/genlm/' + data.periodo + '/' + data.anho + '/' + data.definitivo,
+    method: 'get',
+    responseType: 'blob'
   })
 }
 
@@ -19,8 +20,9 @@ export function genLibroCajaDiario(periodo, anho, definitivo) {
     definitivo
   }
   return request({
-    url: '/info/genlcd/' + data.periodo + '/' + data.anho,
-    method: 'get'
+    url: '/info/genlcd/' + data.periodo + '/' + data.anho + '/' + data.definitivo,
+    method: 'get',
+    responseType: 'blob'
   })
 }
 
@@ -149,5 +151,16 @@ export function informeColocacionSaldadoAsesor(ases_id) {
     },
     responseType: 'blob',
     method: 'get'
+  })
+}
+
+export function InformeBancolombia() {
+  return request({
+    url: 'info/bcol',
+    method: 'get',
+    headers: {
+      'content-type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8',
+    },
+    responseType: 'blob'
   })
 }

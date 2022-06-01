@@ -27,8 +27,8 @@ export default {
   data () {
     return {
       title: settings.title,
-      logo: 'logotexto.png',
-      minilogo: 'logosimbolo.png'
+      logo: 'logo.png',
+      minilogo: 'logo.png'
     }
   }
 }
