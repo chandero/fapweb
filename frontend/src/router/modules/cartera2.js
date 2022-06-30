@@ -91,7 +91,13 @@ const cartera2Router = {
           component: () => import('@/views/cartera2/menu4informe/menu4-2recaudointerescausado'),
           name: 'menu_cartera_menu4informe_menu4-2recaudointerescausado',
           meta: { title: 'menu_cartera_menu4informe_menu4-2recaudointerescausado', icon: 'coin5', roles: ['admin', 'cartera', 'gerencia'] }
-        }
+        },
+        {
+          path: 'menu4-3bancolombia',
+          component: () => import('@/views/cartera2/menu4informe/menu4-3bancolombia'),
+          name: 'menu_cartera_menu4informe_menu4-3bancolombia',
+          meta: { title: 'menu_cartera_menu4informe_menu4-3bancolombia', icon: 'coin5', roles: ['admin', 'cartera', 'gerencia'] }
+        } 
       ]
     },
     {

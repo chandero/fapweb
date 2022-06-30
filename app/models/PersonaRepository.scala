@@ -57,25 +57,25 @@ case class Persona_b(
     fecha_ingreso_empresa: Option[DateTime], // 11
     cargo_actual: Option[String], // 12
     declaracion: Option[String], // 13
-    ingresos_a_principal: Option[BigDecimal], // 14
-    ingresos_otros: Option[BigDecimal], // 15
-    ingresos_conyuge: Option[BigDecimal], // 16
-    ingresos_conyuge_otros: Option[BigDecimal], // 17
+    ingresos_a_principal: Option[Double], // 14
+    ingresos_otros: Option[Double], // 15
+    ingresos_conyuge: Option[Double], // 16
+    ingresos_conyuge_otros: Option[Double], // 17
     desc_ingr_otros: Option[String] // 18
 )
 
 case class Persona_c(
-    egresos_alquiler: Option[BigDecimal], // 1
-    egresos_servicios: Option[BigDecimal], // 2
-    egresos_transporte: Option[BigDecimal], // 3
-    egresos_alimentacion: Option[BigDecimal], // 4
-    egresos_deudas: Option[BigDecimal], // 5
-    egresos_otros: Option[BigDecimal], // 6
+    egresos_alquiler: Option[Double], // 1
+    egresos_servicios: Option[Double], // 2
+    egresos_transporte: Option[Double], // 3
+    egresos_alimentacion: Option[Double], // 4
+    egresos_deudas: Option[Double], // 5
+    egresos_otros: Option[Double], // 6
     desc_egre_otros: Option[String], // 7
-    egresos_conyuge: Option[BigDecimal], // 8
-    otros_egresos_conyuge: Option[BigDecimal], // 9
-    total_activos: Option[BigDecimal], // 10
-    total_pasivos: Option[BigDecimal], // 11
+    egresos_conyuge: Option[Double], // 8
+    otros_egresos_conyuge: Option[Double], // 9
+    total_activos: Option[Double], // 10
+    total_pasivos: Option[Double], // 11
     educacion: Option[Int], // 12
     retefuente: Option[Int], // 13
     acta: Option[String], // 14
@@ -87,7 +87,7 @@ case class Persona_c(
 
 case class Persona_d(
     duracion_sociedad: Option[Int], // 1
-    capital_social: Option[BigDecimal], // 2
+    capital_social: Option[Double], // 2
     matricula_mercantil: Option[String], // 3
     foto_huella: Option[Array[Byte]], // 4
     datos_huella: Option[Array[Byte]], // 5
@@ -103,7 +103,7 @@ case class Persona_e(
     descripcion_contrato: Option[String],
     id_sector: Option[Int],
     descripcion_sector: Option[String],
-    venta_anual: Option[BigDecimal],
+    venta_anual: Option[Double],
     fecha_ultimo_balance: Option[DateTime],
     numero_empleados: Option[Int],
     declara_renta: Option[Int],
@@ -576,10 +576,10 @@ object Persona_b {
       (__ \ "fecha_ingreso_empresa").readNullable[DateTime] and
       (__ \ "cargo_actual").readNullable[String] and
       (__ \ "declaracion").readNullable[String] and
-      (__ \ "ingresos_a_principal").readNullable[BigDecimal] and
-      (__ \ "ingresos_otros").readNullable[BigDecimal] and
-      (__ \ "ingresos_conyuge").readNullable[BigDecimal] and
-      (__ \ "ingresos_conyuge_otros").readNullable[BigDecimal] and
+      (__ \ "ingresos_a_principal").readNullable[Double] and
+      (__ \ "ingresos_otros").readNullable[Double] and
+      (__ \ "ingresos_conyuge").readNullable[Double] and
+      (__ \ "ingresos_conyuge_otros").readNullable[Double] and
       (__ \ "desc_ingr_otros").readNullable[String]
   )(Persona_b.apply _)
 
@@ -597,10 +597,10 @@ object Persona_b {
       get[Option[DateTime]]("fecha_ingreso_empresa") ~
       get[Option[String]]("cargo_actual") ~
       get[Option[String]]("declaracion") ~
-      get[Option[BigDecimal]]("ingresos_a_principal") ~
-      get[Option[BigDecimal]]("ingresos_otros") ~
-      get[Option[BigDecimal]]("ingresos_conyuge") ~
-      get[Option[BigDecimal]]("ingresos_conyuge_otros") ~
+      get[Option[Double]]("ingresos_a_principal") ~
+      get[Option[Double]]("ingresos_otros") ~
+      get[Option[Double]]("ingresos_conyuge") ~
+      get[Option[Double]]("ingresos_conyuge_otros") ~
       get[Option[String]]("desc_ingr_otros") map {
       case id_apoderado ~
             id_identificacion_apoderado ~
@@ -674,17 +674,17 @@ object Persona_c {
   }
 
   implicit val pbReads: Reads[Persona_c] = (
-    (__ \ "egresos_alquiler").readNullable[BigDecimal] and
-      (__ \ "egresos_servicios").readNullable[BigDecimal] and
-      (__ \ "egresos_transporte").readNullable[BigDecimal] and
-      (__ \ "egresos_alimentacion").readNullable[BigDecimal] and
-      (__ \ "egresos_deudas").readNullable[BigDecimal] and
-      (__ \ "egresos_otros").readNullable[BigDecimal] and
+    (__ \ "egresos_alquiler").readNullable[Double] and
+      (__ \ "egresos_servicios").readNullable[Double] and
+      (__ \ "egresos_transporte").readNullable[Double] and
+      (__ \ "egresos_alimentacion").readNullable[Double] and
+      (__ \ "egresos_deudas").readNullable[Double] and
+      (__ \ "egresos_otros").readNullable[Double] and
       (__ \ "desc_egre_otros").readNullable[String] and
-      (__ \ "egresos_conyuge").readNullable[BigDecimal] and
-      (__ \ "otros_egresos_conyuge").readNullable[BigDecimal] and
-      (__ \ "total_activos").readNullable[BigDecimal] and
-      (__ \ "total_pasivos").readNullable[BigDecimal] and
+      (__ \ "egresos_conyuge").readNullable[Double] and
+      (__ \ "otros_egresos_conyuge").readNullable[Double] and
+      (__ \ "total_activos").readNullable[Double] and
+      (__ \ "total_pasivos").readNullable[Double] and
       (__ \ "educacion").readNullable[Int] and
       (__ \ "retefuente").readNullable[Int] and
       (__ \ "acta").readNullable[String] and
@@ -695,17 +695,17 @@ object Persona_c {
   )(Persona_c.apply _)
 
   val _set = {
-    get[Option[BigDecimal]]("egresos_alquiler") ~
-      get[Option[BigDecimal]]("egresos_servicios") ~
-      get[Option[BigDecimal]]("egresos_transporte") ~
-      get[Option[BigDecimal]]("egresos_alimentacion") ~
-      get[Option[BigDecimal]]("egresos_deudas") ~
-      get[Option[BigDecimal]]("egresos_otros") ~
+    get[Option[Double]]("egresos_alquiler") ~
+      get[Option[Double]]("egresos_servicios") ~
+      get[Option[Double]]("egresos_transporte") ~
+      get[Option[Double]]("egresos_alimentacion") ~
+      get[Option[Double]]("egresos_deudas") ~
+      get[Option[Double]]("egresos_otros") ~
       get[Option[String]]("desc_egre_otros") ~
-      get[Option[BigDecimal]]("egresos_conyuge") ~
-      get[Option[BigDecimal]]("otros_egresos_conyuge") ~
-      get[Option[BigDecimal]]("total_activos") ~
-      get[Option[BigDecimal]]("total_pasivos") ~
+      get[Option[Double]]("egresos_conyuge") ~
+      get[Option[Double]]("otros_egresos_conyuge") ~
+      get[Option[Double]]("total_activos") ~
+      get[Option[Double]]("total_pasivos") ~
       get[Option[Int]]("educacion") ~
       get[Option[Int]]("retefuente") ~
       get[Option[String]]("acta") ~
@@ -776,7 +776,7 @@ object Persona_d {
 
   implicit val pbReads: Reads[Persona_d] = (
     (__ \ "duracion_sociedad").readNullable[Int] and
-      (__ \ "capital_social").readNullable[BigDecimal] and
+      (__ \ "capital_social").readNullable[Double] and
       (__ \ "matricula_mercantil").readNullable[String] and
       (__ \ "foto_huella").readNullable[Array[Byte]] and
       (__ \ "datos_huella").readNullable[Array[Byte]] and
@@ -787,7 +787,7 @@ object Persona_d {
 
   val _set = {
     get[Option[Int]]("duracion_sociedad") ~
-      get[Option[BigDecimal]]("capital_social") ~
+      get[Option[Double]]("capital_social") ~
       get[Option[String]]("matricula_mercantil") ~
       get[Option[Array[Byte]]]("foto_huella") ~
       get[Option[Array[Byte]]]("datos_huella") ~
@@ -849,7 +849,7 @@ object Persona_e {
       (__ \ "descripcion_contrato").readNullable[String] and
       (__ \ "id_sector").readNullable[Int] and
       (__ \ "descripcion_sector").readNullable[String] and
-      (__ \ "venta_anual").readNullable[BigDecimal] and
+      (__ \ "venta_anual").readNullable[Double] and
       (__ \ "fecha_ultimo_balance").readNullable[DateTime] and
       (__ \ "numero_empleados").readNullable[Int] and
       (__ \ "declara_renta").readNullable[Int] and
@@ -867,7 +867,7 @@ object Persona_e {
       get[Option[String]]("descripcion_contrato") ~
       get[Option[Int]]("id_sector") ~
       get[Option[String]]("descripcion_sector") ~
-      get[Option[BigDecimal]]("venta_anual") ~
+      get[Option[Double]]("venta_anual") ~
       get[Option[DateTime]]("fecha_ultimo_balance") ~
       get[Option[Int]]("numero_empleados") ~
       get[Option[Int]]("declara_renta") ~

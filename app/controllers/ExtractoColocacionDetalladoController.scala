@@ -28,4 +28,10 @@ class ExtractoColocacionDetalladoController @Inject()(
                 Ok(Json.toJson(e))
             }
         }
+
+        def obtenerAction(id_colocacion: String, id_cbte_colocacion: Int, fecha_extracto: Long) = Action.async { implicit request =>
+            eService.obtener(id_colocacion, id_cbte_colocacion, fecha_extracto).map { e =>
+                Ok(Json.toJson(e))
+            }
+        }        
     }

@@ -1618,35 +1618,63 @@ class FacturaRepository @Inject()(
         val _formaPagoData = new _LsFormaPago(Some("10"), Some("1"), None)
 
         var _listNotasData = new ListBuffer[_LsNota]()
-        _listNotasData += new _LsNota(Some("OFICINAS"), Some(1))
-        _listNotasData += new _LsNota(Some(" "), Some(2))
-        _listNotasData += new _LsNota(Some("PRINCIPAL BUCARAMANGA"), Some(3))
+
+        val _parseFactLsNota = int("FALN_CONSECUTIVO") ~ str("FALN_DESCRIPCION") map { case i ~ s => (i, s) }
+        val _resNotas = SQL("""SELECT * FROM FACTURA_LSNOTA flsn WHERE flsn.FACT_NUMERO = {fact_numero}""")
+          .on(
+            'fact_numero -> fact_numero
+          ).as(_parseFactLsNota *)
+
+        var _idx = 0 
+        _resNotas.foreach { nota =>
+          _listNotasData += new _LsNota(Some(nota._2), Some(_idx + nota._1))
+          _idx += 1
+        }        
+
+        _listNotasData += new _LsNota(Some("OFICINAS"), Some( _idx + 1 ))
+        _listNotasData += new _LsNota(Some(" "), Some(_idx + 2))
+        _listNotasData += new _LsNota(Some("PRINCIPAL BUCARAMANGA"), Some(_idx + 3))
         _listNotasData += new _LsNota(
-          Some("Carrera 20 No. 36-06 Edificio Sagrada Familia Of. 407"),
-          Some(4)
+          Some("Carrera 20 No. 36-06 Edificio Sagrada Familia Of. 405"),
+          Some(_idx + 4)
         )
         _listNotasData += new _LsNota(
-          Some("Teléfonos: 6701000 - 3162854212"),
-          Some(5)
+          Some("Teléfonos: 3162854212"),
+          Some(_idx + 5)
         )
-        _listNotasData += new _LsNota(Some("Bucaramanga"), Some(6))
-        _listNotasData += new _LsNota(Some(" "), Some(7))
-        _listNotasData += new _LsNota(Some("SUCURSAL FLORIDABLANCA"), Some(8))
+        _listNotasData += new _LsNota(Some("Bucaramanga"), Some( _idx + 6))
+        _listNotasData += new _LsNota(Some(" "), Some( _idx + 7))
+        _listNotasData += new _LsNota(Some("SUCURSAL FLORIDABLANCA"), Some(_idx + 8))
         _listNotasData += new _LsNota(
           Some("Carrera 8 No. 43-03 Lagos II"),
-          Some(9)
+          Some(_idx + 9)
         )
         _listNotasData += new _LsNota(
-          Some("Teléfonos: 6750757 - 3173836208"),
-          Some(10)
+          Some("Teléfonos: 6076750757 - 3173836208"),
+          Some(_idx + 10)
         )
-        _listNotasData += new _LsNota(Some("Floridablanca"), Some(11))
-        _listNotasData += new _LsNota(Some(" "), Some(12))
+        _listNotasData += new _LsNota(Some("Floridablanca"), Some(_idx + 11))
+
+        _listNotasData += new _LsNota(Some(" "), Some( _idx + 12))
+        _listNotasData += new _LsNota(Some("SUCURSAL GIRON"), Some(_idx + 13))
+        _listNotasData += new _LsNota(
+          Some("Calle 26 No. 22 - 65 Villa Campestre"),
+          Some(_idx + 14)
+        )
+        _listNotasData += new _LsNota(
+          Some("Teléfonos: 6076087922 - 3245899421"),
+          Some(_idx + 15)
+        )
+        _listNotasData += new _LsNota(Some("Girón"), Some(_idx + 16))
+
+
+        _listNotasData += new _LsNota(Some(" "), Some(_idx + 17))
         _listNotasData += new _LsNota(
           Some("Email: fap@fundacionapoyo.com"),
-          Some(13)
+          Some(_idx + 18)
         )
-        _listNotasData += new _LsNota(Some("www.fundacionapoyo.com"), Some(14))
+        
+        _listNotasData += new _LsNota(Some("www.fundacionapoyo.com"), Some(_idx + 19))
 
         val _listFormaPagoData = new ListBuffer[_LsFormaPago]()
         _listFormaPagoData += _formaPagoData

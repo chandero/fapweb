@@ -165,7 +165,8 @@ class LibroMayorRepository @Inject()(dbapi: DBApi, conf: Configuration)(implicit
       val dbdefault = dbapi.database("default"); 
       var _listData = ListBuffer[LibroMayor]()      
       dbdefault.withConnection { implicit connection =>
-        SQL("""SELECT * FROM CON$HISTORIALIBROREGISTRADO WHERE LIRE_ANHO = {lire_anho} AND LIRE_ID = 1""").
+        SQL("""SELECT * FROM CON$HISTORIALIBROREGISTRADO WHERE LIRE_ANHO = {lire_anho} AND LIRE_ID = 1
+               ORDER BY LIRE_ANHO, LIRE_PERIODO DESC, LIRE_CONSECUTIVO DESC""").
         on(
           'lire_anho -> anho
         ).as(LMRelacion._set *)
@@ -173,7 +174,7 @@ class LibroMayorRepository @Inject()(dbapi: DBApi, conf: Configuration)(implicit
 
     }
 
-    def generar(periodo: Int, anho: Int, usua_id: scala.Long): Future[Boolean] = Future[Boolean] {
+    def generar(periodo: Int, anho: Int, usua_id: scala.Long, definitivo: Boolean): Future[Array[Byte]] = Future[Array[Byte]] {
         var base = ""
         val anho_actual:Int = Calendar.getInstance.get(Calendar.YEAR)
         if (anho == anho_actual) {
@@ -205,13 +206,14 @@ class LibroMayorRepository @Inject()(dbapi: DBApi, conf: Configuration)(implicit
           _fecha_final.set(Calendar.MILLISECOND, 0)          
         } else {
           _fecha_inicial.set(Calendar.YEAR, anho)
-          _fecha_inicial.set(Calendar.MONTH, periodo-2)
+          _fecha_inicial.set(Calendar.MONTH, periodo - 2)
           _fecha_inicial.set(Calendar.DATE, 1)
           _fecha_inicial.set(Calendar.HOUR, 0)
           _fecha_inicial.set(Calendar.MINUTE, 0)
           _fecha_inicial.set(Calendar.SECOND, 0)
           _fecha_inicial.set(Calendar.MILLISECOND, 0)
           var _last_day = _fecha_inicial.getActualMaximum(Calendar.DAY_OF_MONTH);        
+          _fecha_inicial.set(Calendar.MONTH, 0)
           _fecha_final.set(Calendar.YEAR, anho)
           _fecha_final.set(Calendar.MONTH, periodo-2)
           _fecha_final.set(Calendar.DATE, _last_day)
@@ -281,6 +283,9 @@ class LibroMayorRepository @Inject()(dbapi: DBApi, conf: Configuration)(implicit
                           case Some(c) => c.substring(0,4) + '%'
                           case None => ""
                         }
+                        println("Analizando: " + _codigo)
+                        println("Fecha Periodo Anterior: " +sdf.format(_fecha_inicial.getTime()) + " - " + sdf.format(_fecha_final.getTime()))
+                        println("Fecha Periodo Actual:" + sdf.format(_fecha_mov_inicial.getTime()) + " - " + sdf.format(_fecha_mov_final.getTime()))
                         val s_ant = SQL(anterior).on(
                                    'codigo -> _codigo,
                                    'fecha_inicial -> sdf.format(_fecha_inicial.getTime()),
@@ -334,8 +339,10 @@ class LibroMayorRepository @Inject()(dbapi: DBApi, conf: Configuration)(implicit
                         println("saldo_anterior: " + s_ant);
                         println("saldo_actual: " + s_act);
 
-                        val lm = new LibroMayor(p.codigo, p.nombre, Some(saldo_anterior + debito_ant - credito_ant),  Some(debito_act), Some(credito_act), Some(saldo_anterior + debito_ant - credito_ant + debito_act - credito_act))
-                        _listData += lm
+                        if (saldo_anterior != 0 || debito_ant != 0 || credito_ant != 0 || debito_act != 0 || credito_act != 0 ) {
+                          val lm = new LibroMayor(p.codigo, p.nombre, Some(saldo_anterior + debito_ant - credito_ant),  Some(debito_act), Some(credito_act), Some(saldo_anterior + debito_ant - credito_ant + debito_act - credito_act))
+                          _listData += lm
+                        }
                         
                     }
 
@@ -387,29 +394,32 @@ class LibroMayorRepository @Inject()(dbapi: DBApi, conf: Configuration)(implicit
                   pagina = listener.getPagina()
                   println("linea 03")
                   println("paginas: " + (pagina + 1))
-                  dbdefault.withConnection { implicit connection => 
-                    SQL("""INSERT INTO CON$HISTORIALIBROREGISTRADO VALUES ({lire_id}, {lire_anho}, {lire_periodo}, {lire_consecutivo}, {lire_fecha}, {lire_hora}, {id})""").
-                      on(
-                        'lire_id -> 1,
-                        'lire_anho -> anho,
-                        'lire_periodo -> periodo,
-                        'lire_consecutivo -> consecutivo,
-                        'lire_fecha -> new DateTime(),
-                        'lire_hora -> new DateTime(),
-                        'id -> usua_id
-                    ).executeUpdate()
-                    SQL("""UPDATE CON$LIBROREGISTRADO SET LIRE_PAGINA = {lire_pagina} WHERE LIRE_ID = {id}""").
-                    on(
-                      'id -> 1,
-                      'lire_pagina -> (pagina_libro + (pagina + 1))
-                    ).executeUpdate()
+                  if (definitivo) {
+                    dbdefault.withConnection { implicit connection => 
+                      SQL("""INSERT INTO CON$HISTORIALIBROREGISTRADO VALUES ({lire_id}, {lire_anho}, {lire_periodo}, {lire_consecutivo}, {lire_fecha}, {lire_hora}, {id})""").
+                        on(
+                          'lire_id -> 1,
+                          'lire_anho -> anho,
+                          'lire_periodo -> periodo,
+                          'lire_consecutivo -> consecutivo,
+                          'lire_fecha -> new DateTime(),
+                          'lire_hora -> new DateTime(),
+                          'id -> usua_id
+                      ).executeUpdate()
+                      SQL("""UPDATE CON$LIBROREGISTRADO SET LIRE_PAGINA = {lire_pagina}, LIRE_ULTIMOPERIODO = {lire_ultimoperiodo} WHERE LIRE_ID = {id}""").
+                        on(
+                        'id -> 1,
+                        'lire_pagina -> (pagina_libro + (pagina + 1)),
+                        'lire_ultimoperiodo -> _fecha_mov_final.getTime()
+                      ).executeUpdate()
+                    }
                   }
                   val destino = conf.get[String]("reporte_ruta")
                   JasperExportManager.exportReportToPdfFile(jasperPrint, destino + nombre)
-
-                  
                 }
-                true
+                val destino = conf.get[String]("reporte_ruta")
+                val byteArray = Files.readAllBytes(Paths.get(destino + nombre))
+                byteArray
             }
         }
 

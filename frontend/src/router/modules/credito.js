@@ -16,7 +16,7 @@ const creditoRouter = {
       component: () => import('@/views/credito/menu1solicitud/index'), // Parent router-view
       name: 'menu_credito_menu1solicitud',
       meta: { title: 'menu_credito_menu1solicitud', icon: 'form', roles: ['admin', 'credito'] },
-      redirect: '/credito/menu1solicitud/menu1-1list',
+      redirect: '/credito/menu1solicitud/menu1-2create',
       children: [
         {
           path: 'menu1-1list',
@@ -28,7 +28,7 @@ const creditoRouter = {
         {
           path: 'menu1-2create',
           component: () => import('@/views/credito/menu1solicitud/menu1-2create'),
-          name: 'menu_solicitud_menu1solicitud_menu1-2create',
+          name: 'menu_credito_menu1solicitud_menu1-2create',
           hidden: true,
           meta: { title: 'menu_credito_menu1solicitud_menu1-2create', roles: ['admin', 'credito'] }
         },

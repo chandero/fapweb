@@ -18,6 +18,9 @@
         <el-form-item :label="$t('general.anho')">
           <el-input v-model="form.anho" type="number" />
         </el-form-item>
+        <el-form-item :label="$t('general.definitivo')">
+          <el-switch v-model="form.definitivo" :active-value="true" :inactive-value="false" />
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="generar">Generar</el-button>
         </el-form-item>
@@ -59,12 +62,19 @@ export default {
         lock: true,
         text: 'Generando Libro',
       });      
-      genLibroMayor(this.form.periodo, this.form.anho).then(response => {
+      genLibroMayor(this.form.periodo, this.form.anho, this.form.definitivo).then(response => {
         loading.close()
-        if (response.data === true) {
-          this.dialogVisible = true
+        var blob = response.data
+        const filename = 'LibroMayor_' + this.form.anho+'_'+this.form.periodo+'.pdf'
+        if (window.navigator.msSaveOrOpenBlob) {
+          window.navigator.msSaveBlob(blob, filename)
         } else {
-          this.dialogVisible = false
+          var downloadLink = window.document.createElement('a')
+          downloadLink.href = window.URL.createObjectURL(new Blob([blob], { type: 'application/pdf' }))
+          downloadLink.download = filename
+          document.body.appendChild(downloadLink)
+          downloadLink.click()
+          document.body.removeChild(downloadLink)
         }
       }).catch(err => {
         loading.close()

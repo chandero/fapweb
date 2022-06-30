@@ -46,4 +46,12 @@ class TipoLineaCreditoController @Inject()(
         Ok(write(lista))
       }
   }  
+
+  def obtenerListaAction() = Action.async {
+    implicit request: Request[AnyContent] =>
+      val usua_id = Utility.extraerUsuario(request)
+      tiService.obtenerListaApiRest().map { lista =>
+        Ok(write(lista))
+      }
+  }  
 }

@@ -174,7 +174,8 @@ class LibroCajaDiarioRepository @Inject()(dbapi: DBApi, conf: Configuration)(imp
       val db = dbapi.database(base)
       var _listData = ListBuffer[LibroCajaDiario]()      
       db.withConnection { implicit connection =>
-        SQL("""SELECT * FROM CON$HISTORIALIBROREGISTRADO WHERE LIRE_ANHO = {lire_anho} AND LIRE_ID = 2""").
+        SQL("""SELECT * FROM CON$HISTORIALIBROREGISTRADO WHERE LIRE_ANHO = {lire_anho} AND LIRE_ID = 2
+               ORDER BY LIRE_ANHO, LIRE_PERIODO DESC, LIRE_CONSECUTIVO DESC""").
         on(
           'lire_anho -> anho
         ).as(LCDRelacion._set *)
@@ -182,7 +183,7 @@ class LibroCajaDiarioRepository @Inject()(dbapi: DBApi, conf: Configuration)(imp
 
     }
 
-    def generar(periodo: Int, anho: Int, usua_id: scala.Long): Future[Boolean] = Future[Boolean] {
+    def generar(periodo: Int, anho: Int, usua_id: scala.Long, definitivo: Boolean): Future[Array[Byte]] = Future[Array[Byte]] {
         var base = ""
         val anho_actual:Int = Calendar.getInstance.get(Calendar.YEAR)
         if (anho == anho_actual) {
@@ -193,6 +194,12 @@ class LibroCajaDiarioRepository @Inject()(dbapi: DBApi, conf: Configuration)(imp
         val db = dbapi.database(base)
         var default = dbapi.database("default")
         var _listData = ListBuffer[LibroCajaDiario]()
+
+        var _fecha_final = Calendar.getInstance()
+        _fecha_final.set(Calendar.YEAR, anho)
+        _fecha_final.set(Calendar.MONTH, periodo-1)
+        _fecha_final.set(Calendar.DATE, _fecha_final.getActualMaximum(Calendar.DAY_OF_MONTH))
+
         db.withConnection {
             implicit connection =>
             val id_agencia = conf.get[String]("id_agencia")
@@ -268,28 +275,31 @@ class LibroCajaDiarioRepository @Inject()(dbapi: DBApi, conf: Configuration)(imp
                   pagina = listener.getPagina()
                   println("linea 03")
                   println("paginas: " + (pagina + 1))
-                  default.withConnection { implicit connection => SQL("""INSERT INTO CON$HISTORIALIBROREGISTRADO VALUES ({lire_id}, {lire_anho}, {lire_periodo}, {lire_consecutivo}, {lire_fecha}, {lire_hora}, {id})""").
+                  if (definitivo) {
+                    default.withConnection { implicit connection => SQL("""INSERT INTO CON$HISTORIALIBROREGISTRADO VALUES ({lire_id}, {lire_anho}, {lire_periodo}, {lire_consecutivo}, {lire_fecha}, {lire_hora}, {id})""").
+                        on(
+                          'lire_id -> 2,
+                          'lire_anho -> anho,
+                          'lire_periodo -> periodo,
+                          'lire_consecutivo -> consecutivo,
+                          'lire_fecha -> new DateTime(),
+                          'lire_hora -> new DateTime(),
+                          'id -> usua_id
+                      ).executeUpdate()
+                      SQL("""UPDATE CON$LIBROREGISTRADO SET LIRE_PAGINA = {lire_pagina}, LIRE_ULTIMOPERIODO = {lire_ultimoperido} WHERE LIRE_ID = {id}""").
                       on(
-                        'lire_id -> 2,
-                        'lire_anho -> anho,
-                        'lire_periodo -> periodo,
-                        'lire_consecutivo -> consecutivo,
-                        'lire_fecha -> new DateTime(),
-                        'lire_hora -> new DateTime(),
-                        'id -> usua_id
-                    ).executeUpdate()
-                    SQL("""UPDATE CON$LIBROREGISTRADO SET LIRE_PAGINA = {lire_pagina} WHERE LIRE_ID = {id}""").
-                    on(
-                      'id -> 2,
-                      'lire_pagina -> (pagina_libro + (pagina + 1))
-                    ).executeUpdate()
+                        'id -> 2,
+                        'lire_pagina -> (pagina_libro + (pagina + 1)),
+                        'lire_ultimoperido -> _fecha_final.getTime()
+                      ).executeUpdate()
+                    }
                   }
                   val destino = conf.get[String]("reporte_ruta")
                   JasperExportManager.exportReportToPdfFile(jasperPrint, destino + nombre)
-
-                  
                 }
-                true
+                val destino = conf.get[String]("reporte_ruta")
+                val byteArray = Files.readAllBytes(Paths.get(destino + nombre))
+                byteArray
             }
         }
 

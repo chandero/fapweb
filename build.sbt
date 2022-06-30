@@ -15,17 +15,23 @@ crossScalaVersions := Seq("2.12.7", "2.12.11")
 lazy val `fapweb` = (project in file(".")).enablePlugins(PlayScala)
 
 libraryDependencies ++= Seq(
-  guice, 
-  filters, 
-  jdbc, 
+  guice,
+  filters,
+  jdbc,
   cacheApi,
-  ws, 
+  ws,
   specs2 % Test,
+  "org.slf4j" % "log4j-over-slf4j" % "2.0.0-alpha7",
+  "org.slf4j" % "slf4j-simple" % "2.0.0-alpha7",
   "com.typesafe.play" %% "anorm" % "2.5.3",
-  "org.postgresql" % "postgresql" % "42.2.2",
+  "org.firebirdsql.jdbc" % "jaybird" % "4.0.0.java8",
   "com.typesafe.play" %% "play-json" % "2.6.10",
   "com.typesafe.play" %% "play-json-joda" % "2.6.10",
   "com.pauldijou" %% "jwt-play" % "4.2.0",
+  //
+  "ch.qos.logback" % "logback-classic" % "1.2.11",
+  // "com.github.maricn" % "logback-slack-appender" % "1.6.1",
+  //
   "org.apache.commons" % "commons-email" % "1.5",
   "com.jaroop" %% "anorm-relational" % "0.3.0",
   // Jasper Report
@@ -37,20 +43,64 @@ libraryDependencies ++= Seq(
   "net.sf.jasperreports" % "jasperreports-chart-themes" % "6.13.0",
   "com.norbitltd" %% "spoiwo" % "1.7.0",
   "org.mozilla" % "rhino" % "1.7R3",
-
-  "com.lihaoyi" %% "requests" % "0.6.2",
+  // Otras
   "org.joda" % "joda-money" % "1.0.1",
-  "org.firebirdsql.jdbc" % "jaybird" % "4.0.0.java8",
-
+  "com.github.t3hnar" %% "scala-bcrypt" % "4.3.0",
+  "com.lihaoyi" %% "requests" % "0.7.0",
   // JSON
   "net.liftweb" %% "lift-json" % "3.4.1",
-  "net.liftweb" %% "lift-json-ext" % "3.4.1"
+  "net.liftweb" %% "lift-json-ext" % "3.4.1",
+  // CSV parser
+  "org.apache.poi" % "poi" % "5.2.0",
+  "org.apache.poi" % "poi-ooxml" % "5.2.0",
+  "com.deepoove" % "poi-tl" % "1.12.0",
+  "com.univocity" % "univocity-parsers" % "2.4.1",
+  //
+  "org.apache.httpcomponents" % "httpcore" % "4.4.13",
+  //
+  "com.beachape" %% "enumeratum" % "1.6.1",
+  // Pdf Generator
+  "com.hhandoko" %% "play28-scala-pdf" % "4.3.0",
+  //
+  "net.codingwell" %% "scala-guice" % "4.2.11",
+  "commons-io" % "commons-io" % "2.4",
+  // Docx Files
+  "org.docx4j" % "docx4j-core" % "11.3.2",
+  "org.docx4j" % "docx4j-JAXB-ReferenceImpl" % "11.3.2",
+  "org.docx4j" % "docx4j-JAXB-MOXy" % "11.3.2",
+  "org.docx4j" % "docx4j-export-fo" % "11.3.2",
+  "org.docx4j" % "docx4j-conversion-via-microsoft-graph" % "11.3.2",
+  "org.plutext.graph-convert" % "graph-convert-base" % "1.0.3",
+  "org.plutext.graph-convert" % "using-graph-sdk" % "1.0.3",
+  "fr.opensagres.xdocreport" % "fr.opensagres.poi.xwpf.converter.pdf" % "2.0.3",
+  // to Pdf
+  "antlr" % "antlr" % "2.7.7",
+  "org.antlr" % "antlr-runtime" % "3.5.2",
+  "org.apache.avalon.framework" % "avalon-framework-api" % "4.3.1",
+  "org.apache.avalon.framework" % "avalon-framework-impl" % "4.3.1",
+  "org.apache.xmlgraphics" % "batik-anim" % "1.14",
+  "org.apache.xmlgraphics" % "batik-awt-util" % "1.14",
+  "org.apache.xmlgraphics" % "batik-bridge" % "1.14",
+  "org.apache.xmlgraphics" % "batik-constants" % "1.14",
+  "org.apache.xmlgraphics" % "batik-css" % "1.14",
+  "org.apache.xmlgraphics" % "batik-dom" % "1.14",
+  "org.apache.xmlgraphics" % "batik-ext" % "1.14",
+  "org.apache.xmlgraphics" % "batik-extension" % "1.14",
+  "org.apache.xmlgraphics" % "batik-gvt" % "1.14",
+  "org.apache.xmlgraphics" % "batik-i18n" % "1.14",
+  "org.apache.xmlgraphics" % "batik-parser" % "1.14",
+  "org.apache.xmlgraphics" % "batik-script" % "1.14",
+  "org.apache.xmlgraphics" % "batik-svg-dom" % "1.14",
+  "org.apache.xmlgraphics" % "batik-svggen" % "1.14",
+  "org.apache.xmlgraphics" % "batik-transcoder" % "1.14"
 )
 
 // Play framework hooks for development
 // PlayKeys.playRunHooks += WebpackServer(file("./frontend"))
 
-unmanagedResourceDirectories in Test +=  baseDirectory ( _ /"target/web/public/test" ).value
+unmanagedResourceDirectories in Test += baseDirectory(
+  _ / "target/web/public/test"
+).value
 
 resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
 resolvers += "Jasper" at "https://jaspersoft.artifactoryonline.com/jaspersoft/jr-ce-releases/"
@@ -65,7 +115,7 @@ cleanFrontEndBuild := {
   val d = file("public/bundle")
   if (d.exists()) {
     d.listFiles.foreach(f => {
-      if(f.isFile) f.delete
+      if (f.isFile) f.delete
     })
   }
 }
@@ -81,4 +131,4 @@ frontEndBuild := {
 frontEndBuild := (frontEndBuild dependsOn cleanFrontEndBuild).value
 
 dist := (dist dependsOn frontEndBuild).value
-*/
+ */

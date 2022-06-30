@@ -10,5 +10,5 @@ fi
 
 
 ${ROOT_DIR}/bin/fapweb \
-    -Dhttp.port=9000 \
+    -Dhttp.port=9005 \
     -J-Xmx1280M

@@ -32,6 +32,14 @@ class TipoIdentificacionController @Inject()(
       }
   }
 
+  def obtenerListaTipoIdentificacionAction() = Action.async {
+    implicit request: Request[AnyContent] =>
+      val usua_id = Utility.extraerUsuario(request)
+      tiService.obtenerListaTipoIdentificacion().map { lista =>
+        Ok(Json.toJson(lista))
+      }
+  }
+
   def obtenerListaTipoIdentificacionExterna(token: String) = Action.async {
     implicit request: Request[AnyContent] =>
       val secret = config.get[String]("token")

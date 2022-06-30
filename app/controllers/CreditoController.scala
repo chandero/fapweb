@@ -28,4 +28,14 @@ class CreditoController @Inject()(
                 Ok(Json.toJson(p))
             }
         }
+
+        def liquidacionDePruebaAction(id_colocacion: String, cuotas: Int, fecha_corte: Long) = Action.async { 
+            implicit request: Request[AnyContent] =>
+            println("id_colocacion: " + id_colocacion)
+            println("cuotas: " + cuotas)
+            println("fecha_corte: " + fecha_corte)
+            cService.liquidar(id_colocacion, cuotas, fecha_corte).map { p =>
+                Ok(Json.toJson(p))
+            }
+        }
 }

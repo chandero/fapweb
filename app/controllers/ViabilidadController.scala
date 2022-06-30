@@ -22,7 +22,7 @@ import net.liftweb.json.Serialization.read
 import net.liftweb.json.parse
 
 @Singleton
-class   ViabilidadController @Inject()(
+class ViabilidadController @Inject()(
     tiService: ViabilidadRepository,
     cc: ControllerComponents,
     authenticatedUserAction: AuthenticatedUserAction
@@ -32,13 +32,12 @@ class   ViabilidadController @Inject()(
   implicit val formats = Serialization.formats(NoTypeHints) ++ List(
     DateTimeSerializer
   )
-  def viabilidad() = Action.async {
-    implicit request: Request[AnyContent] =>
-      val usua_id = Utility.extraerUsuario(request)
-      println("JSON body:" + request.body.asJson.get)      
-      val json = net.liftweb.json.parse(request.body.asJson.get.toString())
-      val v = json.extract[ViabilidadPeticion]
-      val result = tiService.viabilidad(v)
-      Future.successful(Ok(write(result)))
+  def viabilidad() = Action.async { implicit request: Request[AnyContent] =>
+    val usua_id = Utility.extraerUsuario(request)
+    println("JSON body:" + request.body.asJson.get)
+    val json = net.liftweb.json.parse(request.body.asJson.get.toString())
+    val v = json.extract[ViabilidadPeticion]
+    val result = tiService.viabilidad(v)
+    Future.successful(Ok(write(result)))
   }
 }

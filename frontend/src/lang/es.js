@@ -67,6 +67,7 @@ export default {
     menu_cartera_menu4informe: 'Informes',
     'menu_cartera_menu4informe_menu4-1recaudoxmes': 'Recaudo Caja/Bancos',
     'menu_cartera_menu4informe_menu4-2recaudointerescausado': 'Interés Causado P.G.',
+    'menu_cartera_menu4informe_menu4-3bancolombia': 'Bancolombia',
     menu_cartera_menu5consulta: 'Consulta',
     'menu_cartera_menu5consulta_menu5-1colocacion': 'Colocacion',
     informe: 'Informes',
