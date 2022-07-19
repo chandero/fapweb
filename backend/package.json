@@ -23,7 +23,7 @@
     "morgan": "~1.9.1",
     "node-firebird": "^0.9.3",
     "nodemon": "^2.0.4",
-    "properties-reader": "^2.0.0",
+    "properties-reader": "^2.2.0",
     "sqlstring": "^2.3.2",
     "zero-fill": "^2.2.4"
   }
