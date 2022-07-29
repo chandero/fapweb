@@ -33,15 +33,18 @@ class FacturaController @Inject()(
     config: Configuration,
     authenticatedUserAction: AuthenticatedUserAction
 )(implicit ec: ExecutionContext)
-    extends AbstractController(cc) with ImplicitJsonFormats {
-  implicit val formats = Serialization.formats(NoTypeHints) ++ List(DateTimeSerializer)        
+    extends AbstractController(cc)
+    with ImplicitJsonFormats {
+  implicit val formats = Serialization.formats(NoTypeHints) ++ List(
+    DateTimeSerializer
+  )
 
   def buscarPorNumero(fact_numero: Long): Action[AnyContent] = Action.async {
     request =>
       service.buscarPorNumero(fact_numero).map { factura =>
         factura match {
           case Some(f) => Ok(write(f))
-          case None => NotFound
+          case None    => NotFound
         }
       }
   }
@@ -59,10 +62,12 @@ class FacturaController @Inject()(
       }
       val empr_id = Utility.extraerEmpresa(request)
       val total = service.cuentaFactura()
-      service.todosFactura(page_size, current_page, empr_id.get, orderby, filtro).map { facturas =>
-        Ok(write(new ResultDto(facturas, total)))
+      service
+        .todosFactura(page_size, current_page, empr_id.get, orderby, filtro)
+        .map { facturas =>
+          Ok(write(new ResultDto(facturas, total)))
+        }
     }
-  }
 
   def todosNotaDebito(): Action[AnyContent] =
     authenticatedUserAction.async { implicit request: Request[AnyContent] =>
@@ -77,11 +82,13 @@ class FacturaController @Inject()(
       }
       val empr_id = Utility.extraerEmpresa(request)
       val total = service.cuentaNotaDebito()
-      service.todosNotaDebito(page_size, current_page, empr_id.get, orderby, filtro).map { facturas =>
-        println("notas: " + write(facturas))
-        Ok(write(new ResultDto(facturas, total)))
+      service
+        .todosNotaDebito(page_size, current_page, empr_id.get, orderby, filtro)
+        .map { facturas =>
+          println("notas: " + write(facturas))
+          Ok(write(new ResultDto(facturas, total)))
+        }
     }
-  }
 
   def todosNotaCredito(): Action[AnyContent] =
     authenticatedUserAction.async { implicit request: Request[AnyContent] =>
@@ -96,11 +103,12 @@ class FacturaController @Inject()(
       }
       val empr_id = Utility.extraerEmpresa(request)
       val total = service.cuentaNotaCredito()
-      service.todosNotaCredito(page_size, current_page, empr_id.get, orderby, filtro).map { facturas =>
-        Ok(write(new ResultDto(facturas, total)))
+      service
+        .todosNotaCredito(page_size, current_page, empr_id.get, orderby, filtro)
+        .map { facturas =>
+          Ok(write(new ResultDto(facturas, total)))
+        }
     }
-  }
-
 
   def enviarFactura(fact_numero: Long): Action[AnyContent] = Action.async {
     request =>
@@ -110,17 +118,26 @@ class FacturaController @Inject()(
       }
   }
 
-  def crearNotaFactura() = authenticatedUserAction.async { implicit request =>
-      val json = request.body.asJson.get
-      var nota = net.liftweb.json.parse(json.toString()).extract[FacturaNota]
-      val usua_id = Utility.extraerUsuario(request)
-      val empr_id = Utility.extraerEmpresa(request)
-      empr_id match {
-        case Some(e) => service.crearNota(nota, usua_id.get).map { result => 
-                          Ok(write(result))
-                        }
-        case None => Future.successful(NotFound)
+  def enviarDSA(dsa_numero: Long): Action[AnyContent] = Action.async {
+    request =>
+      service.enviarDSA(dsa_numero).map { rootInterface =>
+        implicit val formats = DefaultFormats
+        Ok(write(rootInterface))
       }
+  }
+
+  def crearNotaFactura() = authenticatedUserAction.async { implicit request =>
+    val json = request.body.asJson.get
+    var nota = net.liftweb.json.parse(json.toString()).extract[FacturaNota]
+    val usua_id = Utility.extraerUsuario(request)
+    val empr_id = Utility.extraerEmpresa(request)
+    empr_id match {
+      case Some(e) =>
+        service.crearNota(nota, usua_id.get).map { result =>
+          Ok(write(result))
+        }
+      case None => Future.successful(NotFound)
+    }
   }
 
   def enviarNotaDebito(fact_nota_numero: Long): Action[AnyContent] =

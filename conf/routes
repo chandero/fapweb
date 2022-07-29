@@ -192,6 +192,7 @@ POST   /api/soex/                       controllers.SolicitudExternaController.c
 GET    /api/fact/bpn/:n                 controllers.FacturaController.buscarPorNumero(n: Long)
 POST   /api/fact/cnf                    controllers.FacturaController.crearNotaFactura
 GET    /api/fact/epn/:n                 controllers.FacturaController.enviarFactura(n: Long)
+GET    /api/fact/edsapn/:n              controllers.FacturaController.enviarDSA(n: Long)
 GET    /api/fact/end/:n                 controllers.FacturaController.enviarNotaDebito(n: Long)
 GET    /api/fact/enc/:n                 controllers.FacturaController.enviarNotaCredito(n: Long)
 POST   /api/fact/fcget                  controllers.FacturaController.todosFactura
@@ -237,7 +238,8 @@ GET    /api/http/st/:f                  controllers.HttpClientController.setdocu
 GET    /api/http/stnd/:f                controllers.HttpClientController.setnotadebitobyjson(f: Int)
 GET    /api/http/stnc/:f                controllers.HttpClientController.setnotacreditobyjson(f: Int)
 
-
+# Api Recaudo Online
+POST /api/reon/crear               controllers.RecaudoOnlineController.crear
 # Api Rest Página Web
 GET /api/l01                           controllers.TipoLineaCreditoController.obtenerListaApiRest
 POST /api/v01                           controllers.ViabilidadController.viabilidad
