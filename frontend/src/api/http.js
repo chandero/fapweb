@@ -19,3 +19,13 @@ export function enviarDSA(id) {
     method: "get"
   });
 }
+
+export function enviarFactura(id) {
+    const data = {
+        id
+    }
+    return request({
+      url: '/http/st/' + data.id,
+      method: 'get'
+    })
+  }

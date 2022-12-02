@@ -26,3 +26,8 @@ front/node_modules
 *.csv
 frontend/package-lock.json
 frontend/node_modules
+./project/.bloob
+*.class
+*.scala.semanticdb
+*.bin
+/.bloob/*.*
