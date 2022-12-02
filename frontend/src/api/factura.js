@@ -193,3 +193,13 @@ export function enviarNotaCreditoDSA(fact_nota_numero) {
     method: 'get'
   })
 }
+
+export function enviarNotaCredito(fact_nota_numero) {
+  const data = {
+    fact_nota_numero
+  }
+  return request({
+    url: '/http/stnc/' + data.fact_nota_numero,
+    method: 'get'
+  })
+}
