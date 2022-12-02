@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.19.1.final using JasperReports Library version 6.19.1-867c00bf88cd4d784d404379d6c05e1b419e8a4c  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="FaP_Carta_Primer_Cobro" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="c6ec6cd2-865a-407d-8ae3-6d6cf674f039">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="FaPConnection"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="185"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="808"/>
+	<parameter name="DEUDOR" class="java.lang.String"/>
+	<parameter name="CONCOPIA" class="java.lang.String"/>
+	<parameter name="ID_COLOCACION" class="java.lang.String"/>
+	<parameter name="CIUDAD" class="java.lang.String"/>
+	<parameter name="CODEUDOR" class="java.lang.String"/>
+	<parameter name="TELEFONO" class="java.lang.String"/>
+	<parameter name="BARRIO" class="java.lang.String"/>
+	<parameter name="DIRECCION" class="java.lang.String"/>
+	<parameter name="CREDITO" class="java.lang.String"/>
+	<parameter name="URL_LOGO" class="java.lang.String"/>
+	<parameter name="URL_FIRMA" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[]]>
+	</queryString>
+	<pageHeader>
+		<band height="700">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<image>
+				<reportElement x="50" y="0" width="480" height="80" uuid="a4e4ff7c-f14c-48a7-9e0e-c6c6e56fc410"/>
+				<imageExpression><![CDATA["/home/chandero/Documentos/Desarrollo/Repositorios/fundacionapoyo/fapweb/app/resources/image/logofull.png"]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="50" y="83" width="480" height="617" uuid="786ab5df-f213-4862-bb34-0e2cd3cec80e"/>
+				<textElement textAlignment="Justified" markup="styled"/>
+				<textFieldExpression><![CDATA["Bucaramanga , "+DATEFORMAT(NOW( ),"dd 'de' MMMM 'de' YYYY")+CHAR(13)+
+CHAR(13)+
+CHAR(13)+
+"Señor(a)"+CHAR(13)+
+"<style isBold='true'>"+UPPER($P{CODEUDOR})+"</style>"+CHAR(13)+
+CHAR(13)+
+CHAR(13)+
+"Asunto: NOTIFICACION MANEJO DE CREDITO- " + UPPER($P{DEUDOR})+CHAR(13)+
+CHAR(13)+
+CHAR(13)+
+CHAR(13)+
+"Le comunicamos a manera de NOTIFICACION que el crédito número " + UPPER($P{CREDITO}) + " contraído por usted(es) ante la FUNDACION APOYO, se encuentra en mora por incumplimiento en la cancelación de las cuotas en las fechas pactadas. Motivo por el cuál dicha información será reportada a las Centrales de Información Crediticia."+CHAR(13)+
+CHAR(13)+
+"Le recordamos que la puntualidad en el pago de sus cuotas es la mejor garantía para la continuidad del crédito."+CHAR(13)+
+CHAR(13)+
+"Por lo tanto esperamos que luego de recibida la presente notificación, efectúe la correspondiente cancelación. Favor comunicarse con la Fundación Apoyo y confirmar el valor a cancelar."+CHAR(13)+
+CHAR(13)+
+CHAR(13)+
+"Nota: Si ya realizó el pago, favor hacer caso omiso a la presente comunicación."+CHAR(13)+
+CHAR(13)+
+"NOTA: ESTOS REQUISITOS CORRESPONDEN AL ARTÍCULO 12 DE LA LEY 1266 DE 31/12/2008."+CHAR(13)+
+CHAR(13)+
+CHAR(13)+
+CHAR(13)+
+"Atentamente,"+CHAR(13)+
+CHAR(13)+
+CHAR(13)+
+CHAR(13)+
+CHAR(13)+
+CHAR(13)+
+CHAR(13)+
+CHAR(13)+
+CHAR(13)+
+"Departamento de Crédito y Cartera"+CHAR(13)+
+$P{CONCOPIA}]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="60" y="520" width="240" height="80" uuid="ffd7cea9-20a4-4e54-8009-316e5729b252"/>
+				<imageExpression><![CDATA["/home/chandero/Documentos/Desarrollo/Repositorios/fundacionapoyo/fapweb/app/resources/image/FirmaEliecer.png"]]></imageExpression>
+			</image>
+		</band>
+	</pageHeader>
+	<pageFooter>
+		<band height="50">
+			<staticText>
+				<reportElement x="-1" y="0" width="571" height="50" uuid="185a6680-ce68-4e44-ad4b-d3716f18bee8"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Cra 20 N° 36-06 Ofc. 405 y 407 Edificio Sagrada Familia- Centro Bucaramanga - Santander
+Teléfonos 3162854212 - 3176801924 - 3173836208
+E-mail: fap@fundacionapoyo.com
+CONSTRUYENDO FUTURO]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+</jasperReport>

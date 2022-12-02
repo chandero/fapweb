@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+    <table>
+        <tr>
+            <td>
+                {{ fecha_hoy }}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p>A QUIEN PUEDA INTERESAR</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+               <p>LA FUNDACION DE APOYO A LA EDUCACION Y FOMENTO EMPRESARIAL se permite informar que {{ nombre }} identificado con {{ tipo_documento }} {{ numero_documento }}, a la fecha de expedición de esta certificación, tiene con la FUNDACION los siguientes productos de Crédito:</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <table>
+                    <th>
+                        <td>
+                            Línea
+                        </td>
+                        <td>
+                            No. Colocación
+                        </td>
+                        <td>
+                            Fecha Apertura
+                        </td>
+                        <td>
+                            Saldo Actual
+                        </td>
+                        <td>
+                            Estado
+                        </td>
+                    </th>
+                    <tr>
+                        <td>
+                            <p>{{ linea_descripcion }}</p>
+                        </td>
+                        <td>
+                            <p>{{ id_colocacion }}</p>
+                        </td>
+                        <td>
+                            <p>{{ fecha_apertura }}</p>
+                        </td>
+                        <td>
+                            <p>{{ saldo_actual }}</p>
+                        </td>
+                        <td>
+                            <p>{{ estado_descripcion }}</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p>* Importante: Esta constancia solo hace referencia a los productos mencionados anteriormente.</p>
+                <p>*Si desea verificar la veracidad de esta información, puede comunicarse a los siguientes números: {{ telefonos }}</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p>Atentamente,</p>
+                <br/>
+                <p>{{ firma }} </p>
+            </td>
+        </tr>
+    </table>
+</html>

@@ -1,0 +1,254 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                           controllers.FrontController.index()
+
+# Usuarios
+# GET     /api/u/t                        controllers.UsuarioController.todos()
++ nocsrf
+GET     /api/u/a/:u/:c                  controllers.UsuarioController.autenticar(u: String, c: String)
++ nocsrf
+GET     /api/usua/recovery/:e           controllers.UsuarioController.recuperarClave(e: String)
++ nocsrf
+GET     /api/usua/link/:e               controllers.UsuarioController.linkValidator(e: String)
++ nocsrf
+POST    /api/usua/change                controllers.UsuarioController.cambiarClave()
+GET     /api/u/bpe/:u                   controllers.UsuarioController.buscarporemail(u: String)      
+GET     /api/u/bpi/:id                  controllers.UsuarioController.buscarporid(id: Long) 
+GET     /api/u/ui                       controllers.UsuarioController.userinfo()
+GET     /api/usua/get/:p/:c             controllers.UsuarioController.todos(p: Long, c: Long)
+POST    /api/usua/save                  controllers.UsuarioController.guardar
+
+
+# Transaccional
++ nocsrf
+GET     /api/tran/auth/:i/:p/:c               controllers.TransaccionalController.autenticar(i: Int, p: String, c: String)
++ nocsrf
+GET     /api/tran/register/:i/:p/:e               controllers.TransaccionalController.registrar(i: Int, p: String, e: String)
++ nocsrf
+GET     /api/tran/link/:t               controllers.TransaccionalController.validarEnlace(t: String)    
++ nocsrf
+GET     /api/tran/recovery/:e           controllers.TransaccionalController.recuperarClave(e: String)
++ nocsrf
+POST    /api/tran/changepass                controllers.TransaccionalController.cambiarClave()
+
+# User Logout
+POST    /api/login/logout               controllers.UsuarioController.logout()
+
+GET     /api/empr/get/:p/:c             controllers.EmpresaController.todos(p:Long, c:Long)
+GET     /api/empr/:id                   controllers.EmpresaController.buscarPorId(id: Long)
+GET     /api/empr/get/u                 controllers.EmpresaController.buscarPorUsuario()
+GET     /api/empr/del/:id               controllers.EmpresaController.borrarEmpresa(id: Long)
+POST    /api/empr/save                  controllers.EmpresaController.guardarEmpresa
+POST    /api/empr/upd                   controllers.EmpresaController.actualizarEmpresa
+
+# Municipios
+GET     /api/muni/get/:id               controllers.MunicipioController.buscarpordepartamento(id: Long)
+GET     /api/muni/all                   controllers.MunicipioController.todos
+
+GET     /api/barr/get/:id/:p/:c         controllers.BarrioController.buscarpormunicipio(id: Long, p:Long, c:Long)
+GET     /api/barr/get/empr              controllers.BarrioController.buscarporempresa
+GET     /api/barr/byid/:id              controllers.BarrioController.buscarporid(id: Long)
+GET     /api/barr/del/:id               controllers.BarrioController.borrarBarrio(id: Long)
+POST    /api/barr/save                  controllers.BarrioController.guardarBarrio
+POST    /api/barr/upd                   controllers.BarrioController.actualizarBarrio
+
+GET     /api/tipobarr/get               controllers.BarrioController.obtenertipobarrio
+
+GET     /api/depa/get                   controllers.DepartamentoController.todos()
+
+GET     /api/perf/get/:p/:c             controllers.PerfilController.todos(p:Long, c:Long)
+
+POST    /api/calc/t                     controllers.CalculoController.tabla
+
+# Informes
+
+# Informes Otros
+GET     /api/info/genlm/:p/:a/:d           controllers.LibroMayorController.generar(p:Int, a:Int, d:Boolean)
+GET     /api/info/conlm/:a              controllers.LibroMayorController.consultar(a:Int)
+GET     /api/info/verlm/:a/:p/:c        controllers.LibroMayorController.ver(a:Int, p:Int, c:Int)
+
+GET     /api/info/genlcd/:p/:a/:d           controllers.LibroCajaDiarioController.generar(p:Int, a:Int, d:Boolean)
+GET     /api/info/conlcd/:a              controllers.LibroCajaDiarioController.consultar(a:Int)
+GET     /api/info/verlcd/:a/:p/:c        controllers.LibroCajaDiarioController.ver(a:Int, p:Int, c:Int)
+
+POST    /api/info/gcbp                  controllers.InformeAsociadoBuenPagoController.generar
+GET     /api/info/ccbp                  controllers.InformeAsociadoBuenPagoController.consultar
+GET     /api/info/ecbp                  controllers.InformeAsociadoBuenPagoController.exportar
+GET     /api/info/conc/:c               controllers.InformeColocacionCausacionController.consultar(c: String)
+GET     /api/info/extc/:c/:i/:f         controllers.InformeColocacionCausacionController.extracto(c: String, i: Long, f: Long)
+GET     /api/info/expc/:c/:e/:t         controllers.InformeColocacionCausacionController.exportar(c: String, e: Long, t: String)
+
+# Informacion Creditos
+GET     /api/incr/busc/:i/:p            controllers.InformacionCreditoController.buscarCredito(i: Int, p: String)
+GET     /api/incrac/busc/:i/:p          controllers.InformacionCreditoController.buscarCreditoAction(i: Int, p: String)
+GET     /api/inmu/busc/:i               controllers.BienRaizController.buscar(i: String)
+GET     /api/vehi/busc/:i               controllers.VehiculoController.buscar(i: Int)
+GET     /api/info/bcol                  controllers.BancolombiaInformeController.consultar 
+# Colocaciones
+GET     /api/col/busc/:i/:p             controllers.ColocacionController.buscarColocacion(i: Int, p: String)
+
+# Creditos
+GET     /api/cred/ldp/:i/:c/:f          controllers.CreditoController.liquidacionDePrueba(i:String, c:Int, f:Long)  
+GET     /api/credac/ldp/:i/:c/:f        controllers.CreditoController.liquidacionDePruebaAction(i:String, c:Int, f:Long)  
+GET     /api/cred/csxa/:i               controllers.InformeColocacionSaldadaAsesorController.generarXlsx(i: Long)
+
+# Control Cobro
+GET     /api/coco/bpd/:i/:p             controllers.ControlCobroController.obtenerCreditosPorDocumento(i: Int, p: String)
+GET     /api/cocoac/bpd/:i/:p           controllers.ControlCobroController.obtenerCarteraPorDocumentoAction(i: Int, p: String)
+GET     /api/cocoah/bpd/:i/:p           controllers.ControlCobroController.obtenerHistoriaPorDocumentoAction(i: Int, p: String)
+GET     /api/cocoaf/bpd/:i/:p           controllers.ControlCobroController.obtenerFianzaPorDocumentoAction(i: Int, p: String)
+GET     /api/coco/bpe/:e/:i/:f/:a       controllers.ControlCobroController.obtenerCreditosPorEstado(e: Int, i: Int, f: Int, a: Int)
+GET     /api/coco/bpc/:c                controllers.ControlCobroController.obtenerCreditoPorColocacion(c: String)
+GET     /api/coco/bdp/:i/:p             controllers.ControlCobroController.obtenerDireccion(i: Int, p: String)
+GET     /api/coco/bcc/:i                controllers.ControlCobroController.obtenerControlCobro(i: String)
+POST    /api/coco/ccs                   controllers.ControlCobroController.agregar
+GET     /api/coco/fpys/:c               controllers.ControlCobroController.formatoPazYSalvo(c: String)
+POST    /api/coco/npa                   controllers.ControlCobroController.cartaPrimerAviso
+
+# Informes Graficas
+GET     /api/ingr/rdm/:a/:m             controllers.InformesGraficasController.recaudoDiarioMes(a: Int, m: Int)
+GET     /api/ingr/ric/:fi/:ff           controllers.InformesGraficasController.recaudoInteresCausadoPeriodoGracia(fi: Long, ff: Long)
+
+# Tipos
+GET     /api/ti/obt                     controllers.TipoIdentificacionController.obtenerListaTipoIdentificacion
+GET     /api/tiac/obt                   controllers.TipoIdentificacionController.obtenerListaTipoIdentificacionAction
+GET     /api/ti/:t                      controllers.TipoIdentificacionController.obtenerListaTipoIdentificacionExterna(t: String)
+
+GET     /api/tp/obt                     controllers.TipoPersonaController.obtenerLista
+GET     /api/tpac/obt                   controllers.TipoPersonaController.obtenerListaAction
+
+GET     /api/tec/obt                    controllers.TipoEstadoCivilController.obtenerLista
+GET     /api/tecac/obt                  controllers.TipoEstadoCivilController.obtenerListaAction
+
+GET     /api/tne/obt                    controllers.TipoNivelEscolaridadController.obtenerLista
+GET     /api/tneac/obt                  controllers.TipoNivelEscolaridadController.obtenerListaAction
+
+GET     /api/tet/obt                    controllers.TipoEstratoController.obtenerLista
+GET     /api/tetac/obt                  controllers.TipoEstratoController.obtenerListaAction
+
+GET     /api/tvd/obt                    controllers.TipoViviendaController.obtenerLista
+GET     /api/tvdac/obt                  controllers.TipoViviendaController.obtenerListaAction
+
+GET     /api/toc/obt                    controllers.TipoOcupacionController.obtenerLista
+GET     /api/tocac/obt                  controllers.TipoOcupacionController.obtenerListaAction
+
+GET     /api/tco/obt                    controllers.TipoContratoController.obtenerLista
+GET     /api/tcoac/obt                  controllers.TipoContratoController.obtenerListaAction
+
+GET     /api/tcu/obt                    controllers.TipoCiiuController.obtenerLista
+GET     /api/tcuac/obt                  controllers.TipoCiiuController.obtenerListaAction
+
+GET     /api/td/obt                     controllers.TipoDireccionController.obtenerLista
+GET     /api/tdac/obt                   controllers.TipoDireccionController.obtenerListaAction
+
+GET     /api/tr/obt                     controllers.TipoReferenciaController.obtenerLista
+GET     /api/trac/obt                   controllers.TipoReferenciaController.obtenerListaAction
+
+GET     /api/tt/obt                     controllers.TipoParentescoController.obtenerLista
+GET     /api/ttac/obt                   controllers.TipoParentescoController.obtenerListaAction
+
+GET     /api/tcc/obt                    controllers.TipoCuotaController.obtenerLista
+GET     /api/tccac/obt                  controllers.TipoCuotaController.obtenerListaAction
+
+GET     /api/tlc/obt                    controllers.TipoLineaCreditoController.obtenerLista
+GET     /api/tlcac/obt                  controllers.TipoLineaCreditoController.obtenerListaAction
+
+GET     /api/tgc/obt                    controllers.TipoGarantiaController.obtenerLista
+GET     /api/tgcac/obt                  controllers.TipoGarantiaController.obtenerListaAction
+
+GET     /api/trc/obt                    controllers.TipoRespaldoController.obtenerLista
+GET     /api/trcac/obt                  controllers.TipoRespaldoController.obtenerListaAction
+
+GET     /api/ofi/obt                    controllers.OficinaController.obtenerLista
+GET     /api/ofiac/obt                  controllers.OficinaController.obtenerListaAction
+
+GET     /api/ase/obt                    controllers.AsesorController.obtenerLista
+GET     /api/aseac/obt                  controllers.AsesorController.obtenerListaAction
+
+GET     /api/tesc/obt                   controllers.TipoEstadoColocacionController.obtenerLista
+GET     /api/tescac/obt                 controllers.TipoEstadoColocacionController.obtenerListaAction
+
+GET     /api/tess/obt                   controllers.TipoEstadoSolicitudController.obtenerLista
+GET     /api/tessac/obt                 controllers.TipoEstadoSolicitudController.obtenerListaAction
+
+GET     /api/contable/gtpc              controllers.ContabilidadController.obtenerTiposComprobante
+
+# Persona
+GET     /api/pers/ver/:i/:p             controllers.PersonaController.obtener(i:Int , p:String)
+GET     /api/persac/ver/:i/:p           controllers.PersonaController.obtenerAction(i:Int , p:String)
+POST    /api/pers/gdr                   controllers.PersonaController.guardar()
+POST    /api/persac/gdr                 controllers.PersonaController.guardarAction()
+POST    /api/pers/opn                   controllers.PersonaController.obtenerPorApellidosyNombres
+GET     /api/pers/bpc/:c                controllers.PersonaController.obtenerPersonaPorColocacion(c: String)
+
+# Solicitud
+POST   /api/soex/                       controllers.SolicitudExternaController.crear()
+
+
+# Factura
+GET    /api/fact/bpn/:n                 controllers.FacturaController.buscarPorNumero(n: Long)
+GET    /api/fact/dsabpn/:n              controllers.FacturaController.buscarDSAPorNumero(n: Long)
+POST   /api/fact/cnf                    controllers.FacturaController.crearNotaFactura
+GET    /api/fact/epn/:n                 controllers.FacturaController.enviarFactura(n: Long)
+GET    /api/fact/edsapn/:n              controllers.FacturaController.enviarDSA(n: Long)
+GET    /api/fact/end/:n                 controllers.FacturaController.enviarNotaDebito(n: Long)
+GET    /api/fact/enc/:n                 controllers.FacturaController.enviarNotaCredito(n: Long)
+GET    /api/fact/ens/:n                 controllers.FacturaController.enviarNotaCreditoDSA(n: Long)
+POST   /api/fact/fcget                  controllers.FacturaController.todosFactura
+POST   /api/fact/dsaget                  controllers.FacturaController.todosDSA
+POST   /api/fact/ndget                  controllers.FacturaController.todosNotaDebito
+POST   /api/fact/ncget                  controllers.FacturaController.todosNotaCredito
+POST   /api/fact/ncsget                  controllers.FacturaController.todosNotaCreditoDSA
+
+# Extracto
+GET    /api/exco/oec/:i                 controllers.ExtractoColocacionController.obtener(i: String)
+GET    /api/excoac/oec/:i               controllers.ExtractoColocacionController.obtenerAction(i: String)
+GET    /api/exco/oed/:i/:c/:f           controllers.ExtractoColocacionDetalladoController.obtener(i: String, c: Int, f: Long)
+GET    /api/excoac/oed/:i/:c/:f         controllers.ExtractoColocacionDetalladoController.obtenerAction(i: String, c: Int, f: Long)
+
+# Garantia Personal
+GET    /api/gape/ogp/:c                 controllers.GarantiaPersonalController.obtener(c: String)
+
+# Garantia Real
+GET    /api/gare/ogr/:c                 controllers.GarantiaRealController.obtener(c: String)
+
+# Puc
+GET    /api/puc/ocn/:c                  controllers.PucController.obtenerNombre(c: String)
+GET    /api/puc/ol                      controllers.PucController.obtenerLista()
+
+# ColPeriodoGracia
+GET    /api/pegr/get                    controllers.ColPeriodoGraciaController.todos
+GET    /api/pegr/norm/:c                controllers.ColPeriodoGraciaController.normalizarColocacionPeriodoGracia(c: String)
+GET    /api/pegr/norv/:c                controllers.ColPeriodoGraciaController.normalizarreversoColocacionPeriodoGracia(c: String)
+GET    /api/pegr/elim/:c                controllers.ColPeriodoGraciaController.marcarEliminado(c: String)
+GET    /api/pegr/add/:c/:f/:d           controllers.ColPeriodoGraciaController.agregarPeriodoGracia(c: String, f: Long, d: Int)
+GET    /api/pegr/upd/:c/:d              controllers.ColPeriodoGraciaController.actualizarPeriodoGracia(c: String, d: Int)
+
+# Auxiliar
+POST    /api/auxi/cons                  controllers.AuxiliarController.consultar 
+POST    /api/auxi/axls                  controllers.AuxiliarController.aExcel
+
+# Balance
+POST    /api/bala/cons                  controllers.BalanceController.consultar
+POST    /api/bala/axls                  controllers.BalanceController.aExcel
+
+# Http
+GET    /api/http/status                 controllers.HttpClientController.status
+GET    /api/http/gtbi/:f/:p/:d          controllers.HttpClientController.gettransactionbyid(f: String, p: String, d:String)
+GET    /api/http/st/:f                  controllers.HttpClientController.setdocumentbyjson(f: Int)
+GET    /api/http/dsast/:f               controllers.HttpClientController.setdocumentbydsajson(f: Int)
+GET    /api/http/stnd/:f                controllers.HttpClientController.setnotadebitobyjson(f: Int)
+GET    /api/http/stnc/:f                controllers.HttpClientController.setnotacreditobyjson(f: Int)
+GET    /api/http/stncs/:f               controllers.HttpClientController.setnotacreditodsabyjson(f: Int)
+
+# Api Recaudo Online
+POST /api/reon/crear               controllers.RecaudoOnlineController.crear
+# Api Rest Página Web
+GET /api/l01                           controllers.TipoLineaCreditoController.obtenerListaApiRest
+POST /api/v01                           controllers.ViabilidadController.viabilidad
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.at(path="/public", file)
+
