@@ -267,10 +267,9 @@ class LibroMayorRepository @Inject()(dbapi: DBApi, conf: Configuration)(implicit
                      FROM "con$puc"
                      LEFT JOIN "gen$agencia" ON ("con$puc".ID_AGENCIA = "gen$agencia".ID_AGENCIA)
                      WHERE
-                     ("con$puc".NIVEL = {nivel}) and ("con$puc".CODIGO < {codigo})
+                     ("con$puc".NIVEL = {nivel})
                      ORDER BY "con$puc".CODIGO """).on(
-                        'nivel -> 3,
-                        'codigo -> "800000000000000000"
+                        'nivel -> 3
                     ).as(PucLibro._set *)
             val usuario = dbdefault.withConnection { implicit connection =>
                SQL("""SELECT NOMBRE || ' ' || PRIMER_APELLIDO || ' ' || SEGUNDO_APELLIDO AS nombre FROM \"gen$empleado\" WHERE ID = {usua_id}""").

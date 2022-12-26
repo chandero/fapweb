@@ -2,6 +2,7 @@ package models
 
 import javax.inject.Inject
 import java.util.Calendar
+import java.util.UUID.randomUUID
 
 import play.api.libs.json._
 import play.api.libs.json.JodaReads
@@ -48,12 +49,13 @@ class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol)(
 
   def liquidacionCuotaFija(id_colocacion: String, cuotas: Int, fecha_corte: Long): Future[Liquidacion] = {
     val _fecha_corte = new DateTime(fecha_corte)
+    var uuid: String = randomUUID().toString()
     _g.liquidarCuotaFija(id_colocacion, cuotas, _fecha_corte).map { _l =>
         if (_l._6) {
-            val result = new Liquidacion(Some(_l._1), Some(_l._2), Some(_l._3), Some(_l._4), Some(_l._5), _l._6)
+            val result = new Liquidacion(Some(_l._1), Some(_l._2), Some(_l._3), Some(_l._4), Some(_l._5), _l._6, uuid)
             result
         } else {
-            val result = new Liquidacion(None, None, None, None, None, _l._6)
+            val result = new Liquidacion(None, None, None, None, None, _l._6, uuid)
             result
         }
       }
@@ -61,12 +63,13 @@ class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol)(
 
   def liquidacionCuotaVariableAnticipada(id_colocacion: String, cuotas: Int, fecha_corte: Long): Future[Liquidacion] = {
     val _fecha_corte = new DateTime(fecha_corte)
+    var uuid: String = randomUUID().toString()
     _g.liquidarCuotaVariableAnticipada(id_colocacion, cuotas, _fecha_corte).map { _l =>
         if (_l._6) {
-            val result = new Liquidacion(Some(_l._1), Some(_l._2), Some(_l._3), Some(_l._4), Some(_l._5), _l._6)
+            val result = new Liquidacion(Some(_l._1), Some(_l._2), Some(_l._3), Some(_l._4), Some(_l._5), _l._6, uuid)
             result
         } else {
-            val result = new Liquidacion(None, None, None, None, None, _l._6)
+            val result = new Liquidacion(None, None, None, None, None, _l._6, uuid)
             result
         }
       }
@@ -74,12 +77,13 @@ class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol)(
 
   def liquidacionCuotaVariableVencida(id_colocacion: String, cuotas: Int, fecha_corte: Long): Future[Liquidacion] = {
     val _fecha_corte = new DateTime(fecha_corte)
+    var uuid: String = randomUUID().toString()
     _g.liquidarCuotaVariableVencida(id_colocacion, cuotas, _fecha_corte).map { _l =>
         if (_l._6) {
-            val result = new Liquidacion(Some(_l._1), Some(_l._2), Some(_l._3), Some(_l._4), Some(_l._5), _l._6)
+            val result = new Liquidacion(Some(_l._1), Some(_l._2), Some(_l._3), Some(_l._4), Some(_l._5), _l._6, uuid)
             result
         } else {
-            val result = new Liquidacion(None, None, None, None, None, _l._6)
+            val result = new Liquidacion(None, None, None, None, None, _l._6, uuid)
             result
         }
       }

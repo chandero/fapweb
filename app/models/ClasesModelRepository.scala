@@ -597,7 +597,8 @@ case class Liquidacion(
     fecha_capital: Option[DateTime],
     fecha_interes: Option[DateTime],
     fecha_proxima: Option[DateTime],
-    liquidado: Boolean
+    liquidado: Boolean,
+    referencia: String
 )
 
 object Liquidacion {
@@ -613,7 +614,8 @@ object Liquidacion {
       "fecha_capital" -> e.fecha_capital,
       "fecha_interes" -> e.fecha_interes,
       "fecha_proxima" -> e.fecha_proxima,
-      "liquidado" -> e.liquidado
+      "liquidado" -> e.liquidado,
+      "referencia" -> e.referencia
     )
   }
 
@@ -623,7 +625,8 @@ object Liquidacion {
       (__ \ "fecha_capital").readNullable[DateTime] and
       (__ \ "fecha_interes").readNullable[DateTime] and
       (__ \ "fecha_proxima").readNullable[DateTime] and
-      (__ \ "liquidado").read[Boolean]
+      (__ \ "liquidado").read[Boolean] and
+      (__ \ "referencia").read[String]
   )(Liquidacion.apply _)
 }
 
