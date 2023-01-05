@@ -37,8 +37,9 @@ class CalculoRepository @Inject()(dbapi: DBApi, _globalesCol: GlobalesCol, _func
         get[BigDecimal]("tabla.cuot_saldo") ~
         get[BigDecimal]("tabla.cuot_capital") ~
         get[BigDecimal]("tabla.cuot_interes") ~
-        get[BigDecimal]("tabla.cuot_otros") map {
-           case cuot_num ~ cuot_fecha ~ cuot_saldo ~ cuot_capital ~ cuot_interes ~ cuot_otros => Tabla(cuot_num, cuot_fecha, cuot_saldo, cuot_capital, cuot_interes, cuot_otros)
+        get[BigDecimal]("tabla.cuot_otros") ~
+        get[BigDecimal]("tabla.cuot_aporte") map {
+           case cuot_num ~ cuot_fecha ~ cuot_saldo ~ cuot_capital ~ cuot_interes ~ cuot_otros ~ cuot_aporte => Tabla(cuot_num, cuot_fecha, cuot_saldo, cuot_capital, cuot_interes, cuot_otros, cuot_aporte)
         }
     }
 
@@ -80,7 +81,8 @@ class CalculoRepository @Inject()(dbapi: DBApi, _globalesCol: GlobalesCol, _func
                         println("interes: " + cuot_interes)
                         var cuot_capital = cuota - cuot_interes
                         var cuot_otros:BigDecimal = 0
-                        val tabla = new Tabla(i, cuot_fecha, cuot_saldo, cuot_capital, cuot_interes, cuot_otros)
+                        var cuot_aporte:BigDecimal = 0
+                        val tabla = new Tabla(i, cuot_fecha, cuot_saldo, cuot_capital, cuot_interes, cuot_otros, cuot_aporte)
                         cuot_fecha = _funcion.calculoFecha(cuot_fecha, 30)
                         list += tabla
                         cuot_saldo = cuot_saldo - cuot_capital
@@ -94,7 +96,7 @@ class CalculoRepository @Inject()(dbapi: DBApi, _globalesCol: GlobalesCol, _func
                      })
                      val _adescontar = _globalesCol.calcularDescuentoPorCuota(list, _descuentoColocacion.toList, valor, amortizacion, valor)
                      for( i <- 1 to list.length){
-                        _listResult += new Tabla(list(i).cuot_num, list(i).cuot_fecha, list(i).cuot_saldo, list(i).cuot_capital, list(i).cuot_interes, _adescontar(i).valor)
+                        _listResult += new Tabla(list(i).cuot_num, list(i).cuot_fecha, list(i).cuot_saldo, list(i).cuot_capital, list(i).cuot_interes, _adescontar(i).valor, list(i).cuot_aporte)
                      }
                      
                      _listResult.toList

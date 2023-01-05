@@ -636,7 +636,8 @@ case class Tabla(
     cuot_saldo: BigDecimal,
     cuot_capital: BigDecimal,
     cuot_interes: BigDecimal,
-    cuot_otros: BigDecimal
+    cuot_otros: BigDecimal,
+    cuot_aporte: BigDecimal,
 )
 
 case class ADescontar(
@@ -682,7 +683,8 @@ object Tabla {
       "cuot_saldo" -> tabla.cuot_saldo,
       "cuot_capital" -> tabla.cuot_capital,
       "cuot_interes" -> tabla.cuot_interes,
-      "cuot_otros" -> tabla.cuot_otros
+      "cuot_otros" -> tabla.cuot_otros,
+      "cuot_aporte" -> tabla.cuot_aporte
     )
   }
   implicit val tablaReads: Reads[Tabla] = (
@@ -691,7 +693,8 @@ object Tabla {
       (__ \ "cuot_saldo").read[BigDecimal] and
       (__ \ "cuot_capital").read[BigDecimal] and
       (__ \ "cuot_interes").read[BigDecimal] and
-      (__ \ "cuot_otros").read[BigDecimal]
+      (__ \ "cuot_otros").read[BigDecimal] and
+      (__ \ "cuot_aporte").read[BigDecimal]
   )(Tabla.apply _)
 
   val _set = {
@@ -709,6 +712,7 @@ object Tabla {
           0,
           cuot_capital,
           cuot_interes,
+          0,
           0
         )
     }

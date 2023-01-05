@@ -17,7 +17,7 @@ import anorm.JodaParameterMetaData._
 import org.joda.time.DateTime
 
 import scala.collection.mutable.ListBuffer
-import scala.math.BigDecimal
+import scala.math.{BigDecimal, round}
 import scala.util.{Failure, Success}
 import scala.concurrent.{Await, Future}
 
@@ -162,7 +162,7 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
     dias
   }
 
-    def calcularDescuentoPorCuota(_cuota: Seq[Tabla], _descuento: Seq[DescuentoColocacion], _valorDesembolso: BigDecimal, _amortizaCapital: Int, _saldoActual: BigDecimal): Seq[ADescontar] = {
+    def calcularDescuentoPorCuota(_cuota: Seq[Tabla], _descuento: Seq[DescuentoColocacion], _valorDesembolso: BigDecimal, _amortizaCapital: Int, _saldoActual: BigDecimal): List[ADescontar] = {
         var _descontar = new ListBuffer[ADescontar]()
         var nValor: BigDecimal = 0
         var nPorcColocacion: Double = 0
@@ -196,7 +196,7 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
             nAmortiza = descuento.amortizacion
 
             if (nValor > 0 ) {
-                if (bEnDesembolso) { return _descontar }
+                if (bEnDesembolso) { return _descontar.toList }
                 if (bEsDistribuido) { nCobro = math.round(nValor.doubleValue / _cuota.length) }
                 if (bEnCuota) {
                     nCobro = nValor
@@ -206,7 +206,7 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                     }
                 }
             } else if (nPorcColocacion > 0) {
-                if (bEnDesembolso) { return _descontar }
+                if (bEnDesembolso) { return _descontar.toList }
                 nCobro = math.round(_valorDesembolso.doubleValue * nPorcColocacion/100)*(_amortizaCapital/nAmortiza);  
                 if (bEsDistribuido) { nCobro = math.round(nCobro.doubleValue / _cuota.length) }
                 if (bEnCuota) {
@@ -216,7 +216,7 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                     }
                 }              
             } else if (nPorcSaldo > 0) {
-                if (bEnDesembolso) { return _descontar }
+                if (bEnDesembolso) { return _descontar.toList }
                 if (bEnCuota && !bEsDistribuido) {
                     nValor = _valorDesembolso
                     _cuota.foreach { _c =>
@@ -239,7 +239,7 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                     }
                 }
             } else if (nPorcCuota > 0) {
-                if (bEnDesembolso) { return _descontar }
+                if (bEnDesembolso) { return _descontar.toList }
                 if (bEnCuota && !bEsDistribuido){
                     _cuota.foreach { _c => 
                         nCobro = math.round(_c.cuot_capital.doubleValue * nPorcCuota)
@@ -574,18 +574,37 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                     var _proximo_pago = new DateTime()
 
                     var _saldo = _valor_desembolso
+                    val _aporteParse = get[BigDecimal]("APORTE") ~ get[Int]("PLAZO") map {
+                        case aporte ~ plazo => (aporte, plazo)
+                    }
+                    var _valor_total_aporte = 0
+                    var _valor_aporte = db.withConnection { implicit connection => SQL("""SELECT APORTE, PLAZO FROM COL$APORTEVINCULADO WHERE ID_COLOCACION = {id_colocacion}""").on('id_colocacion -> id_colocacion).as(_aporteParse.singleOpt) match {
+                            case Some(aporte) => 
+                                _valor_total_aporte = aporte._1.toInt
+                                round(aporte._1.toDouble / aporte._2)
+                            case None => 0
+                        }
+                    }
+                    var _valor_cobrado_aporte = 0L                    
                     _tablaLiquidacion.foreach { t =>
-                        val _c = new Tabla(t.cuot_num, t.cuot_fecha, _saldo, t.cuot_capital, t.cuot_interes, t.cuot_otros)
-                        _cdsCuotas += _c
                         _saldo = _saldo - t.cuot_capital
+                        if (_saldo <= 0 ) _valor_aporte = _valor_total_aporte - _valor_cobrado_aporte  
+                        _valor_cobrado_aporte += _valor_aporte
+                        val _c = new Tabla(t.cuot_num, t.cuot_fecha, _saldo, t.cuot_capital, t.cuot_interes, t.cuot_otros, _valor_aporte)
+                        _cdsCuotas += _c
                     }
 
-                    val _adescontar = calcularDescuentoPorCuota(_cdsCuotas, _cdsDescuento, _valor_desembolso, _amortiza_capital, _saldo_actual)
+                    var _adescontar = calcularDescuentoPorCuota(_cdsCuotas, _cdsDescuento, _valor_desembolso, _amortiza_capital, _saldo_actual)
+                    var _codigo_aporte_donacion = db.withConnection { implicit connection => SQL("""SELECT CODIGO FROM "col$codigospucbasicos" WHERE ID_CODIGOPUCBASICO = 65""").as(SqlParser.scalar[String].single) }
+                    _cdsCuotas.map { _c => 
+                        _adescontar :+ new ADescontar(0, _codigo_aporte_donacion, _c.cuot_num, _c.cuot_aporte)
+                    }
 
                     val i = 0
                     var _cuotas = new ListBuffer[Tabla]
+
                     for( i <- 0 to _cdsCuotas.length - 1){
-                        _cuotas += new Tabla(_cdsCuotas(i).cuot_num, _cdsCuotas(i).cuot_fecha, _cdsCuotas(i).cuot_saldo, _cdsCuotas(i).cuot_capital, _cdsCuotas(i).cuot_interes, _adescontar(i).valor)
+                        _cuotas += new Tabla(_cdsCuotas(i).cuot_num, _cdsCuotas(i).cuot_fecha, _cdsCuotas(i).cuot_saldo, _cdsCuotas(i).cuot_capital, _cdsCuotas(i).cuot_interes, _adescontar(i).valor, _cdsCuotas(i).cuot_aporte)
                     }
 
                     // Proceso de Liquidacion
@@ -613,10 +632,22 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                     }
 
                     var _porcentaje_gestion = 0
-                    val _valor_tasa_efectiva = c.a.tasa_interes_corriente.get
+                    var _valor_tasa_efectiva = c.a.tasa_interes_corriente.get
                     if (_tasa_usura < _valor_tasa_efectiva) {
                         _porcentaje_gestion = math.round(((_valor_tasa_efectiva - _tasa_usura) * 100).toFloat / _valor_tasa_efectiva.toFloat)
                     }
+                    val _tasa_maxima = buscoTasaEfectivaMaxima(fecha_corte,_clasificacion,"A")
+                    if (_valor_tasa_efectiva > _tasa_maxima) {
+                        _valor_tasa_efectiva = _tasa_maxima
+                    }
+                    var _tasa_liq_mora = _tasa_mora
+                    if (_tasa_mora > _tasa_maxima) {
+                         _tasa_liq_mora = _tasa_maxima
+                    } else {
+                        _tasa_liq_mora = _tasa_mora
+                    }
+                    var _tasa_liquidar_mora = _funcion.tasaNominalVencida(_tasa_liq_mora, _amortizacion)
+
                     val _codigos = _codigopuccolocacionService.obtener(c.a.id_clasificacion.get, c.a.id_garantia.get, c.a.id_categoria.get)
                     val _codigosdup = _codigopuccolocacionService.obtenerFacturado(c.a.id_clasificacion.get, c.a.id_garantia.get, c.a.id_categoria.get)
                     var _cuota_liq = new ListBuffer[CuotasLiq]()
@@ -726,7 +757,6 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                                 case _ =>   _tasa_efectiva = buscoTasaEfectivaMaximaIpc
                                             _tasa_liquidar = _funcion.tasaNominalVencida(_tasa_efectiva, _amortizacion)
                             }
-                            var _tasa_liquidar_mora = _funcion.tasaNominalVencida(_tasa_mora, _amortizacion)
                             var _vtasa = _tasa_liquidar
                             var _duplicar = false
                             var _a_cobrar = BigDecimal(0)
@@ -930,6 +960,11 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                                      _total_debito += _debito
                                 }
 
+                                _codigo_puc = _codigos.cod_int_mes match {
+                                    case Some(c) => c 
+                                    case None => "No Encontrado"
+                                }
+                                _codigo_nombre = codigoNombre(_codigo_puc)
                                 _cl = new CuotasLiq(
                                     _cuota_numero,
                                     _codigo_puc,
@@ -1049,11 +1084,17 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                             }
                         }
                       }
+                        
+                        _saldo_actual = _saldo_actual - _capital
+                        _m_saldo_actual = _saldo_actual
+                        _m_interes_hasta = _fecha_pago_interes
+                    }
+
   
                     // Agregar Caja
                     _codigo_nombre = codigoNombre(_codigo_caja)
-                     _cl = new CuotasLiq(
-                                    _cuota_numero,
+                    val _cl = new CuotasLiq(
+                                    0,
                                     _codigo_caja,
                                     _codigo_nombre,
                                     _fecha_corte,
@@ -1075,11 +1116,7 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                                 )
                     if (_cl.debito != 0 || _cl.credito != 0) {        
                             _my_cuotas_liq += _cl   
-                    }                        
-                        _saldo_actual = _saldo_actual - _capital
-                        _m_saldo_actual = _saldo_actual
-                        _m_interes_hasta = _fecha_pago_interes
-                    }
+                    }                    
                   
                     _liquidado = true
                     (_my_cuotas_liq.toList, _m_saldo_actual, _m_capital_hasta, _m_interes_hasta, _m_fecha_prox, _liquidado)
@@ -1174,17 +1211,17 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
 
                     var _saldo = _valor_desembolso
                     _tablaLiquidacion.foreach { t =>
-                        val _c = new Tabla(t.cuot_num, t.cuot_fecha, _saldo, t.cuot_capital, t.cuot_interes, t.cuot_otros)
+                        val _c = new Tabla(t.cuot_num, t.cuot_fecha, _saldo, t.cuot_capital, t.cuot_interes, t.cuot_otros, 0)
                         _cdsCuotas += _c
                         _saldo = _saldo - t.cuot_capital
                     }
 
-                    val _adescontar = calcularDescuentoPorCuota(_cdsCuotas, _cdsDescuento, _valor_desembolso, _amortiza_capital, _saldo_actual)
+                    var _adescontar = calcularDescuentoPorCuota(_cdsCuotas, _cdsDescuento, _valor_desembolso, _amortiza_capital, _saldo_actual)
 
                     val i = 0
                     var _cuotas = new ListBuffer[Tabla]
                     for( i <- 0 to _cdsCuotas.length - 1){
-                        _cuotas += new Tabla(_cdsCuotas(i).cuot_num, _cdsCuotas(i).cuot_fecha, _cdsCuotas(i).cuot_saldo, _cdsCuotas(i).cuot_capital, _cdsCuotas(i).cuot_interes, _adescontar(i).valor)
+                        _cuotas += new Tabla(_cdsCuotas(i).cuot_num, _cdsCuotas(i).cuot_fecha, _cdsCuotas(i).cuot_saldo, _cdsCuotas(i).cuot_capital, _cdsCuotas(i).cuot_interes, _adescontar(i).valor, 0)
                     }
 
                     // Proceso de Liquidacion
@@ -1649,10 +1686,16 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                         }
                       }
   
+                        
+                        _saldo_actual = _saldo_actual - _capital
+                        _m_saldo_actual = _saldo_actual
+                        _m_interes_hasta = _fecha_pago_interes
+                    }
+                  
                     // Agregar Caja
                     _codigo_nombre = codigoNombre(_codigo_caja)
-                     _cl = new CuotasLiq(
-                                    _cuota_numero,
+                     val _cl = new CuotasLiq(
+                                    0,
                                     _codigo_caja,
                                     _codigo_nombre,
                                     _fecha_corte,
@@ -1674,12 +1717,8 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                                 )
                     if (_cl.debito != 0 || _cl.credito != 0) {        
                             _my_cuotas_liq += _cl   
-                    }                        
-                        _saldo_actual = _saldo_actual - _capital
-                        _m_saldo_actual = _saldo_actual
-                        _m_interes_hasta = _fecha_pago_interes
                     }
-                  
+
                     _liquidado = true
                     (_my_cuotas_liq.toList, _m_saldo_actual, _m_capital_hasta, _m_interes_hasta, _m_fecha_prox, _liquidado)
                     // Fin Evaluar Cuota a Cuota a Liquidar

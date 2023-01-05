@@ -24,7 +24,7 @@ class CreditoController @Inject()(
     extends AbstractController(cc) {
         def liquidacionDePrueba(id_colocacion: String, cuotas: Int, fecha_corte: Long) = authenticatedUserAction.async { 
             implicit request: Request[AnyContent] =>
-            cService.liquidar(id_colocacion, cuotas, fecha_corte).map { p =>
+            cService.liquidar(id_colocacion, cuotas, fecha_corte, false).map { p =>
                 Ok(Json.toJson(p))
             }
         }
@@ -34,7 +34,7 @@ class CreditoController @Inject()(
             println("id_colocacion: " + id_colocacion)
             println("cuotas: " + cuotas)
             println("fecha_corte: " + fecha_corte)
-            cService.liquidar(id_colocacion, cuotas, fecha_corte).map { p =>
+            cService.liquidar(id_colocacion, cuotas, fecha_corte, true).map { p =>
                 Ok(Json.toJson(p))
             }
         }
