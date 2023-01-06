@@ -561,8 +561,8 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                     val _amortiza_interes = c.b.amortiza_interes.get
                     val _clasificacion = c.a.id_clasificacion.get
                     val _categoria = c.a.id_categoria.get
-                    val _fecha_pago_capital = _funcion.limpiarFecha(c.b.fecha_capital.get)
-                    val _fecha_pago_interes = _funcion.limpiarFecha(c.b.fecha_interes.get)
+                    var _fecha_pago_capital = _funcion.limpiarFecha(c.b.fecha_capital.get)
+                    var _fecha_pago_interes = _funcion.limpiarFecha(c.b.fecha_interes.get)
                     val _puntos_interes = c.a.puntos_interes.get
                     val _tipo_interes = c.a.id_interes.get
                     val _linea = c.a.id_linea.get
@@ -836,7 +836,8 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                             if (_af.devuelto) {
                                 _devuelto = true
                             }
-                            _dias = _funcion.diasEntreFechas(_af.fecha_inicial, _af.fecha_final, _fecha_desembolso)
+                            val _fecha_desembolso_tmp = _funcion.calculoFecha(_fecha_desembolso, _dias_prorroga)
+                            _dias = _funcion.diasEntreFechas(_af.fecha_inicial, _af.fecha_final, _fecha_desembolso_tmp )
                             if (_af.vencida) {
                                 _tasa = _tasa_liquidar_mora
                             } else {
@@ -1088,6 +1089,7 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                         _saldo_actual = _saldo_actual - _capital
                         _m_saldo_actual = _saldo_actual
                         _m_interes_hasta = _fecha_pago_interes
+                        _fecha_pago_interes = _funcion.calculoFecha(_fecha_pago_interes, _amortizacion)
                     }
 
   
@@ -1442,7 +1444,8 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                             if (_af.devuelto) {
                                 _devuelto = true
                             }
-                            _dias = _funcion.diasEntreFechas(_af.fecha_inicial, _af.fecha_final, _fecha_desembolso)
+                            val _fecha_desembolso_tmp = _funcion.calculoFecha(_fecha_desembolso, _dias_prorroga)
+                            _dias = _funcion.diasEntreFechas(_af.fecha_inicial, _af.fecha_final, _fecha_desembolso_tmp )
                             if (_af.vencida) {
                                 _tasa = _tasa_liquidar_mora
                             } else {
