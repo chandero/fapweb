@@ -8,9 +8,9 @@
             "type": "scala",
             "request": "attach",
             "name": "fapweb",
-            "buildTarget": "???",
+            "buildTarget": "fapweb",
             "hostName": "localhost",
-            "port": 5005
+            "port": 5500
         }
 
     ]

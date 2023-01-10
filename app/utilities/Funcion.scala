@@ -33,7 +33,11 @@ class Funcion @Inject()(dbapi: DBApi){
 
         var _b = 0
 
-        if (_fechaInicial.getDayOfMonth.equals(_fechaInicial.dayOfMonth().withMaximumValue())) {
+/*         if (_fechaInicial.getDayOfMonth.equals(_fechaInicial.dayOfMonth().withMaximumValue())) {
+          _fechaInicial = _fechaInicial.plusDays(1)
+        } */
+
+        if (_fechaInicial.getDayOfMonth.equals(31)) {
           _fechaInicial = _fechaInicial.plusDays(1)
         }
 
@@ -55,13 +59,13 @@ class Funcion @Inject()(dbapi: DBApi){
 
 
         if ((_mm == 2) && (_dd == 28)) {
-          if ( _ddd == 28 ) { _dd = _ddd }
-          else if ( _ddd == 29 ) { _dd = _ddd }
+          if ( _ddd == 28 ) { _dd = _ddd } // 28
+          else if ( _ddd == 29 ) { _dd = _ddd } // 29
           else if ( _ddd == 30 ) { _dd = 30 }
           else if ( _ddd < 28 ) { _dd = 30 }
         }
         else if (( _mm == 2 ) && ( _dd == 29)) {
-          if ( _ddd == 29 ) { _dd = _ddd }
+          if ( _ddd == 29 ) { _dd = _ddd } // 29
           else if ( _ddd == 30 ) { _dd = 30 }
           else if ( _ddd < 29 ) { _dd = 30 }
         }
@@ -73,7 +77,7 @@ class Funcion @Inject()(dbapi: DBApi){
 
         if ((_dddd == 29) && ( _m == 3) && (_b == 1 )) {
           if ( _ddd ==29 ) { _dias = _dias + 1 }
-          else if ( _ddd ==28 ) { _dias = _dias + 2 }
+          else if ( _ddd == 28 ) { _dias = _dias + 2 }
         }
 
         if (( _dddd == 28) && ( _m == 3) && ( _b ==1 )) {
@@ -85,7 +89,7 @@ class Funcion @Inject()(dbapi: DBApi){
           _dias = _dias + 2
         }
 
-        if ((_dddd == 29) && (_dd == 29) && (_mm ==2 ) && (_ddd > 29)) {
+        if ((_dddd == 29) && (_dd == 29) && (_mm == 2 ) && (_ddd > 29)) {
           _dias = _dias + 1
         }
 
@@ -108,14 +112,16 @@ class Funcion @Inject()(dbapi: DBApi){
         if (_negativo) {
           _dias = -_dias
         }
-        else {
-           _dias
-        }
+
+      println("Fecha Inicial: " + _fechaInicial)
+      println("Fecha Final: " + _fechaFinal)
+      println("Fecha Corte: " + _fechaCorte)
+      println("Dias: " + _dias)
       _dias
   }
 
   def endOfAMonth(_a:Int, _m: Int): Int = {
-    var _fecha = new DateTime(_a, _m, 1, 0, 0)
+    var _fecha = new DateTime(_a, _m, 1, 1, 0)
     _fecha = _fecha.dayOfMonth().withMaximumValue()
     _fecha.getDayOfMonth
   }

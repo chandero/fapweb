@@ -92,7 +92,7 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
   }
 
   def obtenerDiasMora(id_colocacion: String): Int = {
-    var dias = 0
+    var _dias = 0
     val _fechaHoy = new DateTime()
     var _fechaDesembolso = new DateTime()
     val parser = 
@@ -137,7 +137,7 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
     _fecha = _fecha.plusDays(1)
     _fechaDesembolso = new DateTime(c._2)
     _fechaDesembolso = _fechaDesembolso.plusDays(c._6)
-    dias = _funcion.diasEntreFechas(_fecha, _fechaHoy, _fechaDesembolso)
+    _dias = _funcion.diasEntreFechas(_fecha, _fechaHoy, _fechaDesembolso)
 
     // validar si aplica periodo de gracia
     val _parseGracia = str("ID_COLOCACION") ~ date("FECHA_REGISTRO") ~ int("DIAS") map { case a ~ b ~ c => (a,b,c)}
@@ -153,13 +153,13 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                         val _fi = new DateTime(g._2)
                         val _ff = _funcion.calculoFecha(new DateTime(g._2), g._3)
                         if (_fi.getMillis() <= _fechaHoy.getMillis() && _ff.getMillis() >= _fechaHoy.getMillis()) {
-                          dias = 0
+                          _dias = 0
                         }
                       }
       case None => None
     }
 
-    dias
+    _dias
   }
 
     def calcularDescuentoPorCuota(_cuota: Seq[Tabla], _descuento: Seq[DescuentoColocacion], _valorDesembolso: BigDecimal, _amortizaCapital: Int, _saldoActual: BigDecimal): List[ADescontar] = {
@@ -298,8 +298,6 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
     def calcularFechasDevolucion(fecha_desembolso: DateTime, fecha_corte: DateTime, fecha_proxima: DateTime):List[FechaLiq] = {
         
         var _list = new ListBuffer[FechaLiq]()
-
-        
         var _fechaf2 = DateTime.now()
 
         var _fecha_corte = _funcion.limpiarFecha(fecha_corte)
@@ -309,7 +307,6 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
 
         val (_aaa, _mmm, _ddd) = _funcion.decodeDate(fecha_proxima)
         val (_aaaa, _mmmm, _dddd) = _funcion.decodeDate(fecha_desembolso)
-
 
         if ((_mmm == 2) && (_ddd == 28) && (_ddd != _dddd)) {
             _fechaf2 = _fecha_prox
@@ -339,9 +336,6 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
             _devuelto = true
             val _fecha_inicial = _fechaf1
             val _fecha_final = _fecha
-
-            println("Fecha Inicial :" + _fecha_inicial)
-            println("Fecha Final: " + _fecha_final)
 
             val (_a, _m, _d) = _funcion.decodeDate(_fecha_inicial)
             val (_aa, _mm, _dd) = _funcion.decodeDate(_fecha_final)
@@ -566,10 +560,11 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                     val _puntos_interes = c.a.puntos_interes.get
                     val _tipo_interes = c.a.id_interes.get
                     val _linea = c.a.id_linea.get
-                    val _fecha_desembolso = _funcion.limpiarFecha(c.a.fecha_desembolso.get)
+                    val _fecha_desembolso = _funcion.calculoFecha(_funcion.limpiarFecha(c.a.fecha_desembolso.get), c.b.dias_pago.get)
                     var _saldo_actual = c.a.valor_desembolso.get - c.b.abonos_capital.get
                     var _tasa_mora = c.a.tasa_interes_mora.get
                     val _valor_cuota = c.b.valor_cuota.get
+                    val _dias_pago = c.b.dias_pago.get
                     val _dias_prorroga = c.b.dias_prorrogados.get
                     var _proximo_pago = new DateTime()
 
@@ -597,7 +592,7 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                     var _adescontar = calcularDescuentoPorCuota(_cdsCuotas, _cdsDescuento, _valor_desembolso, _amortiza_capital, _saldo_actual)
                     var _codigo_aporte_donacion = db.withConnection { implicit connection => SQL("""SELECT CODIGO FROM "col$codigospucbasicos" WHERE ID_CODIGOPUCBASICO = 65""").as(SqlParser.scalar[String].single) }
                     _cdsCuotas.map { _c => 
-                        _adescontar :+ new ADescontar(0, _codigo_aporte_donacion, _c.cuot_num, _c.cuot_aporte)
+                        _adescontar = _adescontar :+ new ADescontar(0, _codigo_aporte_donacion, _c.cuot_num, _c.cuot_aporte)
                     }
 
                     val i = 0
@@ -836,8 +831,7 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                             if (_af.devuelto) {
                                 _devuelto = true
                             }
-                            val _fecha_desembolso_tmp = _funcion.calculoFecha(_fecha_desembolso, _dias_prorroga)
-                            _dias = _funcion.diasEntreFechas(_af.fecha_inicial, _af.fecha_final, _fecha_desembolso_tmp )
+                            _dias = _funcion.diasEntreFechas(_af.fecha_inicial, _af.fecha_final, _fecha_desembolso )
                             if (_af.vencida) {
                                 _tasa = _tasa_liquidar_mora
                             } else {
@@ -1204,10 +1198,11 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                     val _puntos_interes = c.a.puntos_interes.get
                     val _tipo_interes = c.a.id_interes.get
                     val _linea = c.a.id_linea.get
-                    val _fecha_desembolso = _funcion.limpiarFecha(c.a.fecha_desembolso.get)
+                    val _fecha_desembolso = _funcion.calculoFecha(_funcion.limpiarFecha(c.a.fecha_desembolso.get), c.b.dias_pago.get)
                     var _saldo_actual = c.a.valor_desembolso.get - c.b.abonos_capital.get
                     var _tasa_mora = c.a.tasa_interes_mora.get
                     val _valor_cuota = c.b.valor_cuota.get
+                    val _dias_pago = c.b.dias_pago.get
                     val _dias_prorroga = c.b.dias_prorrogados.get
                     var _proximo_pago = new DateTime()
 
@@ -1444,8 +1439,7 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                             if (_af.devuelto) {
                                 _devuelto = true
                             }
-                            val _fecha_desembolso_tmp = _funcion.calculoFecha(_fecha_desembolso, _dias_prorroga)
-                            _dias = _funcion.diasEntreFechas(_af.fecha_inicial, _af.fecha_final, _fecha_desembolso_tmp )
+                            _dias = _funcion.diasEntreFechas(_af.fecha_inicial, _af.fecha_final, _fecha_desembolso )
                             if (_af.vencida) {
                                 _tasa = _tasa_liquidar_mora
                             } else {

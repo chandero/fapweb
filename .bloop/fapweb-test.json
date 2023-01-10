@@ -27,10 +27,10 @@
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/com/typesafe/play/play-jdbc_2.12/2.8.2/play-jdbc_2.12-2.8.2.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/com/typesafe/play/play-cache_2.12/2.8.2/play-cache_2.12-2.8.2.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/com/typesafe/play/play-ahc-ws_2.12/2.8.2/play-ahc-ws_2.12-2.8.2.jar",
-            "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/slf4j/log4j-over-slf4j/2.0.0-alpha7/log4j-over-slf4j-2.0.0-alpha7.jar",
-            "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-simple/2.0.0-alpha7/slf4j-simple-2.0.0-alpha7.jar",
+            "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/slf4j/log4j-over-slf4j/2.0.6/log4j-over-slf4j-2.0.6.jar",
+            "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-simple/2.0.6/slf4j-simple-2.0.6.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/com/typesafe/play/anorm_2.12/2.5.3/anorm_2.12-2.5.3.jar",
-            "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/firebirdsql/jdbc/jaybird/4.0.0.java8/jaybird-4.0.0.java8.jar",
+            "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/firebirdsql/jdbc/jaybird/4.0.8.java11/jaybird-4.0.8.java11.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/com/typesafe/play/play-json_2.12/2.8.1/play-json_2.12-2.8.1.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/com/typesafe/play/play-json-joda_2.12/2.6.10/play-json-joda_2.12-2.6.10.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/com/pauldijou/jwt-play_2.12/4.2.0/jwt-play_2.12-4.2.0.jar",
@@ -103,14 +103,13 @@
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/com/typesafe/play/shaded-asynchttpclient/2.1.2/shaded-asynchttpclient-2.1.2.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/com/typesafe/play/shaded-oauth/2.1.2/shaded-oauth-2.1.2.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/javax/cache/cache-api/1.1.1/cache-api-1.1.1.jar",
-            "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-api/2.0.0-alpha7/slf4j-api-2.0.0-alpha7.jar",
+            "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-api/2.0.6/slf4j-api-2.0.6.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/com/typesafe/play/anorm-tokenizer_2.12/2.5.3/anorm-tokenizer_2.12-2.5.3.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/com/jsuereth/scala-arm_2.12/2.0/scala-arm_2.12-2.0.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/joda-time/joda-time/2.10.5/joda-time-2.10.5.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/joda/joda-convert/2.1/joda-convert-2.1.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-parser-combinators_2.12/1.1.2/scala-parser-combinators_2.12-1.1.2.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/javax/resource/connector-api/1.5/connector-api-1.5.jar",
-            "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/antlr/antlr4-runtime/4.7.2/antlr4-runtime-4.7.2.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/com/typesafe/play/play-functional_2.12/2.8.1/play-functional_2.12-2.8.1.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.12.11/scala-reflect-2.12.11.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-core/2.10.4/jackson-core-2.10.4.jar",
@@ -402,7 +401,7 @@
         "platform": {
             "name": "jvm",
             "config": {
-                "home": "/usr/lib/jvm/java-11-openjdk",
+                "home": "/home/chandero/.sdkman/candidates/java/11.0.17-tem",
                 "options": [
                     "-Duser.dir=/home/chandero/Documentos/Desarrollo/Repositorios/fundacionapoyo/fapweb"
                 ]
@@ -586,34 +585,34 @@
                 {
                     "organization": "org.slf4j",
                     "name": "log4j-over-slf4j",
-                    "version": "2.0.0-alpha7",
+                    "version": "2.0.6",
                     "configurations": "default",
                     "artifacts": [
                         {
                             "name": "log4j-over-slf4j",
-                            "path": "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/slf4j/log4j-over-slf4j/2.0.0-alpha7/log4j-over-slf4j-2.0.0-alpha7.jar"
+                            "path": "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/slf4j/log4j-over-slf4j/2.0.6/log4j-over-slf4j-2.0.6.jar"
                         },
                         {
                             "name": "log4j-over-slf4j",
                             "classifier": "sources",
-                            "path": "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/slf4j/log4j-over-slf4j/2.0.0-alpha7/log4j-over-slf4j-2.0.0-alpha7-sources.jar"
+                            "path": "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/slf4j/log4j-over-slf4j/2.0.6/log4j-over-slf4j-2.0.6-sources.jar"
                         }
                     ]
                 },
                 {
                     "organization": "org.slf4j",
                     "name": "slf4j-simple",
-                    "version": "2.0.0-alpha7",
+                    "version": "2.0.6",
                     "configurations": "default",
                     "artifacts": [
                         {
                             "name": "slf4j-simple",
-                            "path": "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-simple/2.0.0-alpha7/slf4j-simple-2.0.0-alpha7.jar"
+                            "path": "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-simple/2.0.6/slf4j-simple-2.0.6.jar"
                         },
                         {
                             "name": "slf4j-simple",
                             "classifier": "sources",
-                            "path": "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-simple/2.0.0-alpha7/slf4j-simple-2.0.0-alpha7-sources.jar"
+                            "path": "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-simple/2.0.6/slf4j-simple-2.0.6-sources.jar"
                         }
                     ]
                 },
@@ -637,17 +636,17 @@
                 {
                     "organization": "org.firebirdsql.jdbc",
                     "name": "jaybird",
-                    "version": "4.0.0.java8",
+                    "version": "4.0.8.java11",
                     "configurations": "default",
                     "artifacts": [
                         {
                             "name": "jaybird",
-                            "path": "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/firebirdsql/jdbc/jaybird/4.0.0.java8/jaybird-4.0.0.java8.jar"
+                            "path": "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/firebirdsql/jdbc/jaybird/4.0.8.java11/jaybird-4.0.8.java11.jar"
                         },
                         {
                             "name": "jaybird",
                             "classifier": "sources",
-                            "path": "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/firebirdsql/jdbc/jaybird/4.0.0.java8/jaybird-4.0.0.java8-sources.jar"
+                            "path": "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/firebirdsql/jdbc/jaybird/4.0.8.java11/jaybird-4.0.8.java11-sources.jar"
                         }
                     ]
                 },
@@ -1868,17 +1867,17 @@
                 {
                     "organization": "org.slf4j",
                     "name": "slf4j-api",
-                    "version": "2.0.0-alpha7",
+                    "version": "2.0.6",
                     "configurations": "default",
                     "artifacts": [
                         {
                             "name": "slf4j-api",
-                            "path": "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-api/2.0.0-alpha7/slf4j-api-2.0.0-alpha7.jar"
+                            "path": "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-api/2.0.6/slf4j-api-2.0.6.jar"
                         },
                         {
                             "name": "slf4j-api",
                             "classifier": "sources",
-                            "path": "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-api/2.0.0-alpha7/slf4j-api-2.0.0-alpha7-sources.jar"
+                            "path": "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-api/2.0.6/slf4j-api-2.0.6-sources.jar"
                         }
                     ]
                 },
@@ -1981,23 +1980,6 @@
                             "name": "connector-api",
                             "classifier": "sources",
                             "path": "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/javax/resource/connector-api/1.5/connector-api-1.5-sources.jar"
-                        }
-                    ]
-                },
-                {
-                    "organization": "org.antlr",
-                    "name": "antlr4-runtime",
-                    "version": "4.7.2",
-                    "configurations": "default",
-                    "artifacts": [
-                        {
-                            "name": "antlr4-runtime",
-                            "path": "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/antlr/antlr4-runtime/4.7.2/antlr4-runtime-4.7.2.jar"
-                        },
-                        {
-                            "name": "antlr4-runtime",
-                            "classifier": "sources",
-                            "path": "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/antlr/antlr4-runtime/4.7.2/antlr4-runtime-4.7.2-sources.jar"
                         }
                     ]
                 },

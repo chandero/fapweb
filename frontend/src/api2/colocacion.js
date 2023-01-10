@@ -1,4 +1,4 @@
-import request from '@/utils/request2'
+import request from '@/utils/request'
 
 export function obtenerColocacion(id_colocacion) {
   const data = {
@@ -15,7 +15,7 @@ export function obtenerListaColocacion(id_colocacion) {
     id_colocacion
   }
   return request({
-    url: '/colocacion/listbyid/' + data.id_colocacion,
+    url: '/coco/bpc/' + data.id_colocacion,
     method: 'get'
   })
 }
