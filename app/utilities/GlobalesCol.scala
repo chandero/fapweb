@@ -352,22 +352,22 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
     def calcularFechasALiquidarFija(fecha_inicial: DateTime, fecha_corte: DateTime, fecha_proxima: DateTime):List[FechaLiq] = {
 
         var _list = new ListBuffer[FechaLiq]()
-        var _fechaf1 = fecha_inicial
-        var _fechaf2 = fecha_corte
+        var _fechaf1 = fecha_inicial.toLocalDate()
+        var _fechaf2 = fecha_corte.toLocalDate()
 
-        var _fechaf3 = fecha_proxima
-        var _fechaf4 = DateTime.now()
+        var _fechaf3 = fecha_proxima.toLocalDate()
+        var _fechaf4 = DateTime.now().toLocalDate()
 
-        _fechaf1 = _fechaf1.minusMinutes(_fechaf1.minuteOfHour().get()).minusSeconds(_fechaf1.secondOfMinute().get())
+/*         _fechaf1 = _fechaf1.minusMinutes(_fechaf1.minuteOfHour().get()).minusSeconds(_fechaf1.secondOfMinute().get())
         _fechaf2 = _fechaf2.minusMinutes(_fechaf2.minuteOfHour().get()).minusSeconds(_fechaf2.secondOfMinute().get())
         _fechaf3 = _fechaf3.minusMinutes(_fechaf3.minuteOfHour().get()).minusSeconds(_fechaf3.secondOfMinute().get())
         _fechaf4 = _fechaf4.minusMinutes(_fechaf4.minuteOfHour().get()).minusSeconds(_fechaf4.secondOfMinute().get())
-
+ */
         var _paso = false
 
 
         // Inicio While 1
-        while(_fechaf1.getMillis() <= _fechaf3.getMillis()) {
+        while(_fechaf1.compareTo(_fechaf3) <= 0) {
             var _fecha = _fechaf1.dayOfMonth().withMaximumValue()
             if (_fecha.isAfter(_fechaf3)) {
                 _fecha = _fechaf3
@@ -385,19 +385,19 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
             var _vencido = false
             var _devuelto = false
 
-            val (_a, _m, _d) = _funcion.decodeDate(_fecha_inicial)
-            val (_aa, _mm, _dd) = _funcion.decodeDate(_fecha_final)
+            val (_a, _m, _d) = _funcion.decodeDate(_fecha_inicial.toDateTimeAtCurrentTime())
+            val (_aa, _mm, _dd) = _funcion.decodeDate(_fecha_final.toDateTimeAtCurrentTime())
 
             val _fechaA = _fecha_final.dayOfMonth().withMinimumValue()
             val _fechaB = _fechaf4.dayOfMonth().withMinimumValue()
 
-            if (_fecha.getMillis() <= _fechaf4.getMillis() && _fechaA.getMillis() == _fechaB.getMillis) {
+            if (_fecha.compareTo(_fechaf4) <= 0 && _fechaA.equals(_fechaB)) {
                 _anticipado = false
                 _causado = false
                 _corriente = true
                 _vencido = false
                 _devuelto = false
-            } else if (_fecha.getMillis() <= _fechaf4.getMillis()) {
+            } else if (_fecha.compareTo(_fechaf4) <= 0) {
                 _anticipado = false
                 _causado = true
                 _corriente = false
@@ -412,7 +412,7 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
             }
             _fechaf1 = _fecha
             if (!((_m==_mm) && (_d==31) && (_dd==31))) {
-                _list += new FechaLiq(_fecha_inicial, _fecha_final, _anticipado, _causado, _corriente, _vencido, _devuelto)
+                _list += new FechaLiq(_fecha_inicial.toDateTimeAtCurrentTime(), _fecha_final.toDateTimeAtCurrentTime(), _anticipado, _causado, _corriente, _vencido, _devuelto)
             }
             _fechaf1 = _fecha.plusDays(1)
         }
