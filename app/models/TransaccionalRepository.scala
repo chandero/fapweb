@@ -30,6 +30,16 @@ case class Cliente(
     cliente_primer_apellido: Option[String]
 )
 
+case class EnlaceTransaccional(
+    enla_id: Option[Long],
+    enla_uuid: Option[String],
+    enla_activo: Option[Int],
+    enla_fecha: Option[DateTime],
+    usua_email: Option[String],
+    enla_id_identificacion: Option[Int],
+    enla_id_persona: Option[String]
+)
+
 class TransaccionalRepository @Inject()(dbapi: DBApi, config: Configuration)(
     implicit ec: DatabaseExecutionContext
 ) {
@@ -61,7 +71,7 @@ class TransaccionalRepository @Inject()(dbapi: DBApi, config: Configuration)(
       var _result = false
       db.withTransaction { implicit connection =>
         val _nombre =
-          SQL("""SELECT p.NOMBRE || ' ' || p.PRIMER_APELLIDO || ' ' || p.SEGUNDO_APELLIDO AS NOMBRE FROM "col$colocacion" c 
+          SQL("""SELECT FIRST 1 p.NOMBRE || ' ' || p.PRIMER_APELLIDO || ' ' || p.SEGUNDO_APELLIDO AS NOMBRE FROM "col$colocacion" c
                     INNER JOIN "gen$persona" p ON p.ID_IDENTIFICACION = c.ID_IDENTIFICACION AND p.ID_PERSONA = c.ID_PERSONA
                     WHERE c.ID_IDENTIFICACION = {id_identificacion} AND c.ID_PERSONA = {id_persona} AND c.ID_ESTADO_COLOCACION IN (0,1,2)
                     AND p.EMAIL = {email}""")
@@ -72,38 +82,30 @@ class TransaccionalRepository @Inject()(dbapi: DBApi, config: Configuration)(
             )
             .as(SqlParser.str("NOMBRE").single)
         if (!_nombre.isEmpty()) {
-          val _esInserted = SQL(
-            "INSERT INTO TRAN_USUARIO (TRAN_USUARIO_ID_IDENTIFICACION, TRAN_USUARIO_ID_PERSONA, TRAN_USUARIO_CLAVE, TRAN_USUARIO_EMAIL) VALUES ({id_identificacion}, {id_persona}, {clave}, {email})"
-          ).on(
-              'id_identificacion -> id_identificacion,
-              'id_persona -> id_persona,
-              'clave -> randomUUID().toString.boundedBcrypt(12),
-              'email -> email
-            )
-            .executeInsert()
-            .get > 0
-          if (_esInserted) {
             val _uuid = randomUUID().toString
             _result = SQL(
               """INSERT INTO TRAN_ENLACE 
-                    (TRAN_ENLACE_UUID, TRAN_ENLACE_ACTIVO, TRAN_ENLACE_FECHA, TRAN_ENLACE_EMAIL) 
-                   VALUES ({uuid}, {activo}, {fecha}, {email})"""
+                    (TRAN_ENLACE_UUID, TRAN_ENLACE_ACTIVO, TRAN_ENLACE_FECHA, TRAN_ENLACE_EMAIL, TRAN_ENLACE_ID_IDENTIFICACION, TRAN_ENLACE_ID_PERSONA)
+                   VALUES ({uuid}, {activo}, {fecha}, {email}, {id_identificacion}, {id_persona})"""
             ).on(
                 'uuid -> _uuid,
-                'activo -> true,
+                'activo -> 1,
                 'fecha -> new Timestamp(Calendar.getInstance().getTimeInMillis),
-                'email -> email
+                'email -> email,
+                'id_identificacion -> id_identificacion,
+                'id_persona -> id_persona
               )
               .executeInsert()
               .get > 0
             if (_result) {
               // Enviar correo de enlace
-              val enlace = config.get[String]("link.protocol_transaccional") + "/link/" + _uuid
+              val enlace = config.get[String]("link.protocol_transaccional") + "/l/" + _uuid
               EmailSender.sendCredentialInfo(email, _nombre, enlace)
             }
+          } else {
+            _result = false
           }
         }
-      }
       _result
     }(ec)
 
@@ -148,22 +150,24 @@ class TransaccionalRepository @Inject()(dbapi: DBApi, config: Configuration)(
   def validarEnlace(enla_uuid: String): Future[(Boolean, String)] = Future {
     val fecha: LocalDateTime =
       new LocalDateTime(Calendar.getInstance().getTimeInMillis())
-    val _enlaceRS = {
+/*     val _enlaceRS = {
       get[Option[Long]]("TRAN_ENLACE_ID") ~
         get[Option[String]]("TRAN_ENLACE_UUID") ~
         get[Option[Int]]("TRAN_ENLACE_ACTIVO") ~
         get[Option[DateTime]]("TRAN_ENLACE_FECHA") ~
-        get[Option[String]]("TRAN_ENLACE_EMAIL") map {
-        case enla_id ~ enla_uuid ~ enla_activo ~ enla_fecha ~ enla_email =>
-          Enlace(enla_id, enla_uuid, enla_activo, enla_fecha, enla_email)
+        get[Option[String]]("TRAN_ENLACE_EMAIL") ~
+        get[Option[Int]]("TRAN_ENLACE_ID_IDENTIFICACION") ~
+        get[Option[String]]("TRAN_ENLACE_ID_PERSONA") map {
+        case enla_id ~ enla_uuid ~ enla_activo ~ enla_fecha ~ enla_email ~ enla_id_identificacion ~ enla_id_persona =>
+          EnlaceTransaccional(enla_id, enla_uuid, enla_activo, enla_fecha, enla_email, enla_id_identificacion, enla_id_persona)
       }
-    }
+    } */
     db.withConnection { implicit connection =>
       var _nombre = ""
       val _linkParse = int("TRAN_ENLACE_ACTIVO") ~ date("TRAN_ENLACE_FECHA") ~ str(
         "NOMBRE"
-      ) map {
-        case activo ~ fecha ~ nombre => (activo, fecha, nombre)
+      ) ~ str("TRAN_ENLACE_EMAIL") ~ int("TRAN_ENLACE_ID_IDENTIFICACION") ~ str("TRAN_ENLACE_ID_PERSONA") map {
+        case activo ~ fecha ~ nombre ~ email ~ id_identificacion ~ id_persona => (activo, fecha, nombre, email, id_identificacion, id_persona)
       }
       val link = SQL(
         """SELECT te.TRAN_ENLACE_ACTIVO, te.TRAN_ENLACE_FECHA, gp.NOMBRE || ' ' || gp.PRIMER_APELLIDO || ' ' || gp.SEGUNDO_APELLIDO AS NOMBRE FROM TRAN_ENLACE te
@@ -192,7 +196,17 @@ class TransaccionalRepository @Inject()(dbapi: DBApi, config: Configuration)(
                 'enla_uuid -> enla_uuid
               )
               .executeUpdate()
-            (false, "")
+            val _esInsertado = SQL("""INSERT INTO TRAN_USUARIO (TRAN_USUARIO_ID_IDENTIFICACION, TRAN_USUARIO_ID_PERSONA, TRAN_USUARIO_EMAIL, TRAN_USUARIO_ULTIMO_INGRESO) VALUES ({id_identificacion}, {id_persona}, {email}, {ahora})""").on(
+              'id_identificacion -> link._5,
+              'id_persona -> link._6,
+              'email -> link._4,
+              'ahora -> new Timestamp(Calendar.getInstance().getTimeInMillis)
+            ).executeInsert().get > 0
+            if (_esInsertado) {
+              (true, _nombre)
+            } else {
+              (false, "")
+            }
           }
         }
       }

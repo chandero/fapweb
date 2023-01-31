@@ -3030,7 +3030,7 @@ class FacturaRepository @Inject()(
             case "EE.UU"    => Some("Estados Unidos")
             case _          => Some("Colombia")
           }, 
-          Some(f.id_comprobante.toString()),
+          Some(f.id_comprobante.get.toString()),
           persona.a.get.pais_nacimiento.get match {
             case "COLOMBIA" => Some("CO")
             case "EE.UU."   => Some("US")
@@ -3126,7 +3126,7 @@ class FacturaRepository @Inject()(
         val _referenciaFactura = new _ReferenciaFactura(
           Some(1),
           nc.fact_nota_descripcion,
-          Some(nc.fact_numero.get.toString()),
+          Some(prefijo + nc.fact_numero.get.toString()),
           nc.fact_cufe,
           Some(sdd.format(f.fact_fecha.get.toDate))
         )
