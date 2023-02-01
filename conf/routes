@@ -24,15 +24,15 @@ POST    /api/usua/save                  controllers.UsuarioController.guardar
 
 # Transaccional
 + nocsrf
-GET     /api/tran/auth/:i/:p/:c               controllers.TransaccionalController.autenticar(i: Int, p: String, c: String)
+GET     /api/tran/auth/:i/:p/:c         controllers.TransaccionalController.autenticar(i: Int, p: String, c: String)
 + nocsrf
-GET     /api/tran/register/:i/:p/:e               controllers.TransaccionalController.registrar(i: Int, p: String, e: String)
+GET     /api/tran/register/:i/:p/:e     controllers.TransaccionalController.registrar(i: Int, p: String, e: String)
 + nocsrf
 GET     /api/tran/link/:t               controllers.TransaccionalController.validarEnlace(t: String)    
 + nocsrf
 GET     /api/tran/recovery/:e           controllers.TransaccionalController.recuperarClave(e: String)
 + nocsrf
-POST    /api/tran/changepass                controllers.TransaccionalController.cambiarClave()
+GET    /api/tran/changepass/:e/:p/:l    controllers.TransaccionalController.cambiarClave(e: String, p: String, l: String)
 
 # User Logout
 POST    /api/login/logout               controllers.UsuarioController.logout()

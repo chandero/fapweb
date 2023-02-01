@@ -111,10 +111,8 @@ class TransaccionalController @Inject()(
       }
   }
 
-  def cambiarClave() = Action(parse.json) { request =>
-    val link = (request.body \ "link").as[String]
-    val clave = (request.body \ "password").as[String]
-    val result: Boolean = transaccionalService.cambiarClave(link, clave)
+  def cambiarClave(email: String, clave: String, link: String) = Action { request =>
+    val result: Boolean = transaccionalService.cambiarClave(email, clave, link)
     if (result) {
       Ok("true")
     } else {

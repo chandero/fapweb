@@ -162,33 +162,33 @@ class TransaccionalRepository @Inject()(dbapi: DBApi, config: Configuration)(
           EnlaceTransaccional(enla_id, enla_uuid, enla_activo, enla_fecha, enla_email, enla_id_identificacion, enla_id_persona)
       }
     } */
-    db.withConnection { implicit connection =>
-      var _nombre = ""
+    println("Enlace: Ingreso a buscar si existe el enlace")
+    db.withTransaction { implicit connection =>
+      var _email = ""
       val _linkParse = int("TRAN_ENLACE_ACTIVO") ~ date("TRAN_ENLACE_FECHA") ~ str(
         "NOMBRE"
       ) ~ str("TRAN_ENLACE_EMAIL") ~ int("TRAN_ENLACE_ID_IDENTIFICACION") ~ str("TRAN_ENLACE_ID_PERSONA") map {
         case activo ~ fecha ~ nombre ~ email ~ id_identificacion ~ id_persona => (activo, fecha, nombre, email, id_identificacion, id_persona)
       }
       val link = SQL(
-        """SELECT te.TRAN_ENLACE_ACTIVO, te.TRAN_ENLACE_FECHA, gp.NOMBRE || ' ' || gp.PRIMER_APELLIDO || ' ' || gp.SEGUNDO_APELLIDO AS NOMBRE FROM TRAN_ENLACE te
-          INNER JOIN TRAN_USUARIO tu ON tu.TRAN_USUARIO_EMAIL = te.TRAN_ENLACE_EMAIL
-          INNER JOIN "gen$persona" gp ON gp.ID_IDENTIFICACION = tu.TRAN_USUARIO_ID_IDENTIFICACION AND gp.ID_PERSONA = tu.TRAN_USUARIO_ID_PERSONA
+        """SELECT te.TRAN_ENLACE_ACTIVO, te.TRAN_ENLACE_FECHA, gp.NOMBRE || ' ' || gp.PRIMER_APELLIDO || ' ' || gp.SEGUNDO_APELLIDO AS NOMBRE,
+          te.TRAN_ENLACE_EMAIL, te.TRAN_ENLACE_ID_IDENTIFICACION, te.TRAN_ENLACE_ID_PERSONA FROM TRAN_ENLACE te
+          INNER JOIN "gen$persona" gp ON gp.ID_IDENTIFICACION = te.TRAN_ENLACE_ID_IDENTIFICACION AND gp.ID_PERSONA = te.TRAN_ENLACE_ID_PERSONA
           WHERE te.TRAN_ENLACE_UUID = {uuid} AND te.TRAN_ENLACE_ACTIVO = {activo}"""
       ).on(
           'uuid -> enla_uuid,
           'activo -> 1
         )
         .as(_linkParse.singleOpt)
+      println("Enlace: Link localizado: " + link)
       link match {
         case None => {
           (false, "")
         }
         case Some(link) => {
           val duration = fecha.toDate().getTime() - link._2.getTime()
-          _nombre = link._3
+          _email = link._4
           if (duration < 86400000) {
-            (true, _nombre)
-          } else {
             SQL(
               "UPDATE TRAN_ENLACE SET TRAN_ENLACE_ACTIVO = {enla_activo} WHERE TRAN_ENLACE_UUID = {enla_uuid}"
             ).on(
@@ -203,10 +203,12 @@ class TransaccionalRepository @Inject()(dbapi: DBApi, config: Configuration)(
               'ahora -> new Timestamp(Calendar.getInstance().getTimeInMillis)
             ).executeInsert().get > 0
             if (_esInsertado) {
-              (true, _nombre)
+              (true, _email)
             } else {
               (false, "")
             }
+          } else {
+            (false, "")
           }
         }
       }
@@ -261,7 +263,7 @@ class TransaccionalRepository @Inject()(dbapi: DBApi, config: Configuration)(
    * @param clave: String
    */
 
-  def cambiarClave(link: String, clave: String): Boolean = {
+  def cambiarClave(email: String, clave: String, link: String): Boolean = {
     val fecha: LocalDate = new LocalDate(
       Calendar.getInstance().getTimeInMillis()
     )
@@ -293,7 +295,7 @@ class TransaccionalRepository @Inject()(dbapi: DBApi, config: Configuration)(
         .as(_parser.single)
 
       val _result: Boolean = SQL(
-        "UPDATE TRAN_USUARIO SET TRAN_USUA_CLAVE  = {contrasena} WHERE TRAN_USUARIO_ID_IDENTIFICACION = {id_identificacion} AND TRAN_USUARIO_ID_PERSONA = {id_persona}"
+        "UPDATE TRAN_USUARIO SET TRAN_USUARIO_CLAVE  = {contrasena} WHERE TRAN_USUARIO_ID_IDENTIFICACION = {id_identificacion} AND TRAN_USUARIO_ID_PERSONA = {id_persona}"
       ).on(
           'id_identificacion -> usuario._1,
           'id_persona -> usuario._2,
@@ -309,7 +311,7 @@ class TransaccionalRepository @Inject()(dbapi: DBApi, config: Configuration)(
           )
           .executeUpdate()
 
-        SQL(
+/*         SQL(
           "INSERT INTO auditoria(audi_fecha, audi_hora, usua_id, audi_tabla, audi_uid, audi_campo, audi_valorantiguo, audi_valornuevo, audi_evento) VALUES ({audi_fecha}, {audi_hora}, {usua_id}, {audi_tabla}, {audi_uid}, {audi_campo}, {audi_valorantiguo}, {audi_valornuevo}, {audi_evento})"
         ).on(
             'audi_fecha -> fecha,
@@ -322,7 +324,7 @@ class TransaccionalRepository @Inject()(dbapi: DBApi, config: Configuration)(
             'audi_valornuevo -> '*',
             'audi_evento -> "A"
           )
-          .executeInsert()
+          .executeInsert() */
       }
       _result
     }
