@@ -33,7 +33,10 @@ GET     /api/tran/link/:t               controllers.TransaccionalController.vali
 GET     /api/tran/recovery/:e           controllers.TransaccionalController.recuperarClave(e: String)
 + nocsrf
 GET    /api/tran/changepass/:e/:p/:l    controllers.TransaccionalController.cambiarClave(e: String, p: String, l: String)
-
+# Wompi
++ nocsrf
+POST   /api/wompi/event                 controllers.TransaccionalController.registrarEventoWompi
+GET    /api/wompi/get/:r                controllers.TransaccionalController.obtenerRegistroWompi(r: String)
 # User Logout
 POST    /api/login/logout               controllers.UsuarioController.logout()
 

@@ -40,6 +40,34 @@ case class EnlaceTransaccional(
     enla_id_persona: Option[String]
 )
 
+case class WompiEvent(
+  tran_reference: Option[String],
+  tran_id: Option[String],
+  tran_status: Option[String],
+  tran_created_at: Option[String],
+  tran_finalized_at: Option[String],
+  tran_amount_in_cents: Option[Long],
+  tran_customer_email: Option[String],
+  tran_currency: Option[String],
+  tran_payment_method_type: Option[String],
+  tran_payment_method: Option[String],
+  tran_status_message: Option[String],
+  tran_shipping_address: Option[String],
+  tran_redirect_url: Option[String],
+  tran_payment_source_id: Option[String],
+  tran_payment_link_id: Option[String],
+  tran_customer_data: Option[String],
+  tran_billing_data: Option[String],
+  tran_sent_at: Option[String],
+  tran_json: Option[String]
+)
+
+case class WompiEventRow(
+  tran_id: Option[String],
+  tran_event_received_at: Option[String],
+  tran_event_json: Option[String]
+)
+
 class TransaccionalRepository @Inject()(dbapi: DBApi, config: Configuration)(
     implicit ec: DatabaseExecutionContext
 ) {
@@ -327,6 +355,52 @@ class TransaccionalRepository @Inject()(dbapi: DBApi, config: Configuration)(
           .executeInsert() */
       }
       _result
+    }
+  }
+
+  def registrarEventoWompi(evento: WompiEvent) = {
+    db.withConnection { implicit connection =>
+      val _actualizado: Boolean = SQL(
+        """UPDATE TRAN_TRANSACCION SET
+          TRAN_TRAN_STATUS = {tran_status},
+          TRAN_TRAN_CREATED_AT = {tran_created_at},
+          TRAN_TRAN_FINALIZED_AT = {tran_finalized_at},
+          TRAN_TRAN_AMOUNT_IN_CENTS = {tran_amount_in_cents},
+          TRAN_TRAN_CUSTOMER_EMAIL = {tran_customer_email},
+          TRAN_TRAN_CURRENCY = {tran_currency},
+          TRAN_TRAN_PAYMENT_METHOD_TYPE = {tran_payment_method_type},
+          TRAN_TRAN_PAYMENT_METHOD = {tran_payment_method},
+          TRAN_TRAN_STATUS_MESSAGE = {tran_status_message},
+          TRAN_TRAN_SHIPPING_ADDRESS = {tran_shipping_address},
+          TRAN_TRAN_REDIRECT_URL = {tran_redirect_url},
+          TRAN_TRAN_PAYMENT_SOURCE_ID = {tran_payment_source_id},
+          TRAN_TRAN_PAYMENT_LINK_ID = {tran_payment_link_id},
+          TRAN_TRAN_CUSTOMER_DATA = {tran_customer_data},
+          TRAN_TRAN_BILLING_DATA = {tran_billing_data},
+          TRAN_TRAN_SENT_AT = {tran_sent_at},
+          TRAN_TRAN_JSON = {tran_json}
+          WHERE TRAN_TRAN_ID = {tran_id}"""
+      ).on(
+          'tran_id -> evento.tran_id,
+          'tran_status -> evento.tran_status,
+          'tran_created_at -> evento.tran_created_at,
+          'tran_finalized_at -> evento.tran_finalized_at,
+          'tran_amount_in_cents -> evento.tran_amount_in_cents,
+          'tran_customer_email -> evento.tran_customer_email,
+          'tran_currency -> evento.tran_currency,
+          'tran_payment_method_type -> evento.tran_payment_method_type,
+          'tran_payment_method -> evento.tran_payment_method,
+          'tran_status_message -> evento.tran_status_message,
+          'tran_shipping_address -> evento.tran_shipping_address,
+          'tran_redirect_url -> evento.tran_redirect_url,
+          'tran_payment_source_id -> evento.tran_payment_source_id,
+          'tran_payment_link_id -> evento.tran_payment_link_id,
+          'tran_customer_data -> evento.tran_customer_data,
+          'tran_billing_data -> evento.tran_billing_data,
+          'tran_sent_at -> evento.tran_sent_at,
+          'tran_json -> evento.tran_json
+        )
+        .executeUpdate() > 0
     }
   }
 

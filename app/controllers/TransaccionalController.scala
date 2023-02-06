@@ -119,4 +119,29 @@ class TransaccionalController @Inject()(
       NotFound
     }
   }
+
+  def registrarEventoWompi() = Action.async { request =>
+    val body: AnyContent = request.body
+    Future.successful(Ok("true"))
+/*     val jsonBody: Option[JsValue] = body.asJson
+    jsonBody.map { json =>
+      val wompiEvent = json.as[WompiEventDto]
+      transaccionalService.registrarEventoWompie(wompiEvent).map { result =>
+        if (result) {
+          Ok("true")
+        } else {
+          NotAcceptable("false")
+        }
+      }
+    }.getOrElse {
+      Future.successful(BadRequest("Expecting Json data"))
+    } */
+  }
+
+  def obtenerRegistroWompi(reference: String) = Action.async { request =>
+/*     transaccionalService.obtenerEventosWompie().map { result =>
+      Ok(Json.toJson(result))
+    } */
+    Future.successful(Ok("true"))
+  }
 }
