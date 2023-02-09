@@ -1799,4 +1799,23 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
             }
         }
     }
+
+    def verificacionCancelacionCredito(id_agencia: Int, id_colocacion: String) = {
+        db.withTransaction { implicit connection =>
+            val _esVigente = SQL("""SELECT ID_ESTADO_COLOCACION FROM "col$estado" WHERE ES_VIGENTE = 1""").as(SqlParser.scalar[Int].single)
+            val _esPrejuridico = SQL("""SELECT ID_ESTADO_COLOCACION FROM "col$estado" WHERE ES_PREJURIDICO = 1""").as(SqlParser.scalar[Int].single)
+            val _esJuridico = SQL("""SELECT ID_ESTADO_COLOCACION FROM "col$estado" WHERE ES_JURIDICO = 1""").as(SqlParser.scalar[Int].single)
+            val _esCastigado = SQL("""SELECT ID_ESTADO_COLOCACION FROM "col$estado" WHERE ES_CASTIGADO = 1""").as(SqlParser.scalar[Int].single)
+            val _esCancelado = SQL("""SELECT ID_ESTADO_COLOCACION FROM "col$estado" WHERE ES_CANCELADO = 1""").as(SqlParser.scalar[Int].single)
+            val _esSaldado = SQL("""SELECT ID_ESTADO_COLOCACION FROM "col$estado" WHERE ES_SALDADO = 1""").as(SqlParser.scalar[Int].single)
+            val _esFallecido = SQL("""SELECT ID_ESTADO_COLOCACION FROM "col$estado" WHERE ES_FALLECIDO = 1""").as(SqlParser.scalar[Int].single)
+            val _esIncapacitado = SQL("""SELECT ID_ESTADO_COLOCACION FROM "col$estado" WHERE ES_INCAPACITADO = 1""").as(SqlParser.scalar[Int].single)
+
+            val (_saldo, _estado) = SQL("""SELECT VALOR_DESEMBOLSO - ABONOS_CAPITAL AS SALDO, ID_ESTADO_COLOCACION FROM "col$colocacion" WHERE ID_AGENCIA = {id_agencia} AND ID_COLOCACION = {id_colocacion}""").
+            on(
+                'id_agencia -> id_agencia,
+                'id_colocacion -> id_colocacion
+            ).as(SqlParser.scalar[BigDecimal].single ~ SqlParser.scalar[Int].single map(flatten) *)
+        }
+    }
 }

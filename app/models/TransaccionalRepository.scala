@@ -358,7 +358,7 @@ class TransaccionalRepository @Inject()(dbapi: DBApi, config: Configuration)(
     }
   }
 
-  def registrarEventoWompi(evento: WompiEvent) = {
+  def registrarEventoWompi(evento: WompiEvent): Future[Boolean] = Future[Boolean] {
     db.withConnection { implicit connection =>
       val _actualizado: Boolean = SQL(
         """UPDATE TRAN_TRANSACCION SET
@@ -401,6 +401,69 @@ class TransaccionalRepository @Inject()(dbapi: DBApi, config: Configuration)(
           'tran_json -> evento.tran_json
         )
         .executeUpdate() > 0
+
+      if (!_actualizado) {
+        val _insertado = SQL("""INSERT INTO TRAN_TRANSACCION (
+          TRAN_TRAN_ID,
+          TRAN_TRAN_STATUS,
+          TRAN_TRAN_CREATED_AT,
+          TRAN_TRAN_FINALIZED_AT,
+          TRAN_TRAN_AMOUNT_IN_CENTS,
+          TRAN_TRAN_CUSTOMER_EMAIL,
+          TRAN_TRAN_CURRENCY,
+          TRAN_TRAN_PAYMENT_METHOD_TYPE,
+          TRAN_TRAN_PAYMENT_METHOD,
+          TRAN_TRAN_STATUS_MESSAGE,
+          TRAN_TRAN_SHIPPING_ADDRESS,
+          TRAN_TRAN_REDIRECT_URL,
+          TRAN_TRAN_PAYMENT_SOURCE_ID,
+          TRAN_TRAN_PAYMENT_LINK_ID,
+          TRAN_TRAN_CUSTOMER_DATA,
+          TRAN_TRAN_BILLING_DATA,
+          TRAN_TRAN_SENT_AT,
+          TRAN_TRAN_JSON
+        ) VALUES (
+          {tran_id},
+          {tran_status},
+          {tran_created_at},
+          {tran_finalized_at},
+          {tran_amount_in_cents},
+          {tran_customer_email},
+          {tran_currency},
+          {tran_payment_method_type},
+          {tran_payment_method},
+          {tran_status_message},
+          {tran_shipping_address},
+          {tran_redirect_url},
+          {tran_payment_source_id},
+          {tran_payment_link_id},
+          {tran_customer_data},
+          {tran_billing_data},
+          {tran_sent_at},
+          {tran_json}
+        )""").on(
+            'tran_id -> evento.tran_id,
+            'tran_status -> evento.tran_status,
+            'tran_created_at -> evento.tran_created_at,
+            'tran_finalized_at -> evento.tran_finalized_at,
+            'tran_amount_in_cents -> evento.tran_amount_in_cents,
+            'tran_customer_email -> evento.tran_customer_email,
+            'tran_currency -> evento.tran_currency,
+            'tran_payment_method_type -> evento.tran_payment_method_type,
+            'tran_payment_method -> evento.tran_payment_method,
+            'tran_status_message -> evento.tran_status_message,
+            'tran_shipping_address -> evento.tran_shipping_address,
+            'tran_redirect_url -> evento.tran_redirect_url,
+            'tran_payment_source_id -> evento.tran_payment_source_id,
+            'tran_payment_link_id -> evento.tran_payment_link_id,
+            'tran_customer_data -> evento.tran_customer_data,
+            'tran_billing_data -> evento.tran_billing_data,
+            'tran_sent_at -> evento.tran_sent_at,
+            'tran_json -> evento.tran_json
+          )
+          .executeInsert().get > 0
+      }
+      return Future.successful(true)
     }
   }
 

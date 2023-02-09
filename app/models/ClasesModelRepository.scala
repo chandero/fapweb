@@ -589,16 +589,82 @@ object CuotasLiq {
       (__ \ "esCostas").read[Boolean] and
       (__ \ "idClaseOperacion").read[String]
   )(CuotasLiq.apply _)
+
+  val _set = {
+    get[Int]("cuota_numero") ~
+      get[String]("codigo_puc") ~
+      get[String]("codigo_nombre") ~
+      get[DateTime]("fecha_inicial") ~
+      get[DateTime]("fecha_final") ~
+      get[Int]("dias") ~
+      get[Double]("tasa") ~
+      get[BigDecimal]("debito") ~
+      get[BigDecimal]("credito") ~
+      get[Boolean]("es_capital") ~
+      get[Boolean]("es_causado") ~
+      get[Boolean]("es_corriente") ~
+      get[Boolean]("es_vencido") ~
+      get[Boolean]("es_anticipado") ~
+      get[Boolean]("es_devuelto") ~
+      get[Boolean]("es_otros") ~
+      get[Boolean]("es_caja_banco") ~
+      get[Boolean]("es_costas") ~
+      get[String]("id_clase_operacion") map {
+      case cuota_numero ~
+            codigo_puc ~
+            codigo_nombre ~
+            fecha_inicial ~
+            fecha_final ~
+            dias ~
+            tasa ~
+            debito ~
+            credito ~
+            es_capital ~
+            es_causado ~
+            es_corriente ~
+            es_vencido ~
+            es_anticipado ~
+            es_devuelto ~
+            es_otros ~
+            es_caja_banco ~
+            es_costas ~
+            id_clase_operacion =>
+        CuotasLiq(
+          cuota_numero,
+          codigo_puc,
+          codigo_nombre,
+          fecha_inicial,
+          fecha_final,
+          dias,
+          tasa,
+          debito,
+          credito,
+          es_capital,
+          es_causado,
+          es_corriente,
+          es_vencido,
+          es_anticipado,
+          es_devuelto,
+          es_otros,
+          es_caja_banco,
+          es_costas,
+          id_clase_operacion
+        )
+    }
+  }
 }
 
 case class Liquidacion(
-    items: Option[List[CuotasLiq]],
+    referencia: String,
+    fecha: DateTime,
+    id_colocacion: String,
     saldo: Option[BigDecimal],
     fecha_capital: Option[DateTime],
     fecha_interes: Option[DateTime],
     fecha_proxima: Option[DateTime],
     liquidado: Boolean,
-    referencia: String
+    id_agencia: Int,
+    items: Option[List[CuotasLiq]],
 )
 
 object Liquidacion {
@@ -609,25 +675,132 @@ object Liquidacion {
 
   implicit val wWrites = new Writes[Liquidacion] {
     def writes(e: Liquidacion) = Json.obj(
-      "items" -> e.items,
+      "referencia" -> e.referencia,
+      "id_colocacion" -> e.id_colocacion,
+      "fecha" -> e.fecha,
       "saldo" -> e.saldo,
       "fecha_capital" -> e.fecha_capital,
       "fecha_interes" -> e.fecha_interes,
       "fecha_proxima" -> e.fecha_proxima,
       "liquidado" -> e.liquidado,
-      "referencia" -> e.referencia
+      "id_agencia" -> e.id_agencia,
+      "items" -> e.items
     )
   }
 
   implicit val rReads: Reads[Liquidacion] = (
-    (__ \ "items").readNullable[List[CuotasLiq]] and
+    (__ \ "referencia").read[String] and
+      (__ \ "fecha").read[DateTime] and
+      (__ \ "id_colocacion").read[String] and
       (__ \ "saldo").readNullable[BigDecimal] and
       (__ \ "fecha_capital").readNullable[DateTime] and
       (__ \ "fecha_interes").readNullable[DateTime] and
       (__ \ "fecha_proxima").readNullable[DateTime] and
       (__ \ "liquidado").read[Boolean] and
-      (__ \ "referencia").read[String]
+      (__ \ "id_agencia").read[Int] and
+      (__ \ "items").readNullable[List[CuotasLiq]]
   )(Liquidacion.apply _)
+
+  val _set = {
+      get[String]("referencia") ~
+      get[DateTime]("fecha") ~
+      get[String]("id_colocacion") ~
+      get[Option[BigDecimal]]("saldo") ~
+      get[Option[DateTime]]("fecha_capital") ~
+      get[Option[DateTime]]("fecha_interes") ~
+      get[Option[DateTime]]("fecha_proxima") ~
+      get[Boolean]("liquidado") ~
+      get[Int]("id_agencia") map {
+      case referencia ~ fecha ~ id_colocacion ~ saldo ~ fecha_capital ~ fecha_interes ~ fecha_proxima ~
+            liquidado ~ id_agencia =>
+        Liquidacion(
+          referencia,
+          fecha,
+          id_colocacion,
+          saldo,
+          fecha_capital,
+          fecha_interes,
+          fecha_proxima,
+          liquidado,
+          id_agencia,
+          None
+        )
+    }
+  }
+}
+
+case class Transaccion(
+	tran_tran_reference: Option[String],
+	tran_tran_id: Option[String],
+	tran_tran_status: Option[String],
+	tran_tran_created_at: Option[String],
+	tran_tran_finalized_at: Option[String],
+	tran_tran_amount_in_cents: Option[Long],
+	tran_tran_customer_email: Option[String],
+	tran_tran_currency: Option[String],
+	tran_tran_payment_method_type: Option[String],
+	tran_tran_payment_method: Option[String],
+	tran_tran_status_message: Option[String],
+	tran_tran_shipping_address: Option[String],
+	tran_tran_redirect_url: Option[String],
+	tran_tran_payment_source_id: Option[String],
+	tran_tran_payment_link_id: Option[String],
+	tran_tran_customer_data: Option[String],
+	tran_tran_billing_data: Option[String],
+	tran_tran_sent_at: Option[String],
+	tran_tran_json: Option[String]
+)
+
+object Transaccion {
+  val _set = {
+    get[Option[String]]("tran_tran_reference") ~
+    get[Option[String]]("tran_tran_id") ~
+    get[Option[String]]("tran_tran_status") ~
+    get[Option[String]]("tran_tran_created_at") ~
+    get[Option[String]]("tran_tran_finalized_at") ~
+    get[Option[Long]]("tran_tran_amount_in_cents") ~
+    get[Option[String]]("tran_tran_customer_email") ~
+    get[Option[String]]("tran_tran_currency") ~
+    get[Option[String]]("tran_tran_payment_method_type") ~
+    get[Option[String]]("tran_tran_payment_method") ~
+    get[Option[String]]("tran_tran_status_message") ~
+    get[Option[String]]("tran_tran_shipping_address") ~
+    get[Option[String]]("tran_tran_redirect_url") ~
+    get[Option[String]]("tran_tran_payment_source_id") ~
+    get[Option[String]]("tran_tran_payment_link_id") ~
+    get[Option[String]]("tran_tran_customer_data") ~
+    get[Option[String]]("tran_tran_billing_data") ~
+    get[Option[String]]("tran_tran_sent_at") ~
+    get[Option[String]]("tran_tran_json") map {
+      case tran_tran_reference ~ tran_tran_id ~ tran_tran_status ~ tran_tran_created_at ~ tran_tran_finalized_at ~
+        tran_tran_amount_in_cents ~ tran_tran_customer_email ~ tran_tran_currency ~ tran_tran_payment_method_type ~
+        tran_tran_payment_method ~ tran_tran_status_message ~ tran_tran_shipping_address ~ tran_tran_redirect_url ~
+        tran_tran_payment_source_id ~ tran_tran_payment_link_id ~ tran_tran_customer_data ~ tran_tran_billing_data ~
+        tran_tran_sent_at ~ tran_tran_json =>
+        Transaccion(
+          tran_tran_reference,
+          tran_tran_id,
+          tran_tran_status,
+          tran_tran_created_at,
+          tran_tran_finalized_at,
+          tran_tran_amount_in_cents,
+          tran_tran_customer_email,
+          tran_tran_currency,
+          tran_tran_payment_method_type,
+          tran_tran_payment_method,
+          tran_tran_status_message,
+          tran_tran_shipping_address,
+          tran_tran_redirect_url,
+          tran_tran_payment_source_id,
+          tran_tran_payment_link_id,
+          tran_tran_customer_data,
+          tran_tran_billing_data,
+          tran_tran_sent_at,
+          tran_tran_json
+        )
+    }
+
+  }
 }
 
 case class Tabla(

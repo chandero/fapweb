@@ -38,4 +38,9 @@ class GlobalesCon @Inject()(dbapi: DBApi, _funcion: Funcion )(implicit ec: Datab
         }
     }
 
+    def obtenerIdAuxiliar(): Long = {
+        db.withConnection { implicit connection =>
+            SQL("""SELECT GEN_ID(GEN_AUXILIAR_ID, 1) AS CONSECUTIVO FROM RDB$DATABASE AS id_auxiliar""").as(SqlParser.scalar[Long].single)
+        }
+    }
 }

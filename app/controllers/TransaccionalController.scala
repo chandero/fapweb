@@ -16,6 +16,11 @@ import play.api.Configuration
 
 import scala.collection.mutable.ListBuffer
 
+import net.liftweb.json._
+import net.liftweb.json.Serialization.write
+import net.liftweb.json.Serialization.read
+import net.liftweb.json.parse
+
 import utilities._
 
 @Singleton
@@ -27,6 +32,10 @@ class TransaccionalController @Inject()(
     config: Configuration
 )(implicit ec: ExecutionContext)
     extends AbstractController(cc) {
+
+  implicit val formats = Serialization.formats(NoTypeHints) ++ List(
+    DateTimeSerializer
+  )
 
   def autenticar(
       id_identificacion: Int,
@@ -121,21 +130,15 @@ class TransaccionalController @Inject()(
   }
 
   def registrarEventoWompi() = Action.async { request =>
-    val body: AnyContent = request.body
-    Future.successful(Ok("true"))
-/*     val jsonBody: Option[JsValue] = body.asJson
-    jsonBody.map { json =>
-      val wompiEvent = json.as[WompiEventDto]
-      transaccionalService.registrarEventoWompie(wompiEvent).map { result =>
+    val json = net.liftweb.json.parse(request.body.asJson.get.toString())
+    val wompiEvent = json.extract[WompiEvent]
+    transaccionalService.registrarEventoWompi(wompiEvent).map { result =>
         if (result) {
           Ok("true")
         } else {
           NotAcceptable("false")
         }
       }
-    }.getOrElse {
-      Future.successful(BadRequest("Expecting Json data"))
-    } */
   }
 
   def obtenerRegistroWompi(reference: String) = Action.async { request =>
