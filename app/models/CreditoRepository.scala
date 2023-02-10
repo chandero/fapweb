@@ -28,6 +28,7 @@ import scala.math.BigDecimal
 
 import utilities._
 import java.time.DateTimeException
+import java.sql.Connection
 
 class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol, _gd: GlobalesCon)(
     implicit ec: DatabaseExecutionContext
@@ -166,7 +167,7 @@ class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol, _gd: GlobalesCo
       }
   }
 
-  def aplicarLiquidacion(referencia: String) = {
+  def aplicarLiquidacionWompi(referencia: String) = {
     var _abonoCapital: BigDecimal = 0
     var _descuentoCapital: BigDecimal = 0
     var _causado: BigDecimal = 0
@@ -175,6 +176,9 @@ class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol, _gd: GlobalesCo
     var _anticipado: BigDecimal = 0
     var _devuelto: BigDecimal = 0
     var _otros: BigDecimal = 0
+    var _seguro: BigDecimal = 0
+    var _pago_x_cliente: BigDecimal = 0
+    var _honorarios: BigDecimal = 0
     var _caja_banco: BigDecimal = 0
     var _codigoBanco: String = ""
     var _cuotaAnterior: Int = 0
@@ -197,7 +201,10 @@ class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol, _gd: GlobalesCo
       _comprobante = _comprobante + 1
       SQL("""UPDATE "con$tipocomprobante" SET LLAVECSC = {comprobante} WHERE ID = 1""").on('comprobante -> _comprobante).executeUpdate()
 
-      _valorRecibido = _transaccion.tran_tran_amount_in_cents / 100
+        _valorRecibido = _transaccion.tran_tran_amount_in_cents match {
+          case Some(x) => x / 100
+          case None => 0
+        }
 
       _liquidacion_detalle.map { _r =>
         if (_r.cuotaNumero != _cuotaAnterior) {
@@ -205,7 +212,23 @@ class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol, _gd: GlobalesCo
             _esCambio = true
           } else {
             // Grabar Extracto
-            guardarExtracto()
+            guardarExtracto( _liquidacion,
+              _liquidacion_detalle,
+              _comprobante,
+              _r.cuotaNumero,
+              _abonoCapital,
+              _causado,
+              _anticipado,
+              _corriente,
+              _vencido,
+              _seguro,
+              _pago_x_cliente,
+              _honorarios,
+              _otros,
+              "Wompi",
+              _liquidacion.fecha_interes.get,
+              _liquidacion.fecha_capital.get,
+              1)
             guardarTablaLiquidacion()
             // Grabar Tabla de Liquidación
           }
@@ -247,9 +270,9 @@ class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol, _gd: GlobalesCo
           'id_agencia -> _liquidacion.id_agencia,
           'id_cbte_colocacion -> _comprobante,
           'id_colocacion -> _liquidacion.id_colocacion,
-          'fecha_extracto -> _liquidacion.fecha_liquidacion,
+          'fecha_extracto -> _liquidacion.fecha,
           'hora_extracto -> new DateTime(),
-          'codigo_puc -> _r.codigo_puc,
+          'codigo_puc -> _r.codigoPuc,
           'fecha_inicial -> _r.fecha_inicial,
           'fecha_final -> _r.fecha_final,
           'dias_aplicados -> _r.dias_aplicados,
@@ -258,7 +281,23 @@ class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol, _gd: GlobalesCo
           'valor_credito -> _r.credito
         ).executeInsert()
       }
-      guardarExtracto()
+      guardarExtracto( _liquidacion,
+              _liquidacion_detalle,
+              _comprobante,
+              _r.cuotaNumero,
+              _abonoCapital,
+              _causado,
+              _anticipado,
+              _corriente,
+              _vencido,
+              _seguro,
+              _pago_x_cliente,
+              _honorarios,
+              _otros,
+              "Wompi",
+              _liquidacion.fecha_interes.get,
+              _liquidacion.fecha_capital.get,
+              1)
       guardarTablaLiquidacion()
 
       _abonoSobrante = _valorRecibido - _caja_banco
@@ -423,11 +462,17 @@ class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol, _gd: GlobalesCo
         _pago_x_cliente: BigDecimal,
         _honorarios: BigDecimal,
         _otros: BigDecimal,
-        _tasa_interes: Double,
         _id_empleado: String,
         _interes_pago_hasta: DateTime,
         _capital_pago_hasta: DateTime,
-        _tipo_abono: Int) = {
+        _tipo_abono: Int)(implicit connection: Connection) = {
+      val _registro_interes = _liquidacion_detalle.filter(x => (x.cuotaNumero == _cuotaNumero && (x.esCausado == true || x.esCorriente == true))).head
+      var _saldo_anterior = 0
+      var _tasa_interes = _registro_interes != null match {
+        case true => _registro_interes.tasa
+        case false => 0
+      }
+
       SQL("""INSERT INTO "col$extracto" (ID_AGENCIA, ID_CBTE_COLOCACION, ID_COLOCACION, FECHA_EXTRACTO, HORA_EXTRACTO, CUOTA_EXTRACTO, TIPO_OPERACION, SALDO_ANTERIOR_EXTRACTO, ABONO_CAPITAL, ABONO_CXC, ABONO_ANTICIPADO, ABONO_SERVICIOS, ABONO_MORA, ABONO_SEGURO, ABONO_PAGXCLI, ABONO_HONORARIO, ABONO_OTROS, TASA_INTERES_LIQUIDACION, ID_EMPLEADO, INTERES_PAGO_HASTA, CAPITAL_PAGO_HASTA, TIPO_ABONO)
       VALUES ({id_agencia}, {id_cbte_colocacion}, {id_colocacion}, {fecha_extracto}, {hora_extracto}, {cuota_extracto}, {tipo_operacion}, {saldo_anterior_extracto}, {abono_capital}, {abono_cxc}, {abono_anticipado}, {abono_servicios}, {abono_mora}, {abono_seguro}, {abono_pagxcli}, {abono_honorario}, {abono_otros}, {tasa_interes_liquidacion}, {id_empleado}, {interes_pago_hasta}, {capital_pago_hasta}, {tipo_abono})""")
       .on(
@@ -438,25 +483,25 @@ class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol, _gd: GlobalesCo
         'hora_extracto -> new DateTime(),
         'cuota_extracto -> _cuotaNumero,
         'tipo_operacion -> 1,
-        'saldo_anterior_extracto -> _liquidacion.saldo_anterior,
+        'saldo_anterior_extracto -> _saldo_anterior,
         'abono_capital -> _capital,
         'abono_cxc -> _causado,
         'abono_anticipado -> _anticipado,
         'abono_servicios -> _corriente,
         'abono_mora -> _vencido,
-        'abono_seguro -> _liquidacion.seguro,
-        'abono_pagxcli -> _liquidacion.pagos_x_cliente,
-        'abono_honorario -> _liquidacion.honorarios,
+        'abono_seguro -> _seguro,
+        'abono_pagxcli -> _pago_x_cliente,
+        'abono_honorario -> _honorarios,
         'abono_otros -> _otros,
-        'tasa_interes_liquidacion -> _liquidacion.tasa_interes,
-        'id_empleado -> _liquidacion.id_empleado,
-        'interes_pago_hasta -> _liquidacion.interes_pago_hasta,
-        'capital_pago_hasta -> _liquidacion.capital_pago_hasta,
-        'tipo_abono -> _liquidacion.tipo_abono
+        'tasa_interes_liquidacion -> _tasa_interes,
+        'id_empleado -> _id_empleado,
+        'interes_pago_hasta -> _interes_pago_hasta,
+        'capital_pago_hasta -> _capital_pago_hasta,
+        'tipo_abono -> _tipo_abono
       ).executeInsert()
   }
 
-  def guardarTablaLiquidacion(_id_colocacion: Stirng, _cuota_numero: Int) {
+  def guardarTablaLiquidacion(_id_colocacion: String, _cuota_numero: Int)(implicit connection: Connection){
 
   }
 
