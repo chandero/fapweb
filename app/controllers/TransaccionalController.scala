@@ -142,9 +142,8 @@ class TransaccionalController @Inject()(
   }
 
   def obtenerRegistroWompi(reference: String) = Action.async { request =>
-/*     transaccionalService.obtenerEventosWompie().map { result =>
-      Ok(Json.toJson(result))
-    } */
-    Future.successful(Ok("true"))
+    transaccionalService.obtenerRegistroWompi(reference).map { result =>
+      Ok(write(result))
+    }
   }
 }

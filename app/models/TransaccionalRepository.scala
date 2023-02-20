@@ -40,6 +40,13 @@ case class EnlaceTransaccional(
     enla_id_persona: Option[String]
 )
 
+case class CustomerData(
+  legal_id: Option[String],
+  full_name: Option[String],
+  phone_number: Option[String],
+  legal_id_type: Option[String]
+)
+
 case class WompiEvent(
   tran_reference: Option[String],
   tran_id: Option[String],
@@ -50,16 +57,16 @@ case class WompiEvent(
   tran_customer_email: Option[String],
   tran_currency: Option[String],
   tran_payment_method_type: Option[String],
-  tran_payment_method: Option[String],
+  // tran_payment_method: Option[String],
   tran_status_message: Option[String],
   tran_shipping_address: Option[String],
   tran_redirect_url: Option[String],
   tran_payment_source_id: Option[String],
   tran_payment_link_id: Option[String],
-  tran_customer_data: Option[String],
+  tran_customer_data: Option[CustomerData],
   tran_billing_data: Option[String],
   tran_sent_at: Option[String],
-  tran_json: Option[String]
+  //tran_json: Option[String]
 )
 
 case class WompiEventRow(
@@ -389,16 +396,16 @@ class TransaccionalRepository @Inject()(dbapi: DBApi, config: Configuration)(
           'tran_customer_email -> evento.tran_customer_email,
           'tran_currency -> evento.tran_currency,
           'tran_payment_method_type -> evento.tran_payment_method_type,
-          'tran_payment_method -> evento.tran_payment_method,
+          'tran_payment_method -> None, //evento.tran_payment_method,
           'tran_status_message -> evento.tran_status_message,
           'tran_shipping_address -> evento.tran_shipping_address,
           'tran_redirect_url -> evento.tran_redirect_url,
           'tran_payment_source_id -> evento.tran_payment_source_id,
           'tran_payment_link_id -> evento.tran_payment_link_id,
-          'tran_customer_data -> evento.tran_customer_data,
+          'tran_customer_data -> None, //evento.tran_customer_data,
           'tran_billing_data -> evento.tran_billing_data,
           'tran_sent_at -> evento.tran_sent_at,
-          'tran_json -> evento.tran_json
+          'tran_json -> None //evento.tran_json
         )
         .executeUpdate() > 0
 
@@ -450,16 +457,16 @@ class TransaccionalRepository @Inject()(dbapi: DBApi, config: Configuration)(
             'tran_customer_email -> evento.tran_customer_email,
             'tran_currency -> evento.tran_currency,
             'tran_payment_method_type -> evento.tran_payment_method_type,
-            'tran_payment_method -> evento.tran_payment_method,
+            'tran_payment_method -> None, //evento.tran_payment_method
             'tran_status_message -> evento.tran_status_message,
             'tran_shipping_address -> evento.tran_shipping_address,
             'tran_redirect_url -> evento.tran_redirect_url,
             'tran_payment_source_id -> evento.tran_payment_source_id,
             'tran_payment_link_id -> evento.tran_payment_link_id,
-            'tran_customer_data -> evento.tran_customer_data,
+            'tran_customer_data -> None, //evento.tran_customer_data,
             'tran_billing_data -> evento.tran_billing_data,
             'tran_sent_at -> evento.tran_sent_at,
-            'tran_json -> evento.tran_json
+            'tran_json -> None // evento.tran_json
           )
           .executeInsert().get > 0
       }
@@ -467,4 +474,12 @@ class TransaccionalRepository @Inject()(dbapi: DBApi, config: Configuration)(
     }
   }
 
+  def obtenerRegistroWompi(referencia: String): Future[Transaccion] = Future {
+    db.withTransaction {implicit connection =>
+        SQL("""SELECT * FROM TRAN_TRANSACCIONAL WHERE TRAN_TRAN_REFERENCE = {referencia}""")
+        .on(
+          'referencia -> referencia
+        ).as(Transaccion._set.singleOpt).getOrElse(Transaccion(Some(referencia), None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None))
+    }
+  }
 }

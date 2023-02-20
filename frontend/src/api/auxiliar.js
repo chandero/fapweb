@@ -1,9 +1,10 @@
 import request from '@/utils/request'
 
-export function consultar(ci, cf, fi, ff, id, ip) {
+export function consultar(ci, cf, anho, fi, ff, id, ip) {
     const data = {
         ci,
         cf,
+        anho,
         fi,
         ff,
         id,
@@ -16,10 +17,11 @@ export function consultar(ci, cf, fi, ff, id, ip) {
     })
 }
 
-export function aExcel(ci, cf, fi, ff, id, ip) {
+export function aExcel(ci, cf, anho, fi, ff, id, ip) {
     const data = {
         ci,
         cf,
+        anho,
         fi,
         ff,
         id,

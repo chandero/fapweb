@@ -11,7 +11,7 @@ import play.api.libs.json.JodaWrites
 import play.api.libs.functional.syntax._
 
 import anorm._
-import anorm.SqlParser.{get, str, int, date}
+import anorm.SqlParser.{get, str, int, date, double}
 import anorm.JodaParameterMetaData._
 
 import org.joda.time.DateTime
@@ -1802,6 +1802,7 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
 
     def verificacionCancelacionCredito(id_agencia: Int, id_colocacion: String) = {
         db.withTransaction { implicit connection =>
+            
             val _esVigente = SQL("""SELECT ID_ESTADO_COLOCACION FROM "col$estado" WHERE ES_VIGENTE = 1""").as(SqlParser.scalar[Int].single)
             val _esPrejuridico = SQL("""SELECT ID_ESTADO_COLOCACION FROM "col$estado" WHERE ES_PREJURIDICO = 1""").as(SqlParser.scalar[Int].single)
             val _esJuridico = SQL("""SELECT ID_ESTADO_COLOCACION FROM "col$estado" WHERE ES_JURIDICO = 1""").as(SqlParser.scalar[Int].single)
@@ -1810,12 +1811,14 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
             val _esSaldado = SQL("""SELECT ID_ESTADO_COLOCACION FROM "col$estado" WHERE ES_SALDADO = 1""").as(SqlParser.scalar[Int].single)
             val _esFallecido = SQL("""SELECT ID_ESTADO_COLOCACION FROM "col$estado" WHERE ES_FALLECIDO = 1""").as(SqlParser.scalar[Int].single)
             val _esIncapacitado = SQL("""SELECT ID_ESTADO_COLOCACION FROM "col$estado" WHERE ES_INCAPACITADO = 1""").as(SqlParser.scalar[Int].single)
-
+            val _parser = double("SALDO") ~ int("ID_ESTADO_COLOCACION") map {
+                case _saldo ~ _estado => (_saldo, _estado)
+            }
             val (_saldo, _estado) = SQL("""SELECT VALOR_DESEMBOLSO - ABONOS_CAPITAL AS SALDO, ID_ESTADO_COLOCACION FROM "col$colocacion" WHERE ID_AGENCIA = {id_agencia} AND ID_COLOCACION = {id_colocacion}""").
             on(
                 'id_agencia -> id_agencia,
                 'id_colocacion -> id_colocacion
-            ).as(SqlParser.scalar[BigDecimal].single ~ SqlParser.scalar[Int].single map(flatten) *)
+            ).as(_parser.single)
         }
     }
 }

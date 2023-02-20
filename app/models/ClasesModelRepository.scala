@@ -657,13 +657,16 @@ object CuotasLiq {
 case class Liquidacion(
     referencia: String,
     fecha: DateTime,
+    id_agencia: Int,
     id_colocacion: String,
+    id_identificacion: Int,
+    id_persona: String,
     saldo: Option[BigDecimal],
     fecha_capital: Option[DateTime],
     fecha_interes: Option[DateTime],
     fecha_proxima: Option[DateTime],
     liquidado: Boolean,
-    id_agencia: Int,
+    liquidado_en: Option[DateTime],
     items: Option[List[CuotasLiq]],
 )
 
@@ -676,14 +679,17 @@ object Liquidacion {
   implicit val wWrites = new Writes[Liquidacion] {
     def writes(e: Liquidacion) = Json.obj(
       "referencia" -> e.referencia,
+      "id_agencia" -> e.id_agencia,
       "id_colocacion" -> e.id_colocacion,
+      "id_identificacion" -> e.id_identificacion,
+      "id_persona" -> e.id_persona,
       "fecha" -> e.fecha,
       "saldo" -> e.saldo,
       "fecha_capital" -> e.fecha_capital,
       "fecha_interes" -> e.fecha_interes,
       "fecha_proxima" -> e.fecha_proxima,
       "liquidado" -> e.liquidado,
-      "id_agencia" -> e.id_agencia,
+      "liquidado_en" -> e.liquidado_en,
       "items" -> e.items
     )
   }
@@ -691,38 +697,47 @@ object Liquidacion {
   implicit val rReads: Reads[Liquidacion] = (
     (__ \ "referencia").read[String] and
       (__ \ "fecha").read[DateTime] and
+      (__ \ "id_agencia").read[Int] and
       (__ \ "id_colocacion").read[String] and
+      (__ \ "id_identificacion").read[Int] and
+      (__ \ "id_persona").read[String] and      
       (__ \ "saldo").readNullable[BigDecimal] and
       (__ \ "fecha_capital").readNullable[DateTime] and
       (__ \ "fecha_interes").readNullable[DateTime] and
       (__ \ "fecha_proxima").readNullable[DateTime] and
       (__ \ "liquidado").read[Boolean] and
-      (__ \ "id_agencia").read[Int] and
+      (__ \ "liquidado_en").readNullable[DateTime] and
       (__ \ "items").readNullable[List[CuotasLiq]]
   )(Liquidacion.apply _)
 
   val _set = {
       get[String]("referencia") ~
       get[DateTime]("fecha") ~
+      get[Int]("id_agencia") ~
       get[String]("id_colocacion") ~
+      get[Int]("id_identificacion") ~
+      get[String]("id_persona") ~
       get[Option[BigDecimal]]("saldo") ~
       get[Option[DateTime]]("fecha_capital") ~
       get[Option[DateTime]]("fecha_interes") ~
       get[Option[DateTime]]("fecha_proxima") ~
       get[Boolean]("liquidado") ~
-      get[Int]("id_agencia") map {
-      case referencia ~ fecha ~ id_colocacion ~ saldo ~ fecha_capital ~ fecha_interes ~ fecha_proxima ~
-            liquidado ~ id_agencia =>
+      get[Option[DateTime]]("liquidado_en") map {
+      case referencia ~ fecha ~ id_agencia ~ id_colocacion ~ id_identificacion ~ id_persona ~ saldo ~ fecha_capital ~ fecha_interes ~ fecha_proxima ~
+            liquidado ~ liquidado_en =>
         Liquidacion(
           referencia,
           fecha,
+          id_agencia,
           id_colocacion,
+          id_identificacion,
+          id_persona,
           saldo,
           fecha_capital,
           fecha_interes,
           fecha_proxima,
           liquidado,
-          id_agencia,
+          liquidado_en,
           None
         )
     }

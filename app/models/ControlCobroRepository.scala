@@ -493,6 +493,9 @@ class ControlCobroRepository @Inject()(
             dias_mora += 2
           }
         }
+        if (dias_mora < 0) {
+          dias_mora = 0
+        }
         var _cc = new ControlCobroVista(
           c._1._1,
           c._1._2,

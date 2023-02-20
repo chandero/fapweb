@@ -94,8 +94,8 @@ GET     /api/info/bcol                  controllers.BancolombiaInformeController
 GET     /api/col/busc/:i/:p             controllers.ColocacionController.buscarColocacion(i: Int, p: String)
 
 # Creditos
-GET     /api/cred/ldp/:i/:c/:f          controllers.CreditoController.liquidacionDePrueba(i:String, c:Int, f:Long)  
-GET     /api/credac/ldp/:i/:c/:f        controllers.CreditoController.liquidacionDePruebaAction(i:String, c:Int, f:Long)  
+GET     /api/cred/ldp/:a/:i/:c/:f          controllers.CreditoController.liquidacionDePrueba(a:Int, i:String, c:Int, f:Long)  
+GET     /api/credac/ldp/:a/:i/:c/:f        controllers.CreditoController.liquidacionDePruebaAction(a:Int, i:String, c:Int, f:Long)  
 GET     /api/cred/csxa/:i               controllers.InformeColocacionSaldadaAsesorController.generarXlsx(i: Long)
 
 # Control Cobro

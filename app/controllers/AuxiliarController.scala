@@ -40,11 +40,12 @@ class AuxiliarController @Inject()(
     val json = request.body.asJson.get
     val ci = json.\("ci").as[String]
     val cf = json.\("cf").as[String]
+    val anho = json.\("anho").as[Int]
     val fi = json.\("fi").as[Long]
     val ff = json.\("ff").as[Long]
     val id = json.\("id").as[Int]
     val ip = json.\("ip").as[String]
-    val p = aService.consultar(ci, cf, fi, ff, id, ip)
+    val p = aService.consultar(ci, cf, anho, fi, ff, id, ip)
     Future.successful(Ok(write(p)))
   }
 
@@ -53,11 +54,12 @@ class AuxiliarController @Inject()(
     val json = request.body.asJson.get
     val ci = json.\("ci").as[String]
     val cf = json.\("cf").as[String]
+    val anho = json.\("anho").as[Int]
     val fi = json.\("fi").as[Long]
     val ff = json.\("ff").as[Long]
     val id = json.\("id").as[Int]
     val ip = json.\("ip").as[String]
-    val os = aService.aExcel(empr_id.get, ci, cf, fi, ff, id, ip)
+    val os = aService.aExcel(empr_id.get, ci, cf, anho, fi, ff, id, ip)
     val fmt = DateTimeFormat.forPattern("yyyyMMdd")
     val filename = "FAP101"+"_AUXILIAR_CONTABLE_" + fmt.print(fi) + "_" + fmt.print(ff)  + ".xlsx"
     val attach = "attachment; filename=" + filename

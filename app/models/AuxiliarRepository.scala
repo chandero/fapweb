@@ -165,7 +165,16 @@ class AuxiliarRepository @Inject()(dbapi: DBApi, _gcon: GlobalesCon, _convert: C
     implicit ec: DatabaseExecutionContext) {
   private val db = dbapi.database("default")
 
-  def consultar(codigo_inicial: String, codigo_final: String, fecha_inicial: Long, fecha_final: Long, id_identificacion: Int, id_persona: String): Iterable[Auxiliar] = {
+  def consultar(codigo_inicial: String, codigo_final: String, anho: Integer, fecha_inicial: Long, fecha_final: Long, id_identificacion: Int, id_persona: String): Iterable[Auxiliar] = {
+    var base = ""
+    val anho_actual:Int = Calendar.getInstance.get(Calendar.YEAR)
+    if (anho == anho_actual) {
+      base = "default"
+    } else {
+      base = "db"+"%04d".format(anho)
+    }
+    val db = dbapi.database(base)
+    val dbdefault = dbapi.database("default")    
     var _listResult = new ListBuffer[Auxiliar]()
     val fi = new DateTime(fecha_inicial)
     val ff = new DateTime(fecha_final)
@@ -272,7 +281,16 @@ class AuxiliarRepository @Inject()(dbapi: DBApi, _gcon: GlobalesCon, _convert: C
     }
   }
 
-  def aExcel(empr_id: Long, codigo_inicial: String, codigo_final: String, fecha_inicial: Long, fecha_final: Long, id_identificacion: Int, id_persona: String): Array[Byte] = {
+  def aExcel(empr_id: Long, codigo_inicial: String, codigo_final: String, anho: Integer, fecha_inicial: Long, fecha_final: Long, id_identificacion: Int, id_persona: String): Array[Byte] = {
+    var base = ""
+    val anho_actual:Int = Calendar.getInstance.get(Calendar.YEAR)
+    if (anho == anho_actual) {
+      base = "default"
+    } else {
+      base = "db"+"%04d".format(anho)
+    }
+    val db = dbapi.database(base)
+    val dbdefault = dbapi.database("default") 
     val fmt = DateTimeFormat.forPattern("yyyyMMdd")
     val sdf = new SimpleDateFormat("yyyy-MM-dd")
     val fi = Calendar.getInstance()
@@ -378,7 +396,7 @@ class AuxiliarRepository @Inject()(dbapi: DBApi, _gcon: GlobalesCon, _convert: C
                 "% RF"
               )
             _listRow01 += headerRow
-            val resultSet = consultar(codigo_inicial, codigo_final, fecha_inicial, fecha_final, id_identificacion, id_persona)
+            val resultSet = consultar(codigo_inicial, codigo_final, anho, fecha_inicial, fecha_final, id_identificacion, id_persona)
             var _codigo_anterior = ""
             var fila = 4
             val rows = resultSet.flatMap { i =>

@@ -5,6 +5,13 @@
     </el-header>
     <el-main>
       <el-form>  
+        <el-row>
+          <el-col :xs="24" :sm="12" :md="3" :lg="3" :xl="3">
+            <el-form-item label="Año a Consultar">
+              <el-input type="number" v-model="anho" maxlength="4"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
         <el-row :gutter="6">
           <el-col :span="5">
             <el-form-item label="Codigo Inicial">
@@ -253,8 +260,9 @@ export default {
       cf: '',
       cin: null,
       cfn: null,
-      fi: new Date(),
-      ff: new Date(),
+      anho: new Date().getFullYear(),
+      fi: null,
+      ff: null,
       id_identificacion: 0,
       id_persona: '',
       showBuscarPersonaDlg: false,
@@ -267,13 +275,15 @@ export default {
     }
   },
   beforeMount() {
+    this.fi = new Date(this.anho, 0, 1)
+    this.ff = new Date(this.anho, 11, 31)
     obtenerListaTipoIdentificacion().then(response => {
       this.tipo_documento = response.data
     })
   },
   methods: {
     validar() {
-      if (this.ci && this.cf && this.cin && this.cfn && this.fi && this.ff ) {
+      if (this.ci && this.cf && this.cin && this.cfn && this.anho && this.fi && this.ff ) {
         return false
       } else {
         return true
@@ -285,7 +295,7 @@ export default {
           text: 'Cargando Datos, por favor espere...',
           background: 'rgba(255, 255, 255, 0.7)'
         });
-      consultar(this.ci, this.cf, this.fi.getTime(), this.ff.getTime(), this.id_identificacion, this.id_persona).then(response => {
+      consultar(this.ci, this.cf, parseInt(this.anho), this.fi.getTime(), this.ff.getTime(), this.id_identificacion, this.id_persona).then(response => {
         loading.close()
         this.auxiliarData = response.data;
         this.showDatosAuxiliarDlg = true;
@@ -299,7 +309,7 @@ export default {
           text: 'Exportando Datos, por favor espere...',
           background: 'rgba(255, 255, 255, 0.7)'
         });
-      aExcel(this.ci, this.cf, this.fi.getTime(), this.ff.getTime(), this.id_identificacion, this.id_persona).then(response => {
+      aExcel(this.ci, this.cf, parseInt(this.anho), this.fi.getTime(), this.ff.getTime(), this.id_identificacion, this.id_persona).then(response => {
         loading.close()
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement('a');
@@ -358,6 +368,12 @@ export default {
         this.$alert('Persona No Existe', 'Buscando Persona')
       })
     }        
+  },
+  watch: {
+    anho: function (val) {
+      this.fi = new Date(val, 0, 1)
+      this.ff = new Date(val, 11, 31)
+    }
   }
 }
 </script>
