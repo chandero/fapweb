@@ -75,7 +75,7 @@ case class WompiEventRow(
   tran_event_json: Option[String]
 )
 
-class TransaccionalRepository @Inject()(dbapi: DBApi, config: Configuration)(
+class TransaccionalRepository @Inject()(dbapi: DBApi, config: Configuration, cService:CreditoRepository)(
     implicit ec: DatabaseExecutionContext
 ) {
   private val db = dbapi.database("default")
@@ -396,21 +396,22 @@ class TransaccionalRepository @Inject()(dbapi: DBApi, config: Configuration)(
           'tran_customer_email -> evento.tran_customer_email,
           'tran_currency -> evento.tran_currency,
           'tran_payment_method_type -> evento.tran_payment_method_type,
-          'tran_payment_method -> None, //evento.tran_payment_method,
+          'tran_payment_method -> Option.empty[String], //evento.tran_payment_method,
           'tran_status_message -> evento.tran_status_message,
           'tran_shipping_address -> evento.tran_shipping_address,
           'tran_redirect_url -> evento.tran_redirect_url,
           'tran_payment_source_id -> evento.tran_payment_source_id,
           'tran_payment_link_id -> evento.tran_payment_link_id,
-          'tran_customer_data -> None, //evento.tran_customer_data,
+          'tran_customer_data -> Option.empty[String], //evento.tran_customer_data,
           'tran_billing_data -> evento.tran_billing_data,
           'tran_sent_at -> evento.tran_sent_at,
-          'tran_json -> None //evento.tran_json
+          'tran_json -> Option.empty[String] //evento.tran_json
         )
         .executeUpdate() > 0
 
       if (!_actualizado) {
         val _insertado = SQL("""INSERT INTO TRAN_TRANSACCION (
+          TRAN_TRAN_REFERENCE,
           TRAN_TRAN_ID,
           TRAN_TRAN_STATUS,
           TRAN_TRAN_CREATED_AT,
@@ -430,6 +431,7 @@ class TransaccionalRepository @Inject()(dbapi: DBApi, config: Configuration)(
           TRAN_TRAN_SENT_AT,
           TRAN_TRAN_JSON
         ) VALUES (
+          {tran_reference},
           {tran_id},
           {tran_status},
           {tran_created_at},
@@ -449,6 +451,7 @@ class TransaccionalRepository @Inject()(dbapi: DBApi, config: Configuration)(
           {tran_sent_at},
           {tran_json}
         )""").on(
+            'tran_reference -> evento.tran_reference,
             'tran_id -> evento.tran_id,
             'tran_status -> evento.tran_status,
             'tran_created_at -> evento.tran_created_at,
@@ -457,21 +460,32 @@ class TransaccionalRepository @Inject()(dbapi: DBApi, config: Configuration)(
             'tran_customer_email -> evento.tran_customer_email,
             'tran_currency -> evento.tran_currency,
             'tran_payment_method_type -> evento.tran_payment_method_type,
-            'tran_payment_method -> None, //evento.tran_payment_method
+            'tran_payment_method -> Option.empty[String], //evento.tran_payment_method
             'tran_status_message -> evento.tran_status_message,
             'tran_shipping_address -> evento.tran_shipping_address,
             'tran_redirect_url -> evento.tran_redirect_url,
             'tran_payment_source_id -> evento.tran_payment_source_id,
             'tran_payment_link_id -> evento.tran_payment_link_id,
-            'tran_customer_data -> None, //evento.tran_customer_data,
+            'tran_customer_data -> Option.empty[String], //evento.tran_customer_data,
             'tran_billing_data -> evento.tran_billing_data,
             'tran_sent_at -> evento.tran_sent_at,
-            'tran_json -> None // evento.tran_json
+            'tran_json -> Option.empty[String] // evento.tran_json
           )
           .executeInsert().get > 0
       }
-      return Future.successful(true)
+      evento.tran_status match {
+        case Some(status) =>
+          if (status == "APPROVED") {
+            val _liquidacion = SQL("""SELECT * FROM LIQUIDACION WHERE referencia = {referencia}""").on('referencia -> evento.tran_reference).as(Liquidacion._set.single)
+            _liquidacion.aplicada match {
+              case Some(0) => cService.aplicarLiquidacionWompi(_liquidacion.referencia)
+              case _ => None
+            }
+          }
+        case None => None
+      }
     }
+    true
   }
 
   def obtenerRegistroWompi(referencia: String): Future[Transaccion] = Future {

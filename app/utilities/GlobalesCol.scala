@@ -666,15 +666,15 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                                 0,
                                 0,
                                 _costas,
-                                false,
-                                false,
-                                false,
-                                false,
-                                false,
-                                false,
-                                false,
-                                false,
-                                true,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                1,
                                 ""
                             )
                             if ( _cl.debito != 0 || _cl.credito != 0 ) {
@@ -902,15 +902,42 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                                     _tasa,
                                     _debito,
                                     _credito,
-                                    _es_capital,
-                                    _es_causado,
-                                    _es_corriente,
-                                    _es_vencido,
-                                    _es_anticipado,
-                                    _es_devuelto,
-                                    _es_otros,
-                                    _es_cajabanco,
-                                    _es_costas,
+                                    _es_capital match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_causado match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_corriente match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_vencido match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_anticipado match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_devuelto match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_otros match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_cajabanco match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_costas match {
+                                        case true => 1
+                                        case false => 0
+                                    },
                                     ""
                                 )
                                 if (_cl.debito != 0 || _cl.credito != 0) {
@@ -938,15 +965,42 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                                     _tasa,
                                     _debito,
                                     _credito,
-                                    _es_capital,
-                                    _es_causado,
-                                    _es_corriente,
-                                    _es_vencido,
-                                    _es_anticipado,
-                                    _es_devuelto,
-                                    _es_otros,
-                                    _es_cajabanco,
-                                    _es_costas,
+                                    _es_capital match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_causado match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_corriente match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_vencido match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_anticipado match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_devuelto match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_otros match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_cajabanco match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_costas match {
+                                        case true => 1
+                                        case false => 0
+                                    },
                                     ""
                                 )
                                 if (_cl.debito != 0 || _cl.credito != 0) {
@@ -970,15 +1024,42 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                                     _tasa,
                                     _credito,
                                     _debito,
-                                    _es_capital,
-                                    _es_causado,
-                                    _es_corriente,
-                                    _es_vencido,
-                                    _es_anticipado,
-                                    _es_devuelto,
-                                    _es_otros,
-                                    _es_cajabanco,
-                                    _es_costas,
+                                    _es_capital match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_causado match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_corriente match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_vencido match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_anticipado match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_devuelto match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_otros match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_cajabanco match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_costas match {
+                                        case true => 1
+                                        case false => 0
+                                    },
                                     ""
                                 )
                                 if (_cl.debito != 0 || _cl.credito != 0) {
@@ -1001,15 +1082,15 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                                     0.00,
                                     0.00,
                                     _a_cobrar_gestion,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    true,
-                                    false,
-                                    false,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    1,
+                                    0,
+                                    0,
                                     ""
                                 )
                                 if (_cl.debito != 0 || _cl.credito != 0) {
@@ -1034,15 +1115,15 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                                     0.00,
                                     0.00,
                                     _capital,
-                                    true,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
+                                    1,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
                                     ""
                                 )
                         if (_cl.debito != 0 || _cl.credito != 0) {                        
@@ -1062,15 +1143,15 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                                     0.00,
                                     0.00,
                                     _d.valor,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    true,
-                                    false,
-                                    false,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    1,
+                                    0,
+                                    0,
                                     ""
                             )
                             if (_cl.debito != 0 || _cl.credito != 0) {
@@ -1099,15 +1180,15 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                                     0.00,
                                     _total_credito - _total_debito,
                                     0.00,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    true,
-                                    false,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    1,
+                                    0,
                                     ""
                                 )
                     if (_cl.debito != 0 || _cl.credito != 0) {        
@@ -1273,15 +1354,15 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                                 0,
                                 0,
                                 _costas,
-                                false,
-                                false,
-                                false,
-                                false,
-                                false,
-                                false,
-                                false,
-                                false,
-                                true,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                1,
                                 ""
                             )
                             if ( _cl.debito != 0 || _cl.credito != 0 ) {
@@ -1510,15 +1591,42 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                                     _tasa,
                                     _debito,
                                     _credito,
-                                    _es_capital,
-                                    _es_causado,
-                                    _es_corriente,
-                                    _es_vencido,
-                                    _es_anticipado,
-                                    _es_devuelto,
-                                    _es_otros,
-                                    _es_cajabanco,
-                                    _es_costas,
+                                    _es_capital match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_causado match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_corriente match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_vencido match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_anticipado match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_devuelto match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_otros match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_cajabanco match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_costas match {
+                                        case true => 1
+                                        case false => 0
+                                    },
                                     ""
                                 )
                                 if (_cl.debito != 0 || _cl.credito != 0) {
@@ -1546,15 +1654,42 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                                     _tasa,
                                     _debito,
                                     _credito,
-                                    _es_capital,
-                                    _es_causado,
-                                    _es_corriente,
-                                    _es_vencido,
-                                    _es_anticipado,
-                                    _es_devuelto,
-                                    _es_otros,
-                                    _es_cajabanco,
-                                    _es_costas,
+                                    _es_capital match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_causado match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_corriente match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_vencido match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_anticipado match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_devuelto match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_otros match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_cajabanco match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_costas match {
+                                        case true => 1
+                                        case false => 0
+                                    },
                                     ""
                                 )
                                 if (_cl.debito != 0 || _cl.credito != 0) {
@@ -1573,15 +1708,42 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                                     _tasa,
                                     _credito,
                                     _debito,
-                                    _es_capital,
-                                    _es_causado,
-                                    _es_corriente,
-                                    _es_vencido,
-                                    _es_anticipado,
-                                    _es_devuelto,
-                                    _es_otros,
-                                    _es_cajabanco,
-                                    _es_costas,
+                                    _es_capital match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_causado match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_corriente match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_vencido match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_anticipado match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_devuelto match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_otros match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_cajabanco match {
+                                        case true => 1
+                                        case false => 0
+                                    },
+                                    _es_costas match {
+                                        case true => 1
+                                        case false => 0
+                                    },
                                     ""
                                 )
                                 if (_cl.debito != 0 || _cl.credito != 0) {
@@ -1604,15 +1766,15 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                                     0.00,
                                     0.00,
                                     _a_cobrar_gestion,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    true,
-                                    false,
-                                    false,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    1,
+                                    0,
+                                    0,
                                     ""
                                 )
                                 if (_cl.debito != 0 || _cl.credito != 0) {
@@ -1637,15 +1799,15 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                                     0.00,
                                     0.00,
                                     _capital,
-                                    true,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
+                                    1,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
                                     ""
                                 )
                         if (_cl.debito != 0 || _cl.credito != 0) {                        
@@ -1665,15 +1827,15 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                                     0.00,
                                     0.00,
                                     _d.valor,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    true,
-                                    false,
-                                    false,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    1,
+                                    0,
+                                    0,
                                     ""
                             )
                             if (_cl.debito != 0 || _cl.credito != 0) {
@@ -1701,15 +1863,15 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                                     0.00,
                                     _total_credito - _total_debito,
                                     0.00,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    false,
-                                    true,
-                                    false,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    1,
+                                    0,
                                     ""
                                 )
                     if (_cl.debito != 0 || _cl.credito != 0) {        

@@ -516,15 +516,15 @@ case class CuotasLiq(
     tasa: Double,
     debito: BigDecimal,
     credito: BigDecimal,
-    esCapital: Boolean,
-    esCausado: Boolean,
-    esCorriente: Boolean,
-    esVencido: Boolean,
-    esAnticipado: Boolean,
-    esDevuelto: Boolean,
-    esOtros: Boolean,
-    esCajaBanco: Boolean,
-    esCostas: Boolean,
+    esCapital: Int,
+    esCausado: Int,
+    esCorriente: Int,
+    esVencido: Int,
+    esAnticipado: Int,
+    esDevuelto: Int,
+    esOtros: Int,
+    esCajaBanco: Int,
+    esCostas: Int,
     idClaseOperacion: String
 )
 
@@ -578,15 +578,15 @@ object CuotasLiq {
       (__ \ "tasa").read[Double] and
       (__ \ "debito").read[BigDecimal] and
       (__ \ "credito").read[BigDecimal] and
-      (__ \ "esCapital").read[Boolean] and
-      (__ \ "esCausado").read[Boolean] and
-      (__ \ "esCorriente").read[Boolean] and
-      (__ \ "esVencido").read[Boolean] and
-      (__ \ "esAnticipado").read[Boolean] and
-      (__ \ "esDevuelto").read[Boolean] and
-      (__ \ "esOtros").read[Boolean] and
-      (__ \ "esCajaBanco").read[Boolean] and
-      (__ \ "esCostas").read[Boolean] and
+      (__ \ "esCapital").read[Int] and
+      (__ \ "esCausado").read[Int] and
+      (__ \ "esCorriente").read[Int] and
+      (__ \ "esVencido").read[Int] and
+      (__ \ "esAnticipado").read[Int] and
+      (__ \ "esDevuelto").read[Int] and
+      (__ \ "esOtros").read[Int] and
+      (__ \ "esCajaBanco").read[Int] and
+      (__ \ "esCostas").read[Int] and
       (__ \ "idClaseOperacion").read[String]
   )(CuotasLiq.apply _)
 
@@ -600,15 +600,15 @@ object CuotasLiq {
       get[Double]("tasa") ~
       get[BigDecimal]("debito") ~
       get[BigDecimal]("credito") ~
-      get[Boolean]("es_capital") ~
-      get[Boolean]("es_causado") ~
-      get[Boolean]("es_corriente") ~
-      get[Boolean]("es_vencido") ~
-      get[Boolean]("es_anticipado") ~
-      get[Boolean]("es_devuelto") ~
-      get[Boolean]("es_otros") ~
-      get[Boolean]("es_caja_banco") ~
-      get[Boolean]("es_costas") ~
+      get[Int]("es_capital") ~
+      get[Int]("es_causado") ~
+      get[Int]("es_corriente") ~
+      get[Int]("es_vencido") ~
+      get[Int]("es_anticipado") ~
+      get[Int]("es_devuelto") ~
+      get[Int]("es_otros") ~
+      get[Int]("es_cajabanco") ~
+      get[Int]("es_costas") ~
       get[String]("id_clase_operacion") map {
       case cuota_numero ~
             codigo_puc ~
@@ -665,8 +665,8 @@ case class Liquidacion(
     fecha_capital: Option[DateTime],
     fecha_interes: Option[DateTime],
     fecha_proxima: Option[DateTime],
-    liquidado: Boolean,
-    liquidado_en: Option[DateTime],
+    aplicada: Option[Int],
+    aplicada_en: Option[DateTime],
     items: Option[List[CuotasLiq]],
 )
 
@@ -688,8 +688,8 @@ object Liquidacion {
       "fecha_capital" -> e.fecha_capital,
       "fecha_interes" -> e.fecha_interes,
       "fecha_proxima" -> e.fecha_proxima,
-      "liquidado" -> e.liquidado,
-      "liquidado_en" -> e.liquidado_en,
+      "aplicada" -> e.aplicada,
+      "aplicada_en" -> e.aplicada_en,
       "items" -> e.items
     )
   }
@@ -705,8 +705,8 @@ object Liquidacion {
       (__ \ "fecha_capital").readNullable[DateTime] and
       (__ \ "fecha_interes").readNullable[DateTime] and
       (__ \ "fecha_proxima").readNullable[DateTime] and
-      (__ \ "liquidado").read[Boolean] and
-      (__ \ "liquidado_en").readNullable[DateTime] and
+      (__ \ "aplicada").readNullable[Int] and
+      (__ \ "aplicada_en").readNullable[DateTime] and
       (__ \ "items").readNullable[List[CuotasLiq]]
   )(Liquidacion.apply _)
 
@@ -721,10 +721,10 @@ object Liquidacion {
       get[Option[DateTime]]("fecha_capital") ~
       get[Option[DateTime]]("fecha_interes") ~
       get[Option[DateTime]]("fecha_proxima") ~
-      get[Boolean]("liquidado") ~
-      get[Option[DateTime]]("liquidado_en") map {
+      get[Option[Int]]("aplicada") ~
+      get[Option[DateTime]]("aplicada_en") map {
       case referencia ~ fecha ~ id_agencia ~ id_colocacion ~ id_identificacion ~ id_persona ~ saldo ~ fecha_capital ~ fecha_interes ~ fecha_proxima ~
-            liquidado ~ liquidado_en =>
+            aplicada ~ aplicada_en =>
         Liquidacion(
           referencia,
           fecha,
@@ -736,8 +736,8 @@ object Liquidacion {
           fecha_capital,
           fecha_interes,
           fecha_proxima,
-          liquidado,
-          liquidado_en,
+          aplicada,
+          aplicada_en,
           None
         )
     }

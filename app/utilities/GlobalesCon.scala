@@ -46,13 +46,13 @@ class GlobalesCon @Inject()(dbapi: DBApi, _funcion: Funcion )(implicit ec: Datab
 
     def obtenerConsecutivo(id: Int) = {
         db.withConnection { implicit connection =>
-            var consecutivo = SQL("""SELECT LLAVECSC FROM "con$tipocomprobante" ctp WHERE ctp.ID = {id}""")
+            var consecutivo = SQL("""select CONSECUTIVO from "gen$consecutivos" WHERE ID_CONSECUTIVO = {id}""")
             .on(
                 'id -> id
             )
             .as(SqlParser.scalar[Long].single)
             consecutivo = consecutivo + 1
-            SQL("""UPDATE "con$tipocomprobante" SET LLAVECSC = {consecutivo} WHERE ID = {id}""")
+            SQL("""UPDATE "gen$consecutivos" SET CONSECUTIVO = {consecutivo} WHERE ID_CONSECUTIVO = {id}""")
             .on(
                 'consecutivo -> consecutivo,
                 'id -> id

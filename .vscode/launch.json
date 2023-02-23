@@ -10,7 +10,7 @@
             "name": "fapweb",
             "buildTarget": "fapweb",
             "hostName": "localhost",
-            "port": 5500
+            "port": 5005
         }
 
     ]
