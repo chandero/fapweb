@@ -690,11 +690,12 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                     var cuota = 0
                     var _fecha_prox_capital = new DateTime()
                     var _fecha_prox_nueva = new DateTime()
+                    var _cuota_numero = 0
                     for (cuota <- 0 to (cuotas_a_liquidar - 1)) {
                         val _ncuota = _tablaLiquidacionNoPagada(cuota).cuot_num
                         var _interes_cuota = _funcion.round0(((_saldo_actual * (_funcion.tasaNominalVencida(_valor_tasa_efectiva, _amortizacion) + _puntos_interes) / 100 * _amortizacion ) / 360).toDouble)
                         var _capital = _valor_cuota - _interes_cuota
-                        var _cuota_numero = _ncuota
+                        _cuota_numero = _ncuota
                         var _fecha1 = _fecha_pago_interes
                         _fecha_prox = _tablaLiquidacionNoPagada(cuota).cuot_fecha
                         _fecha_prox = _funcion.limpiarFecha(_fecha_prox)
@@ -965,42 +966,15 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                                     _tasa,
                                     _debito,
                                     _credito,
-                                    _es_capital match {
-                                        case true => 1
-                                        case false => 0
-                                    },
-                                    _es_causado match {
-                                        case true => 1
-                                        case false => 0
-                                    },
-                                    _es_corriente match {
-                                        case true => 1
-                                        case false => 0
-                                    },
-                                    _es_vencido match {
-                                        case true => 1
-                                        case false => 0
-                                    },
-                                    _es_anticipado match {
-                                        case true => 1
-                                        case false => 0
-                                    },
-                                    _es_devuelto match {
-                                        case true => 1
-                                        case false => 0
-                                    },
-                                    _es_otros match {
-                                        case true => 1
-                                        case false => 0
-                                    },
-                                    _es_cajabanco match {
-                                        case true => 1
-                                        case false => 0
-                                    },
-                                    _es_costas match {
-                                        case true => 1
-                                        case false => 0
-                                    },
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
                                     ""
                                 )
                                 if (_cl.debito != 0 || _cl.credito != 0) {
@@ -1024,42 +998,15 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                                     _tasa,
                                     _credito,
                                     _debito,
-                                    _es_capital match {
-                                        case true => 1
-                                        case false => 0
-                                    },
-                                    _es_causado match {
-                                        case true => 1
-                                        case false => 0
-                                    },
-                                    _es_corriente match {
-                                        case true => 1
-                                        case false => 0
-                                    },
-                                    _es_vencido match {
-                                        case true => 1
-                                        case false => 0
-                                    },
-                                    _es_anticipado match {
-                                        case true => 1
-                                        case false => 0
-                                    },
-                                    _es_devuelto match {
-                                        case true => 1
-                                        case false => 0
-                                    },
-                                    _es_otros match {
-                                        case true => 1
-                                        case false => 0
-                                    },
-                                    _es_cajabanco match {
-                                        case true => 1
-                                        case false => 0
-                                    },
-                                    _es_costas match {
-                                        case true => 1
-                                        case false => 0
-                                    },
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
                                     ""
                                 )
                                 if (_cl.debito != 0 || _cl.credito != 0) {
@@ -1163,15 +1110,16 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                         
                         _saldo_actual = _saldo_actual - _capital
                         _m_saldo_actual = _saldo_actual
-                        _m_interes_hasta = _fecha_pago_interes
                         _fecha_pago_interes = _funcion.calculoFecha(_fecha_pago_interes, _amortizacion)
+                        _m_interes_hasta = _fecha_pago_interes
+
                     }
 
   
                     // Agregar Caja
                     _codigo_nombre = codigoNombre(_codigo_caja)
                     val _cl = new CuotasLiq(
-                                    0,
+                                    _cuota_numero,
                                     _codigo_caja,
                                     _codigo_nombre,
                                     _fecha_corte,
@@ -1541,7 +1489,7 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
 
                             if (_af.causado) {
                                 _duplicar = true
-                                _es_causado = true
+                                _es_causado = false
                                 _total_interes_credito += _credito
                             } else {
                                 _es_causado = false

@@ -30,7 +30,7 @@ import utilities._
 import java.time.DateTimeException
 import java.sql.Connection
 
-class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol, _gd: GlobalesCon)(
+class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol, _gd: GlobalesCon, _funcion: Funcion)(
     implicit ec: DatabaseExecutionContext
 ) {
   private val db = dbapi.database("default")
@@ -205,7 +205,7 @@ class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol, _gd: GlobalesCo
       }
   }
 
-  def aplicarLiquidacionWompi(referencia: String) = {
+  def aplicarLiquidacionWompi(referencia: String)(implicit connection: Connection) = {
     var _abonoCapital: BigDecimal = 0
     var _descuentoCapital: BigDecimal = 0
     var _causado: BigDecimal = 0
@@ -230,8 +230,9 @@ class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol, _gd: GlobalesCo
     var _valorRecibido: BigDecimal = 0
 
     var df = DateTimeFormat.forPattern("yyyy-MM-dd");
-
-    db.withTransaction { implicit transaction =>
+    {
+    // db.withTransaction { implicit transaction =>
+      println("Evento: Aplicando Liquidacion Wompi")
       _codigoBanco = SQL("""SELECT CODIGO FROM "gen$bancosconnal" WHERE ID_BANCO = 71""").as(SqlParser.str("CODIGO").single)
       val _transaccion = SQL("""SELECT * FROM TRAN_TRANSACCION WHERE TRAN_TRAN_REFERENCE = {referencia}""").on('referencia -> referencia).as(Transaccion._set.single)
       val _liquidacion = SQL("""SELECT * FROM LIQUIDACION WHERE REFERENCIA = {referencia}""").on('referencia -> referencia).as(Liquidacion._set.single)
@@ -248,7 +249,7 @@ class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol, _gd: GlobalesCo
 
       _liquidacion_detalle.map { _r =>
         if (_r.cuotaNumero != _cuotaAnterior) {
-          if (_esCambio) {
+          if (!_esCambio) {
             _esCambio = true
           } else {
             // Grabar Extracto
@@ -268,7 +269,7 @@ class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol, _gd: GlobalesCo
               "Wompi",
               _liquidacion.fecha_interes.get,
               _liquidacion.fecha_capital.get,
-              1)
+              0)
             guardarTablaLiquidacion(_liquidacion, _r.cuotaNumero)
             // Grabar Tabla de Liquidación
           }
@@ -321,7 +322,7 @@ class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol, _gd: GlobalesCo
           'tasa_liquidacion -> _r.tasa,
           'valor_debito -> _r.debito,
           'valor_credito -> _r.credito
-        ).executeInsert()
+        ).executeUpdate()
       }
       guardarExtracto( _liquidacion,
               _liquidacion_detalle,
@@ -339,7 +340,7 @@ class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol, _gd: GlobalesCo
               "Wompi",
               _liquidacion.fecha_interes.get,
               _liquidacion.fecha_capital.get,
-              1)
+              0)
       guardarTablaLiquidacion(_liquidacion, _cuotaAnterior)
 
       _abonoSobrante = _valorRecibido - _caja_banco
@@ -372,9 +373,14 @@ class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol, _gd: GlobalesCo
           'impreso -> 0,
           'id_empleado -> "WOMPI"
         ).executeUpdate()
-
+       var _codigoPuc = ""
       // Generar Comprobante Detalle
       _liquidacion_detalle.map { _r =>
+        if (_r.esCajaBanco == 1) {
+          _codigoPuc = _codigoBanco
+        } else {
+          _codigoPuc = _r.codigoPuc
+        }
         val _idAux = _gd.obtenerIdAuxiliar()
         SQL("""INSERT INTO "con$auxiliar" (ID_COMPROBANTE, ID_AGENCIA, TIPO_COMPROBANTE, FECHA, CODIGO, DEBITO, CREDITO, ID_COLOCACION, ID_IDENTIFICACION, ID_PERSONA, ESTADOAUX, ID, ID_CLASE_OPERACION) VALUES (
           {id_comprobante}, {id_agencia}, {tipo_comprobante}, {fecha}, {codigo}, {debito}, {credito}, {id_colocacion}, {id_identificacion}, {id_persona}, {estadoaux}, {id}, {id_clase_operacion})""")
@@ -383,7 +389,7 @@ class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol, _gd: GlobalesCo
             'id_agencia -> _liquidacion.id_agencia,
             'tipo_comprobante -> 1,
             'fecha -> _liquidacion.fecha,
-            'codigo -> _r.codigoPuc,
+            'codigo -> _codigoPuc,
             'debito -> _r.debito,
             'credito -> _r.credito,
             'id_colocacion -> _liquidacion.id_colocacion,
@@ -519,10 +525,43 @@ class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol, _gd: GlobalesCo
         case Some(x) => x
         case None => null
       }
-      var _saldo_anterior = 0
+      var _saldo_anterior = 0D
       var _tasa_interes = _registro_interes != null match {
         case true => _registro_interes.tasa
         case false => 0
+      }
+      var _interes_hasta = _interes_pago_hasta
+      var _capital_hasta = _capital_pago_hasta
+      
+      val _parserSaldo = double("SALDO_ANTERIOR_EXTRACTO") ~ double("ABONO_CAPITAL") ~ date("FECHA_DESEMBOLSO") ~ int("DIAS_PAGO") ~ 
+        date("CAPITAL_PAGO_HASTA") ~ date("INTERES_PAGO_HASTA") ~ int("AMORTIZA_CAPITAL") ~ int("AMORTIZA_INTERES") map {
+          case _saldo ~ _abono_capital ~ _fecha_desembolso ~ _dias_pago ~ _capital_pago_hasta ~ _interes_pago_hasta ~ _amortiza_capital ~ 
+            _amortiza_interes => (_saldo, _abono_capital, _fecha_desembolso, _dias_pago, _capital_pago_hasta, _interes_pago_hasta, _amortiza_capital, _amortiza_interes)
+        }
+      val _result = SQL("""SELECT ce.SALDO_ANTERIOR_EXTRACTO, ce.ABONO_CAPITAL,
+          ce.INTERES_PAGO_HASTA, ce.CAPITAL_PAGO_HASTA,
+          cc.FECHA_DESEMBOLSO, cc.DIAS_PAGO,
+          cc.ID_LINEA, cc.ID_ESTADO_COLOCACION,
+          cc.AMORTIZA_CAPITAL, cc.AMORTIZA_INTERES
+          from "col$extracto" ce
+          inner join "col$colocacion" cc on (ce.ID_AGENCIA = cc.ID_AGENCIA and ce.ID_COLOCACION = cc.ID_COLOCACION)
+          where
+          ce.ID_AGENCIA = {id_agencia} and
+          ce.ID_COLOCACION = {id_colocacion}
+          ORDER BY ce.FECHA_EXTRACTO ASC, ce.HORA_EXTRACTO ASC""").
+          on(
+            'id_agencia -> _liquidacion.id_agencia,
+            'id_colocacion -> _liquidacion.id_colocacion
+          ).as(_parserSaldo.*)
+      _result.lastOption match {
+        case Some(x) => {
+          _saldo_anterior = x._1 - x._2
+          _capital_hasta = _funcion.calculoFecha(new DateTime(x._5), (x._7 + x._4))
+          _interes_hasta = _funcion.calculoFecha(new DateTime(x._6), x._8)
+        }
+        case None => {
+          _saldo_anterior = _liquidacion.saldo.get.toDouble
+        }
       }
 
       SQL("""INSERT INTO "col$extracto" (ID_AGENCIA, ID_CBTE_COLOCACION, ID_COLOCACION, FECHA_EXTRACTO, HORA_EXTRACTO, CUOTA_EXTRACTO, TIPO_OPERACION, SALDO_ANTERIOR_EXTRACTO, ABONO_CAPITAL, ABONO_CXC, ABONO_ANTICIPADO, ABONO_SERVICIOS, ABONO_MORA, ABONO_SEGURO, ABONO_PAGXCLI, ABONO_HONORARIOS, ABONO_OTROS, TASA_INTERES_LIQUIDACION, ID_EMPLEADO, INTERES_PAGO_HASTA, CAPITAL_PAGO_HASTA, TIPO_ABONO)
@@ -547,10 +586,10 @@ class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol, _gd: GlobalesCo
         'abono_otros -> _otros,
         'tasa_interes_liquidacion -> _tasa_interes,
         'id_empleado -> _id_empleado,
-        'interes_pago_hasta -> _interes_pago_hasta,
-        'capital_pago_hasta -> _capital_pago_hasta,
+        'interes_pago_hasta -> _interes_hasta,
+        'capital_pago_hasta -> _capital_hasta,
         'tipo_abono -> _tipo_abono
-      ).executeInsert()
+      ).executeUpdate()
   }
 
   def guardarTablaLiquidacion(_liquidacion: Liquidacion, _cuota_numero: Int)(implicit connection: Connection){
