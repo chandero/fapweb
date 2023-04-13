@@ -15,6 +15,9 @@ import VueCurrencyInput from "vue-currency-input";
 import VuePercentInput from "vue-percent-input";
 import VueMask from "v-mask";
 
+import JsonExcel from "vue-json-excel";
+Vue.component("downloadExcel", JsonExcel);
+
 import App from "./App";
 import store from "./store";
 import router from "./router";

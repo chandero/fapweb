@@ -156,7 +156,7 @@ class UsuarioController @Inject()(
   }
 
   def recuperarClave(usua_email:String) = Action.async { request: Request[AnyContent] =>
-    val linkProtocol = config.get[String]("link.protocol")
+    val linkProtocol = config.get[String]("link.protocol_fap")
     usuarioService.recuperar(linkProtocol,usua_email).map { result => 
       if (result){
         Ok(Json.toJson("true"))

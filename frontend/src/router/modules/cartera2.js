@@ -96,8 +96,14 @@ const cartera2Router = {
           path: 'menu4-3bancolombia',
           component: () => import('@/views/cartera2/menu4informe/menu4-3bancolombia'),
           name: 'menu_cartera_menu4informe_menu4-3bancolombia',
-          meta: { title: 'menu_cartera_menu4informe_menu4-3bancolombia', icon: 'coin5', roles: ['admin', 'cartera', 'gerencia'] }
-        } 
+          meta: { title: 'menu_cartera_menu4informe_menu4-3bancolombia', icon: 'infobanco01', roles: ['admin', 'cartera', 'gerencia'] }
+        },
+        {
+          path: 'menu4-4recaudoweb',
+          component: () => import('@/views/cartera2/menu4informe/menu4-4recaudoweb'),
+          name: 'menu_cartera_menu4informe_menu4-4recaudoweb',
+          meta: { title: 'menu_cartera_menu4informe_menu4-4recaudoweb', icon: 'recaudo01', roles: ['admin', 'cartera', 'gerencia'] }
+        },
       ]
     },
     {

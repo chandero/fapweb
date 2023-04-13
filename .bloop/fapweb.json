@@ -45,7 +45,7 @@
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/com/norbitltd/spoiwo_2.12/1.7.0/spoiwo_2.12-1.7.0.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/mozilla/rhino/1.7R3/rhino-1.7R3.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/joda/joda-money/1.0.1/joda-money-1.0.1.jar",
-            "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/com/github/t3hnar/scala-bcrypt_2.12/4.3.0/scala-bcrypt_2.12-4.3.0.jar",
+            "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/mindrot/jbcrypt/0.3m/jbcrypt-0.3m.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/requests_2.12/0.7.0/requests_2.12-0.7.0.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/net/liftweb/lift-json_2.12/3.4.1/lift-json_2.12-3.4.1.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/net/liftweb/lift-json-ext_2.12/3.4.1/lift-json-ext_2.12-3.4.1.jar",
@@ -129,7 +129,6 @@
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/jfree/jfreechart/1.0.19/jfreechart-1.0.19.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/eclipse/jdt/ecj/3.21.0/ecj-3.21.0.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/codehaus/castor/castor-xml/1.4.1/castor-xml-1.4.1.jar",
-            "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/de/svenkubiak/jBCrypt/0.4.1/jBCrypt-0.4.1.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/geny_2.12/0.6.10/geny_2.12-0.6.10.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scalap/2.12.11/scalap-2.12.11.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/com/thoughtworks/paranamer/paranamer/2.8/paranamer-2.8.jar",
@@ -334,7 +333,7 @@
         "platform": {
             "name": "jvm",
             "config": {
-                "home": "/home/chandero/.sdkman/candidates/java/11.0.17-tem",
+                "home": "/usr/lib/jvm/java-11-openjdk",
                 "options": [
                     "-Duser.dir=/home/chandero/Documentos/Desarrollo/Repositorios/fundacionapoyo/fapweb"
                 ]
@@ -839,19 +838,19 @@
                     ]
                 },
                 {
-                    "organization": "com.github.t3hnar",
-                    "name": "scala-bcrypt_2.12",
-                    "version": "4.3.0",
+                    "organization": "org.mindrot",
+                    "name": "jbcrypt",
+                    "version": "0.3m",
                     "configurations": "default",
                     "artifacts": [
                         {
-                            "name": "scala-bcrypt_2.12",
-                            "path": "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/com/github/t3hnar/scala-bcrypt_2.12/4.3.0/scala-bcrypt_2.12-4.3.0.jar"
+                            "name": "jbcrypt",
+                            "path": "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/mindrot/jbcrypt/0.3m/jbcrypt-0.3m.jar"
                         },
                         {
-                            "name": "scala-bcrypt_2.12",
+                            "name": "jbcrypt",
                             "classifier": "sources",
-                            "path": "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/com/github/t3hnar/scala-bcrypt_2.12/4.3.0/scala-bcrypt_2.12-4.3.0-sources.jar"
+                            "path": "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/mindrot/jbcrypt/0.3m/jbcrypt-0.3m-sources.jar"
                         }
                     ]
                 },
@@ -2243,23 +2242,6 @@
                             "name": "castor-xml",
                             "classifier": "sources",
                             "path": "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/codehaus/castor/castor-xml/1.4.1/castor-xml-1.4.1-sources.jar"
-                        }
-                    ]
-                },
-                {
-                    "organization": "de.svenkubiak",
-                    "name": "jBCrypt",
-                    "version": "0.4.1",
-                    "configurations": "default",
-                    "artifacts": [
-                        {
-                            "name": "jBCrypt",
-                            "path": "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/de/svenkubiak/jBCrypt/0.4.1/jBCrypt-0.4.1.jar"
-                        },
-                        {
-                            "name": "jBCrypt",
-                            "classifier": "sources",
-                            "path": "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/de/svenkubiak/jBCrypt/0.4.1/jBCrypt-0.4.1-sources.jar"
                         }
                     ]
                 },

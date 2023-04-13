@@ -40,6 +40,7 @@
     "vue-currency-filter": "^5.1.0",
     "vue-currency-input": "^1.22.6",
     "vue-i18n": "^8.18.2",
+    "vue-json-excel": "^0.3.0",
     "vue-moment": "^4.1.0",
     "vue-pdf": "^4.2.0",
     "vue-percent-input": "^1.1.4",

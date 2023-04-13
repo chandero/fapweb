@@ -23,20 +23,24 @@ POST    /api/usua/save                  controllers.UsuarioController.guardar
 
 
 # Transaccional
+
 + nocsrf
 GET     /api/tran/auth/:i/:p/:c         controllers.TransaccionalController.autenticar(i: Int, p: String, c: String)
 + nocsrf
 GET     /api/tran/register/:i/:p/:e     controllers.TransaccionalController.registrar(i: Int, p: String, e: String)
 + nocsrf
-GET     /api/tran/link/:t               controllers.TransaccionalController.validarEnlace(t: String)    
+GET     /api/tran/link/:t               controllers.TransaccionalController.validarEnlace(t: String)
 + nocsrf
-GET     /api/tran/recovery/:e           controllers.TransaccionalController.recuperarClave(e: String)
+GET     /api/tran/recovery/:i/:p/:e           controllers.TransaccionalController.recuperarClave(i:Int, p:String, e: String)
 + nocsrf
 GET    /api/tran/changepass/:e/:p/:l    controllers.TransaccionalController.cambiarClave(e: String, p: String, l: String)
+
 # Wompi
+
 + nocsrf
 POST   /api/wompi/event                 controllers.TransaccionalController.registrarEventoWompi
 GET    /api/wompi/get/:r                controllers.TransaccionalController.obtenerRegistroWompi(r: String)
+
 # User Logout
 POST    /api/login/logout               controllers.UsuarioController.logout()
 
@@ -67,7 +71,8 @@ GET     /api/perf/get/:p/:c             controllers.PerfilController.todos(p:Lon
 POST    /api/calc/t                     controllers.CalculoController.tabla
 
 # Informes
-
+GET    /api/info/lqweb/:fi/:ff          controllers.InformesController.getLiquidacionAplicadaWeb(fi: Long, ff: Long)
+GET    /api/info/lqwebxlsx/:fi/:ff          controllers.InformesController.getLiquidacionAplicadaWebXlsx(fi: Long, ff: Long)
 # Informes Otros
 GET     /api/info/genlm/:p/:a/:d           controllers.LibroMayorController.generar(p:Int, a:Int, d:Boolean)
 GET     /api/info/conlm/:a              controllers.LibroMayorController.consultar(a:Int)
@@ -190,7 +195,9 @@ GET     /api/pers/bpc/:c                controllers.PersonaController.obtenerPer
 # Solicitud
 POST   /api/soex/                       controllers.SolicitudExternaController.crear()
 
+POST   /api/rschk/set                   controllers.CreditoPreSolicitudController.registrarSolicitud
 
+GET   /api/presol/all                       controllers.CreditoPreSolicitudController.obtenerListaPresolicitud
 # Factura
 GET    /api/fact/bpn/:n                 controllers.FacturaController.buscarPorNumero(n: Long)
 GET    /api/fact/dsabpn/:n              controllers.FacturaController.buscarDSAPorNumero(n: Long)

@@ -209,3 +209,26 @@ export function InformeBancolombia() {
     responseType: "blob"
   });
 }
+
+export function getLiquidacionAplicadaWeb(fi,ff) {
+  const data = {
+    fi,
+    ff
+  };
+  return request({
+    url: "/info/lqweb/" + data.fi + "/" + data.ff,
+    method: "get"
+  });
+}
+
+export function getLiquidacionAplicadaWebXlsx(fi,ff) {
+  const data = {
+    fi,
+    ff
+  };
+  return request({
+    url: "/info/lqwebxlsx/" + data.fi + "/" + data.ff,
+    method: "get",
+    responseType: "blob"
+  });
+}

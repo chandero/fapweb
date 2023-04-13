@@ -1,6 +1,6 @@
 package models
 
-import com.github.t3hnar.bcrypt._
+// import com.github.t3hnar.bcrypt._
 
 import javax.inject.Inject
 import java.util.Calendar
@@ -22,6 +22,7 @@ import org.joda.time.LocalDateTime
 import scala.util.{Try, Success, Failure}
 
 import notifiers._
+import org.mindrot.jbcrypt.BCrypt
 
 case class Cliente(
     cliente_id: Option[Long],
@@ -95,10 +96,19 @@ class TransaccionalRepository @Inject()(dbapi: DBApi, config: Configuration, cSe
           )
           .as(SqlParser.str("TRAN_USUARIO_CLAVE").singleOpt)
       }
-      _hash.isDefined && (contrasena.isBcryptedSafeBounded(_hash.get) match {
-        case Success(s) => true
-        case Failure(f) => false
-      })
+/*       _hash.isDefined && (contrasena.isBcryptedSafeBounded(_hash.get) match {
+        case Success(s) => println("Contraseña es valida:" + contrasena)
+                           true
+        case Failure(f) => println("Contraseña Error:" + contrasena)
+          false
+      }) */
+      if (_hash.isDefined && BCrypt.checkpw(contrasena, _hash.get)) {
+        println("Contraseña es valida:" + contrasena)
+        true
+      } else {
+        println("Contraseña Error:" + contrasena)
+        false
+      }
     }(ec)
 
   def registrar(id_identificacion: Int, id_persona: String, email: String) =
@@ -108,7 +118,7 @@ class TransaccionalRepository @Inject()(dbapi: DBApi, config: Configuration, cSe
         val _nombre =
           SQL("""SELECT FIRST 1 p.NOMBRE || ' ' || p.PRIMER_APELLIDO || ' ' || p.SEGUNDO_APELLIDO AS NOMBRE FROM "col$colocacion" c
                     INNER JOIN "gen$persona" p ON p.ID_IDENTIFICACION = c.ID_IDENTIFICACION AND p.ID_PERSONA = c.ID_PERSONA
-                    WHERE c.ID_IDENTIFICACION = {id_identificacion} AND c.ID_PERSONA = {id_persona} AND c.ID_ESTADO_COLOCACION IN (0,1,2)
+                    WHERE c.ID_IDENTIFICACION = {id_identificacion} AND c.ID_PERSONA = {id_persona} AND c.ID_ESTADO_COLOCACION IN (0,1,2,6,7)
                     AND LOWER(p.EMAIL) = LOWER({email})""")
             .on(
               'id_identificacion -> id_identificacion,
@@ -263,13 +273,23 @@ class TransaccionalRepository @Inject()(dbapi: DBApi, config: Configuration, cSe
                 'enla_uuid -> enla_uuid
               )
               .executeUpdate()
-            val _esInsertado = SQL("""INSERT INTO TRAN_USUARIO (TRAN_USUARIO_ID_IDENTIFICACION, TRAN_USUARIO_ID_PERSONA, TRAN_USUARIO_EMAIL, TRAN_USUARIO_ULTIMO_INGRESO) VALUES ({id_identificacion}, {id_persona}, LOWER({email}), {ahora})""").on(
+            var _esActualizado = false
+            var _esInsertado = false
+            _esActualizado = SQL("""UPDATE TRAN_USUARIO SET TRAN_USUARIO_ULTIMO_INGRESO = {ahora} WHERE TRAN_USUARIO_ID_IDENTIFICACION = {id_identificacion} AND TRAN_USUARIO_ID_PERSONA = {id_persona} AND TRAN_USUARIO_EMAIL = {email}""").on(
+              'ahora -> new Timestamp(Calendar.getInstance().getTimeInMillis),
               'id_identificacion -> link._5,
               'id_persona -> link._6,
-              'email -> link._4,
-              'ahora -> new Timestamp(Calendar.getInstance().getTimeInMillis)
-            ).executeInsert().get > 0
-            if (_esInsertado) {
+              'email -> link._4
+            ).executeUpdate() > 0
+            if (!_esActualizado) {
+              _esInsertado = SQL("""INSERT INTO TRAN_USUARIO (TRAN_USUARIO_ID_IDENTIFICACION, TRAN_USUARIO_ID_PERSONA, TRAN_USUARIO_EMAIL, TRAN_USUARIO_ULTIMO_INGRESO) VALUES ({id_identificacion}, {id_persona}, LOWER({email}), {ahora})""").on(
+                'id_identificacion -> link._5,
+                'id_persona -> link._6,
+                'email -> link._4,
+                'ahora -> new Timestamp(Calendar.getInstance().getTimeInMillis)
+              ).executeInsert().get > 0
+            }
+            if (_esActualizado || _esInsertado) {
               (true, _email)
             } else {
               (false, "")
@@ -282,43 +302,48 @@ class TransaccionalRepository @Inject()(dbapi: DBApi, config: Configuration, cSe
     }
   }
 
-  def recuperar(hosturl: String, email: String): Future[Boolean] = Future {
+  def recuperar(id_identificacion: Int, id_persona: String, email: String): Future[Boolean] = Future {
     val fecha: LocalDateTime =
       new LocalDateTime(Calendar.getInstance().getTimeInMillis())
     val hora: LocalDateTime =
       new LocalDateTime(Calendar.getInstance().getTimeInMillis())
-
     db.withConnection { implicit connection =>
-      val usuario = SQL(
-        "SELECT * FROM \"gen$empleado\" WHERE LOWER(email) = LOWER({email}) and tipo <> 99"
+      val _nombre = SQL(
+        """SELECT (gp.NOMBRE || ' ' || gp.PRIMER_APELLIDO || ' ' || gp.SEGUNDO_APELLIDO) AS NOMBRE FROM TRAN_USUARIO tu
+           INNER JOIN "gen$persona" gp ON gp.ID_IDENTIFICACION = tu.TRAN_USUARIO_ID_IDENTIFICACION AND gp.ID_PERSONA = tu.TRAN_USUARIO_ID_PERSONA AND LOWER(gp.EMAIL) = LOWER(tu.TRAN_USUARIO_EMAIL)
+          WHERE TRAN_USUARIO_ID_IDENTIFICACION = {id_identificacion} AND TRAN_USUARIO_ID_PERSONA = {id_persona} AND LOWER(TRAN_USUARIO_EMAIL) = LOWER({email})"""
       ).on(
-          'email -> email
+          'email -> email,
+          'id_identificacion -> id_identificacion,
+          'id_persona -> id_persona
         )
-        .as(Usuario.usuarioRS.singleOpt)
-        .get
+        .as(SqlParser.scalar[String].singleOpt)
 
-      if (usuario != null) {
-        // enviar correo con el enlace
-        var uuid: String = randomUUID().toString()
-        val enlace = hosturl + "/#/tr/" + uuid
-        val sender = new EmailSender()
-        sender.sendPasswordRecovery(
-          usuario.email.get,
-          usuario.nombre.get + " " + usuario.primer_apellido.get,
-          enlace
-        )
-        SQL(
-          "INSERT INTO ENLACE (ENLA_UUID, ENLA_ACTIVO, ENLA_FECHA, ENLA_EMAIL) VALUES ({enla_uuid}, {enla_activo}, {enla_fecha}, {enla_email})"
-        ).on(
-            'enla_uuid -> uuid,
-            'enla_activo -> 1,
-            'enla_fecha -> fecha,
-            'enla_email -> usuario.email
+      _nombre match {
+        case Some(nombre) =>
+          val _uuid = randomUUID().toString
+          val _result = SQL(
+          """INSERT INTO TRAN_ENLACE 
+              (TRAN_ENLACE_UUID, TRAN_ENLACE_ACTIVO, TRAN_ENLACE_FECHA, TRAN_ENLACE_EMAIL, TRAN_ENLACE_ID_IDENTIFICACION, TRAN_ENLACE_ID_PERSONA)
+                VALUES ({uuid}, {activo}, {fecha}, LOWER({email}), {id_identificacion}, {id_persona})"""
+          ).on(
+            'uuid -> _uuid,
+            'activo -> 1,
+            'fecha -> new Timestamp(Calendar.getInstance().getTimeInMillis),
+            'email -> email,
+            'id_identificacion -> id_identificacion,
+            'id_persona -> id_persona
           )
-          .executeInsert(SqlParser.scalar[String].singleOpt)
-        true
-      } else {
-        false
+          .executeUpdate() > 0
+          if (_result) {
+                  // Enviar correo de enlace
+            val enlace = config.get[String]("link.protocol_transaccional") + "/l/" + _uuid
+            EmailSender.sendPasswordRecovery(email, nombre, enlace)
+          }
+          true
+
+        case None =>
+          false
       }
     }
 
@@ -337,61 +362,44 @@ class TransaccionalRepository @Inject()(dbapi: DBApi, config: Configuration, cSe
     val hora: LocalDateTime = new LocalDateTime(
       Calendar.getInstance().getTimeInMillis()
     )
-    val contrasena = clave.bcryptSafeBounded match {
+    val contrasena = BCrypt.hashpw(clave, BCrypt.gensalt());
+    /* val contrasena = clave.bcryptSafeBounded match {
       case Success(s) => s
       case Failure(f) => ""
-    }
+    } */
     db.withConnection { implicit connection =>
-      val email =
+      val _parser = str("TRAN_ENLACE_EMAIL") ~ int("TRAN_ENLACE_ID_IDENTIFICACION") ~ str("TRAN_ENLACE_ID_PERSONA") map {
+            case email ~ id_identificacion ~ id_persona => (email, id_identificacion, id_persona)
+          }
+      val _dataEnlace =
         SQL(
-          "SELECT TRAN_ENLACE_EMAIL FROM TRAN_ENLACE WHERE TRAN_ENLACE_UUID = {enla_uuid}"
+          "SELECT TRAN_ENLACE_EMAIL, TRAN_ENLACE_ID_IDENTIFICACION, TRAN_ENLACE_ID_PERSONA FROM TRAN_ENLACE WHERE TRAN_ENLACE_UUID = {enla_uuid}"
         ).on(
             'enla_uuid -> link
           )
-          .as(SqlParser.scalar[String].single)
-
-      val _parser = int("ID_IDENTIFICACION") ~ str("ID_PERSONA") map {
-        case id_identificacion ~ id_persona => (id_identificacion, id_persona)
+          .as(_parser.singleOpt)
+      val _result = _dataEnlace match {
+        case Some(usuario) =>
+          SQL(
+          "UPDATE TRAN_USUARIO SET TRAN_USUARIO_CLAVE  = {contrasena} WHERE TRAN_USUARIO_ID_IDENTIFICACION = {id_identificacion} AND TRAN_USUARIO_ID_PERSONA = {id_persona} AND LOWER(TRAN_USUARIO_EMAIL) = LOWER({email})"
+          ).on(
+              'id_identificacion -> usuario._2,
+              'id_persona -> usuario._3,
+              'email -> usuario._1,
+              'contrasena -> contrasena
+            )
+            .executeUpdate() > 0
+            true
+        case None => false
       }
-
-      val usuario = SQL(
-        """SELECT ID_IDENTIFICACION, ID_PERSONA FROM "gen$persona" WHERE LOWER(EMAIL) = LOWER({email})"""
-      ).on(
-          'email -> email
-        )
-        .as(_parser.single)
-
-      val _result: Boolean = SQL(
-        "UPDATE TRAN_USUARIO SET TRAN_USUARIO_CLAVE  = {contrasena} WHERE TRAN_USUARIO_ID_IDENTIFICACION = {id_identificacion} AND TRAN_USUARIO_ID_PERSONA = {id_persona}"
-      ).on(
-          'id_identificacion -> usuario._1,
-          'id_persona -> usuario._2,
-          'contrasena -> contrasena
-        )
-        .executeUpdate() > 0
       if (_result) {
-        SQL(
-          "UPDATE TRAN_ENLACE SET TRAN_ENLACE_ACTIVO = {enla_activo} WHERE TRAN_ENLACE_UUID = {enla_uuid}"
-        ).on(
+         SQL(
+            "UPDATE TRAN_ENLACE SET TRAN_ENLACE_ACTIVO = {enla_activo} WHERE TRAN_ENLACE_UUID = {enla_uuid}"
+          ).on(
             'enla_activo -> 0,
             'enla_uuid -> link
           )
-          .executeUpdate()
-
-/*         SQL(
-          "INSERT INTO auditoria(audi_fecha, audi_hora, usua_id, audi_tabla, audi_uid, audi_campo, audi_valorantiguo, audi_valornuevo, audi_evento) VALUES ({audi_fecha}, {audi_hora}, {usua_id}, {audi_tabla}, {audi_uid}, {audi_campo}, {audi_valorantiguo}, {audi_valornuevo}, {audi_evento})"
-        ).on(
-            'audi_fecha -> fecha,
-            'audi_hora -> hora,
-            'usua_id -> usuario._2,
-            'audi_tabla -> "TRAN_USUARIO",
-            'audi_uid -> usuario._2,
-            'audi_campo -> "contrasena",
-            'audi_valorantiguo -> '*',
-            'audi_valornuevo -> '*',
-            'audi_evento -> "A"
-          )
-          .executeInsert() */
+         .executeUpdate()
       }
       _result
     }
@@ -525,12 +533,16 @@ class TransaccionalRepository @Inject()(dbapi: DBApi, config: Configuration, cSe
     true
   }
 
-  def obtenerRegistroWompi(referencia: String): Future[Transaccion] = Future {
-    db.withTransaction {implicit connection =>
-        SQL("""SELECT * FROM TRAN_TRANSACCION WHERE TRAN_TRAN_REFERENCE = {referencia}""")
+  def obtenerRegistroWompi(id: String): Future[Transaccion] = Future {
+    val _transaction = db.withTransaction {implicit connection =>
+        SQL("""SELECT * FROM TRAN_TRANSACCION WHERE TRAN_TRAN_ID = {id}""")
         .on(
-          'referencia -> referencia
-        ).as(Transaccion._set.singleOpt).getOrElse(Transaccion(Some(referencia), None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None))
+          'id -> id
+        ).as(Transaccion._set.singleOpt)
+    }
+    _transaction match {
+      case Some(transaction) => transaction
+      case None => Transaccion(None, Some(id), None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None)
     }
   }
 }

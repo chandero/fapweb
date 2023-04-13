@@ -31,3 +31,10 @@ export function liquidacionDePrueba(id_colocacion, cuotas, fecha_corte) {
     method: 'get'
   })
 }
+
+export function obtenerListaPresolicitud() {
+  return request({
+    url: '/presol/all',
+    method: 'get'
+  });
+}

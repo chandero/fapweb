@@ -247,6 +247,12 @@ class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol, _gd: GlobalesCo
           case None => 0
         }
 
+      // Actualizar Liquidación
+      SQL("""UPDATE LIQUIDACION SET ID_COMPROBANTE = {comprobante} WHERE REFERENCIA = {referencia}""").on(
+        'comprobante -> _comprobante,
+        'referencia -> referencia
+      ).executeUpdate()  
+
       _liquidacion_detalle.map { _r =>
         if (_r.cuotaNumero != _cuotaAnterior) {
           if (!_esCambio) {

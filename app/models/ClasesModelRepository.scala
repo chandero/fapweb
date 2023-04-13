@@ -1420,3 +1420,114 @@ object ControlCobro {
   }
 
 }
+
+case class PreSolicitud (
+  id_identificacion: Option[Int],
+  id_persona: Option[String],
+  fecha_expedicion: Option[scala.Long],
+  lugar_expedicion: Option[String],
+  primer_nombre: Option[String],
+  segundo_nombre: Option[String],
+  primer_apellido: Option[String],
+  segundo_apellido: Option[String],
+  ingresos: Option[Double],
+  gastos: Option[Double],
+  otros_egresos: Option[Double],
+  numero_celular: Option[String],
+  email: Option[String],
+  id_linea: Option[Int],
+  monto_solicitado: Option[Double],
+  plazo_solicitado: Option[Int],
+  prso_evaluacion_mora: Option[Int],
+  prso_evaluacion_previa: Option[Int],
+  prso_autorizo: Option[Int],
+  prso_origen: Option[String],
+  id_empleado: Option[String],
+  prso_estado: Option[Int],
+  created_at: Option[scala.Long],
+  updated_at: Option[scala.Long],
+  deleted_at: Option[scala.Long]
+)
+
+object PreSolicitud {
+  val _set = {
+    get[Option[Int]]("id_identificacion") ~
+      get[Option[String]]("id_persona") ~
+      get[Option[scala.Long]]("prso_fecha_expedicion") ~
+      get[Option[String]]("prso_lugar_expedicion") ~
+      get[Option[String]]("prso_primer_nombre") ~
+      get[Option[String]]("prso_segundo_nombre") ~
+      get[Option[String]]("prso_primer_apellido") ~
+      get[Option[String]]("prso_segundo_apellido") ~
+      get[Option[Double]]("prso_ingresos") ~
+      get[Option[Double]]("prso_gastos") ~
+      get[Option[Double]]("prso_otros_egresos") ~
+      get[Option[String]]("prso_telefono_contacto") ~
+      get[Option[String]]("prso_email") ~ 
+      get[Option[Int]]("id_linea") ~ 
+      get[Option[Double]]("prso_monto_solicitado") ~
+      get[Option[Int]]("prso_plazo_solicitado") ~
+      get[Option[Int]]("prso_evaluacion_mora") ~ 
+      get[Option[Int]]("prso_evaluacion_previa") ~ 
+      get[Option[Int]]("prso_autorizo") ~ 
+      get[Option[String]]("prso_origen") ~ 
+      get[Option[String]]("id_empleado") ~ 
+      get[Option[Int]]("prso_estado") ~ 
+      get[Option[scala.Long]]("created_at") ~ 
+      get[Option[scala.Long]]("updated_at") ~ 
+      get[Option[scala.Long]]("deleted_at") map {
+      case id_identificacion ~ 
+            id_persona ~ 
+            fecha_expedicion ~ 
+            lugar_expedicion ~ 
+            primer_nombre ~ 
+            segundo_nombre ~ 
+            primer_apellido ~ 
+            segundo_apellido ~ 
+            ingresos ~ 
+            gastos ~ 
+            otros_egresos ~ 
+            numero_celular ~ 
+            email ~ 
+            id_linea ~ 
+            monto_solicitado ~ 
+            plazo_solicitado ~ 
+            prso_evaluacion_mora ~ 
+            prso_evaluacion_previa ~ 
+            prso_autorizo ~ 
+            prso_origen ~ 
+            id_empleado ~ 
+            prso_estado ~ 
+            created_at ~ 
+            updated_at ~ 
+            deleted_at =>
+        PreSolicitud(
+          id_identificacion,
+          id_persona,
+          fecha_expedicion,
+          lugar_expedicion,
+          primer_nombre,
+          segundo_nombre,
+          primer_apellido,
+          segundo_apellido,
+          ingresos,
+          gastos,
+          otros_egresos,
+          numero_celular,
+          email,
+          id_linea,
+          monto_solicitado,
+          plazo_solicitado,
+          prso_evaluacion_mora,
+          prso_evaluacion_previa,
+          prso_autorizo,
+          prso_origen,
+          id_empleado,
+          prso_estado,
+          created_at,
+          updated_at,
+          deleted_at
+        )
+      }
+  }
+}

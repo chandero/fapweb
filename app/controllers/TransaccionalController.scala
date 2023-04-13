@@ -108,10 +108,9 @@ class TransaccionalController @Inject()(
     Future.successful(Ok("logout").withNewSession)
   }
 
-  def recuperarClave(usua_email: String) = Action.async {
+  def recuperarClave(id_identificacion: Int, id_persona: String, usua_email: String) = Action.async {
     request: Request[AnyContent] =>
-      val linkProtocol = config.get[String]("link.protocol")
-      transaccionalService.recuperar(linkProtocol, usua_email).map { result =>
+      transaccionalService.recuperar(id_identificacion, id_persona, usua_email).map { result =>
         if (result) {
           Ok(Json.toJson("true"))
         } else {

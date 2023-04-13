@@ -302,11 +302,11 @@ class UsuarioRepository @Inject()(dbapi: DBApi)(
     val contrasena = Conversion.sha1(clave)
     db.withConnection { implicit connection =>
       val email =
-        SQL("SELECT enla_email FROM enlace WHERE enla_uuid = {enla_uuid}")
+        SQL("SELECT ENLA_EMAIL FROM ENLACE WHERE ENLA_UUID = {enla_uuid}")
           .on(
             'enla_uuid -> link
           )
-          .as(SqlParser.scalar[Long].single)
+          .as(SqlParser.scalar[String].single)
 
       val result: Boolean = SQL(
         "UPDATE \"gen$empleado\" SET contrasena = {contrasena} WHERE email = {email}"

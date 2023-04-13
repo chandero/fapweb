@@ -3,7 +3,7 @@ import Layout from '@/views/layout/Layout'
 const creditoRouter = {
   path: '/menu_credito',
   component: Layout,
-  redirect: '/menu_credito/menu1solicitud',
+  redirect: '/credito/menu0presolicitud/menu0-1list',
   name: 'menu_credito',
   meta: {
     title: 'menu_credito',
@@ -12,9 +12,24 @@ const creditoRouter = {
   },
   children: [
     {
+      path: 'menu0presolicitud',
+      name: 'menu0presolicitud',
+      component: () => import('@/views/credito/menu0presolicitud/index'),
+      meta: { title: 'menu_credito_menu0presolicitud', icon:'pdf', roles: ['admin', 'credito'] },
+      redirect: '/menu0presolicitud/menu0-1list',
+      children: [
+        {
+          path: 'menu0-1list',
+          component: () => import('@/views/credito/menu0presolicitud/menu0-1list'),
+          name: 'menu_credito_menu0presolicitud_menu0-1list',
+          meta: { title: 'menu_credito_menu0presolicitud_menu0-1list', icon: 'money', roles: ['admin', 'credito'] }
+        }    
+      ]      
+    },
+    {
       path: 'menu1solicitud',
       component: () => import('@/views/credito/menu1solicitud/index'), // Parent router-view
-      name: 'menu_credito_menu1solicitud',
+      name: 'menu1solicitud',
       meta: { title: 'menu_credito_menu1solicitud', icon: 'form', roles: ['admin', 'credito'] },
       redirect: '/credito/menu1solicitud/menu1-2create',
       children: [
@@ -40,7 +55,7 @@ const creditoRouter = {
           meta: { title: 'menu_credito_menu1solicitud_menu1-3edit', roles: ['admin', 'credito'] }
         }
       ]
-    },
+    },    
     {
       path: 'menu3informe',
       name: 'menu3informe',

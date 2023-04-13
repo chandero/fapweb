@@ -45,7 +45,7 @@ libraryDependencies ++= Seq(
   "org.mozilla" % "rhino" % "1.7R3",
   // Otras
   "org.joda" % "joda-money" % "1.0.1",
-  "com.github.t3hnar" %% "scala-bcrypt" % "4.3.0",
+  "org.mindrot" % "jbcrypt" % "0.3m",
   "com.lihaoyi" %% "requests" % "0.7.0",
   // JSON
   "net.liftweb" %% "lift-json" % "3.4.1",
