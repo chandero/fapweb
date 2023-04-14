@@ -64,8 +64,8 @@ class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol, _gd: GlobalesCo
           val fechaInteres: String = df.print(_l.fecha_interes.get)
           val fechaProxima: String = df.print(_l.fecha_proxima.get)
           println("Validando Liquidacion: Guardando Liquidacion")
-          SQL("""SELECT COUNT(*) FROM "con$puc" """).as(SqlParser.scalar[Int].single)
-          SQL("""INSERT INTO LIQUIDACION VALUES({referencia}, {fecha}, {id_agencia}, {id_colocacion}, {id_identificacion}, {id_persona}, {saldo}, {fecha_capital}, {fecha_interes}, {fecha_proxima}, {aplicada}, {aplicada_en})""").
+          // SQL("""SELECT COUNT(*) FROM "con$puc" """).as(SqlParser.scalar[Int].single)
+          SQL("""INSERT INTO LIQUIDACION VALUES({referencia}, {fecha}, {id_agencia}, {id_colocacion}, {id_identificacion}, {id_persona}, {saldo}, {fecha_capital}, {fecha_interes}, {fecha_proxima}, {aplicada}, {aplicada_en}, {id_comprobante}, {liqu_origen})""").
             on(
               "referencia" -> _l.referencia,
               "fecha" -> DateTime.now(),
@@ -78,7 +78,9 @@ class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol, _gd: GlobalesCo
               "fecha_interes" -> fechaInteres,
               "fecha_proxima" -> fechaProxima,
               "aplicada" -> Some(0),
-              "aplicada_en" -> Option.empty[DateTime]
+              "aplicada_en" -> Option.empty[DateTime],
+              "id_comprobante" -> Option.empty[String],
+              "liqu_origen" -> "WEB"
             ).executeUpdate()
           println("Items: " + _l.items)
           _l.items match {
