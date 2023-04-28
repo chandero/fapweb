@@ -29,6 +29,7 @@ import scala.math.BigDecimal
 import utilities._
 import java.time.DateTimeException
 import java.sql.Connection
+import notifiers.EmailSender
 
 class CreditoPreSolicitudRepository @Inject()(
     dbapi: DBApi,
@@ -149,12 +150,29 @@ class CreditoPreSolicitudRepository @Inject()(
         _result = false
       }
     }
+    if (!_result) {
+      enviarCorreoInviable(presolicitud)
+    }
     _result
+  }
+
+  def enviarCorreoInviable(presolicitud: PreSolicitud) {
+    val _correo_destino = presolicitud.email.getOrElse("")
+    val _primer_nombre_destino = presolicitud.primer_nombre.getOrElse("")
+    val _primer_apellido_destino = presolicitud.primer_apellido.getOrElse("")
+    val _segundo_nombre_destino = presolicitud.segundo_nombre.getOrElse("")
+    val _segundo_apellido_destino = presolicitud.segundo_apellido.getOrElse("")
+    val _nombre_completo = _primer_nombre_destino + " " + _segundo_nombre_destino + " " + _primer_apellido_destino + " " + _segundo_apellido_destino
+    EmailSender.sendSolicitudInviableInfo(_correo_destino, _nombre_completo)
   }
 
   def validarMoraPersona(id_identificacion: Int, id_persona: String)(
       implicit connection: Connection
-  ): Integer = {
+  ) = {
+    val _queryJuridico = """SELECT COUNT(*) FROM "col$colocacion" cc WHERE cc.ID_ESTADO_COLOCACION IN (2,3,6) AND cc.ID_PERSONA = {id_persona}"""
+    val _queryNingunPagoVigente = """SELECT MAX((CURRENT_DATE - cc.FECHA_DESEMBOLSO) - cc.AMORTIZA_INTERES) AS DIAS_MORA FROM "col$colocacion" cc
+                                     WHERE cc.ID_PERSONA = {id_persona} AND
+                                    (SELECT COUNT(*) FROM "col$tablaliquidacion" tl WHERE tl.ID_COLOCACION = cc.ID_COLOCACION AND tl.PAGADA = 1) < 1;"""
     val _query =
       """SELECT MAX(DIAS) FROM (
                         SELECT cc.ID_COLOCACION, MAX(ct.FECHA_PAGADA - ct.FECHA_A_PAGAR) AS DIAS FROM "col$colocacion" cc
@@ -162,13 +180,33 @@ class CreditoPreSolicitudRepository @Inject()(
                         WHERE ct.PAGADA = 1 AND cc.ID_PERSONA = {id_persona} AND ct.FECHA_A_PAGAR > CURRENT_DATE - 1825
                         GROUP BY 1
                 )"""
+    val _resultJuridico = SQL(_queryJuridico).on("id_persona" -> id_persona).as(SqlParser.scalar[Int].single)
+    val _diasJuridico = if (_resultJuridico > 0) {
+      9999
+    } else { 0 }
+    val _diasNingunPago =
+      SQL(_queryNingunPagoVigente).on("id_persona" -> id_persona).as(SqlParser.scalar[Int].single)
+
     val _result = SQL(_query)
       .on("id_persona" -> id_persona)
       .as(SqlParser.scalar[Int].singleOpt)
-    _result match {
+
+    val _diasUltimoPago = _result match {
       case Some(x) => x
       case None    => 0
     }
+
+    var _diasMora = if (_diasUltimoPago > _diasNingunPago) {
+      _diasUltimoPago
+    } else {
+      _diasNingunPago
+    }
+    _diasMora = if (_diasMora > _diasJuridico) {
+      _diasMora
+    } else {
+      _diasJuridico
+    }
+    _diasMora
   }
 
   def obtenerListaPresolicitud(): Future[List[PreSolicitud]] = Future {

@@ -86,6 +86,7 @@
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/apache/xmlgraphics/batik-svg-dom/1.14/batik-svg-dom-1.14.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/apache/xmlgraphics/batik-svggen/1.14/batik-svggen-1.14.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/apache/xmlgraphics/batik-transcoder/1.14/batik-transcoder-1.14.jar",
+            "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/apache/pdfbox/pdfbox/3.0.0-RC1/pdfbox-3.0.0-RC1.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/com/typesafe/play/play-test_2.12/2.8.2/play-test_2.12-2.8.2.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/com/typesafe/play/play-specs2_2.12/2.8.2/play-specs2_2.12-2.8.2.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-xml_2.12/1.2.0/scala-xml_2.12-1.2.0.jar",
@@ -164,7 +165,7 @@
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/antlr/stringtemplate/3.2.1/stringtemplate-3.2.1.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/checkerframework/checker-qual/2.10.0/checker-qual-2.10.0.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/com/google/errorprone/error_prone_annotations/2.3.4/error_prone_annotations-2.3.4.jar",
-            "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/apache/pdfbox/fontbox/2.0.24/fontbox-2.0.24.jar",
+            "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/apache/pdfbox/fontbox/3.0.0-RC1/fontbox-3.0.0-RC1.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/com/thoughtworks/qdox/qdox/1.12/qdox-1.12.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/jakarta/xml/bind/jakarta.xml.bind-api/2.3.3/jakarta.xml.bind-api-2.3.3.jar",
             "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/glassfish/jaxb/jaxb-runtime/2.3.2/jaxb-runtime-2.3.2.jar",
@@ -1580,6 +1581,23 @@
                     ]
                 },
                 {
+                    "organization": "org.apache.pdfbox",
+                    "name": "pdfbox",
+                    "version": "3.0.0-RC1",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "pdfbox",
+                            "path": "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/apache/pdfbox/pdfbox/3.0.0-RC1/pdfbox-3.0.0-RC1.jar"
+                        },
+                        {
+                            "name": "pdfbox",
+                            "classifier": "sources",
+                            "path": "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/apache/pdfbox/pdfbox/3.0.0-RC1/pdfbox-3.0.0-RC1-sources.jar"
+                        }
+                    ]
+                },
+                {
                     "organization": "com.typesafe.play",
                     "name": "play-test_2.12",
                     "version": "2.8.2",
@@ -2893,17 +2911,17 @@
                 {
                     "organization": "org.apache.pdfbox",
                     "name": "fontbox",
-                    "version": "2.0.24",
+                    "version": "3.0.0-RC1",
                     "configurations": "default",
                     "artifacts": [
                         {
                             "name": "fontbox",
-                            "path": "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/apache/pdfbox/fontbox/2.0.24/fontbox-2.0.24.jar"
+                            "path": "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/apache/pdfbox/fontbox/3.0.0-RC1/fontbox-3.0.0-RC1.jar"
                         },
                         {
                             "name": "fontbox",
                             "classifier": "sources",
-                            "path": "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/apache/pdfbox/fontbox/2.0.24/fontbox-2.0.24-sources.jar"
+                            "path": "/home/chandero/.cache/coursier/v1/https/repo1.maven.org/maven2/org/apache/pdfbox/fontbox/3.0.0-RC1/fontbox-3.0.0-RC1-sources.jar"
                         }
                     ]
                 },

@@ -26,6 +26,16 @@ class EmailSender {
     )
   }
 
+  def sendSolicitudInviableInfo(usua_email: String, nombre: String) {
+    val mail = new MailloyContext with Mailloy
+    mail.setSubject("Respuesta Solicitud de Crédito")
+    mail.addRecipient(usua_email)
+    mail.addFrom("Fundación Apoyo <comunicaciones@fundacionapoyo.com>")
+    mail.send(
+      views.html.presolicitudinviable(nombre).body,
+      views.html.presolicitudinviable(nombre).body
+    )
+  }
   def sendHtml(email: String, subject: String, body: String) {
     val mail = new MailloyContext with Mailloy
     mail.setSubject(subject)

@@ -92,7 +92,9 @@ libraryDependencies ++= Seq(
   "org.apache.xmlgraphics" % "batik-script" % "1.14",
   "org.apache.xmlgraphics" % "batik-svg-dom" % "1.14",
   "org.apache.xmlgraphics" % "batik-svggen" % "1.14",
-  "org.apache.xmlgraphics" % "batik-transcoder" % "1.14"
+  "org.apache.xmlgraphics" % "batik-transcoder" % "1.14",
+  // Pdf Box
+  "org.apache.pdfbox" % "pdfbox" % "3.0.0-RC1",
 )
 
 // Play framework hooks for development

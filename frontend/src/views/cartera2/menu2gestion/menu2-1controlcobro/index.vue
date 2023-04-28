@@ -578,7 +578,7 @@ export default {
           var downloadLink = window.document.createElement("a");
           downloadLink.href = window.URL.createObjectURL(
             new Blob([blob], {
-              type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+              type: "application/pdf",
             })
           );
           downloadLink.download = filename;

@@ -26,6 +26,8 @@ import com.deepoove.poi.data.TextRenderData;
 import java.util.ArrayList
 import scala.collection.immutable.HashMap
 import java.{util => ju}
+import java.nio.file.Files
+import java.nio.file.Paths
 
 @Singleton
 class ControlCobroController @Inject()(
@@ -143,24 +145,20 @@ class ControlCobroController @Inject()(
         println("Deudores: " + _listDeudor)
         _data.put("deudores", _listDeudor)
         _data.put("id_colocacion", id_colocacion)
-        val os = DocxGenerator.generateDocxFileFromTemplate2(
+        val os = PdfCreator.pazYSalvoCreator(id_colocacion, _listDeudor)
+
+/*         val os = DocxGenerator.generateDocxFileFromTemplate2(
           "FaP_Carta_Paz_y_Salvo.docx",
           _data
         )
-        val pdf = DocxGenerator.convertDocxToPdf(os)
-        /*         Ok(os)
-          .as(
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-          )
-          .withHeaders(
-            CONTENT_DISPOSITION -> "attachment; filename=pazysalvo.docx"
-          ) */
-
-        Ok(pdf)
+        val filename: String = "/tmp/fap_paz_y_salvo.docx"
+        Files.write(Paths.get(filename), os)
+        val pdf = DocxGenerator.convertDocxToPdf(os) */
+        val filename: String = "fap_paz_y_salvo.pdf"
+        val attach = "attachment; filename=" + filename
+        Ok(os)
           .as("application/pdf")
-          .withHeaders(
-            CONTENT_DISPOSITION -> "attachment; filename=pazysalvo.pdf"
-          )
+            .withHeaders("Content-Disposition" -> attach )
       }
   }
 
