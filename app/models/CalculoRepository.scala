@@ -102,4 +102,78 @@ class CalculoRepository @Inject()(dbapi: DBApi, _globalesCol: GlobalesCol, _func
                      _listResult.toList
                 }
      }
+
+    /**
+        Procesar calculo de la tabla
+     */
+     def tablaPagoSimulador(id_linea:Long, periodicidad: Int, valor:BigDecimal, plazo_mes:Int): Future[Iterable[Tabla]] = Future[Iterable[Tabla]] {
+                db.withConnection { implicit connection =>
+                    /**
+                    Leer la tasa a aplicar en base a la línea
+                     */
+                     var list = new  ListBuffer[Tabla]
+                     var _listResult = new ListBuffer[Tabla]
+                     var _dsDescuento = new ListBuffer[Tabla]
+                     var amortizacion:Int = periodicidad * 30
+                     var cuot_saldo:BigDecimal = valor
+                     val plazo = plazo_mes * 30
+                     var cuot_fecha:DateTime = new DateTime()
+/*                      if (linea == 3){
+                         amortizacion = plazo
+                     } else {
+                         amortizacion = 30
+                     } */
+                     val tasae:Double = SQL("""SELECT l.TASA FROM "col$lineas" l WHERE l.ID_LINEA = {id_linea}""").
+                     on(
+                         'id_linea -> id_linea
+                     ).as(SqlParser.scalar[Double].single)
+
+                     val _tasa_aporte = SQL("""SELECT COLAPO_TASA FROM COL$APORTEDONACION WHERE {plazo} BETWEEN COLAPO_PLAZO_MIN AND COLAPO_PLAZO_MAX""").
+                     on(
+                        "plazo" -> plazo
+                     ).as(SqlParser.scalar[Double].singleOpt)
+
+                     val _valor_aporte = _tasa_aporte match {
+                        case Some(tasa) => Conversion.round((valor * tasa).doubleValue,0)
+                        case None => 0
+                     }
+
+                    val _valorTotalAporte = _valor_aporte
+                    val _valorAporte = Conversion.round((_valorTotalAporte / plazo/amortizacion).doubleValue(), 0)
+
+
+                     val descuentos = SQL("""SELECT d.* FROM "col$descuentos" d WHERE d.ES_ACTIVO = 1""").as(Descuento._set *)
+
+                     val tasan = Conversion.efectiva_a_nominal(tasae, amortizacion)
+                     val cuota = Conversion.cuotafija(valor, plazo, tasae, amortizacion)
+                     println("cuota:"+cuota)
+
+                     var i = 0
+                     for (i <- 1 to (plazo/amortizacion)){
+                        println("tasan:"+tasan)
+                        var cuot_interes:BigDecimal = Conversion.round((cuot_saldo * (tasan/100)*(amortizacion)/360).doubleValue,0)
+                        println("interes: " + cuot_interes)
+                        var cuot_capital = cuota - cuot_interes
+                        var cuot_otros:BigDecimal = 0
+                        var cuot_aporte:BigDecimal = _valor_aporte
+                        val tabla = new Tabla(i, cuot_fecha, cuot_saldo, cuot_capital, cuot_interes, cuot_otros, cuot_aporte)
+                        cuot_fecha = _funcion.calculoFecha(cuot_fecha, 30)
+                        list += tabla
+                        cuot_saldo = cuot_saldo - cuot_capital
+                        println(tabla)
+                     }
+                     val _descuentoColocacion = new ListBuffer[DescuentoColocacion]()
+                     val _descuento = SQL("""SELECT * FROM "col$descuentos" WHERE ES_ACTIVO = 1""").as(Descuento._set *)
+                     _descuento.foreach( d => {
+                         val _dc = new DescuentoColocacion(d.id_descuento, d.descripcion_descuento, true)
+                         _descuentoColocacion += _dc
+                     })
+                     val _adescontar = _globalesCol.calcularDescuentoPorCuota(list, _descuentoColocacion.toList, valor, amortizacion, valor)
+                     for( i <- 0 to list.length - 1){
+                        _listResult += new Tabla(list(i).cuot_num, list(i).cuot_fecha, list(i).cuot_saldo, list(i).cuot_capital, list(i).cuot_interes, _adescontar(i).valor + list(i).cuot_aporte, 0)
+                     }
+                     
+                     _listResult.toList
+                }
+     }     
 }

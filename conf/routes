@@ -69,6 +69,8 @@ GET     /api/depa/get                   controllers.DepartamentoController.todos
 GET     /api/perf/get/:p/:c             controllers.PerfilController.todos(p:Long, c:Long)
 
 POST    /api/calc/t                     controllers.CalculoController.tabla
++nocsrf
+POST    /api/calcm/t                    controllers.CalculoController.tablaPagoSimulador
 
 # Informes
 GET    /api/info/lqweb/:fi/:ff          controllers.InformesController.getLiquidacionAplicadaWeb(fi: Long, ff: Long)

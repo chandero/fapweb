@@ -33,4 +33,18 @@ class CalculoController @Inject()(
           }
         }
 
+        def tablaPagoSimulador() = Action.async { implicit request: Request[AnyContent] =>
+          val json = request.body.asJson.get
+          val linea = (json \ "id_linea").as[Long]
+          val monto = (json \ "monto").as[BigDecimal]
+          val periodicidad = (json \ "periodicidad").as[Int]
+          val plazo = (json \ "plazo").as[Int]
+
+
+          calculoService.tablaPagoSimulador(linea, periodicidad, monto, plazo).map { tabla =>
+            println(tabla.toString) 
+            Ok(Json.toJson(tabla))
+          }
+        }
+
     }

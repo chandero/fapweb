@@ -235,7 +235,7 @@ class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol, _gd: GlobalesCo
     {
     // db.withTransaction { implicit transaction =>
       println("Evento: Aplicando Liquidacion Wompi")
-      _codigoBanco = SQL("""SELECT CODIGO FROM "gen$bancosconnal" WHERE ID_BANCO = 71""").as(SqlParser.str("CODIGO").single)
+      _codigoBanco = SQL("""SELECT CODIGO FROM "gen$bancosconnal" WHERE ID_BANCO = 7""").as(SqlParser.str("CODIGO").single)
       val _transaccion = SQL("""SELECT * FROM TRAN_TRANSACCION WHERE TRAN_TRAN_REFERENCE = {referencia}""").on('referencia -> referencia).as(Transaccion._set.single)
       val _liquidacion = SQL("""SELECT * FROM LIQUIDACION WHERE REFERENCIA = {referencia}""").on('referencia -> referencia).as(Liquidacion._set.single)
       val _liquidacion_detalle = SQL("""SELECT * FROM LIQUIDACION_DETALLE WHERE REFERENCIA = {referencia}""").on('referencia -> referencia).as(CuotasLiq._set *)
