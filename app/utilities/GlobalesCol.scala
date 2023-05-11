@@ -199,6 +199,7 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                 if (bEnDesembolso) { return _descontar.toList }
                 if (bEsDistribuido) { nCobro = math.round(nValor.doubleValue / _cuota.length) }
                 if (bEnCuota) {
+                    println("En cuota...")
                     nCobro = nValor
                     _cuota.foreach { _c =>
                         var _ad = new ADescontar(_d.id_descuento, sCodigo, _c.cuot_num, nCobro)

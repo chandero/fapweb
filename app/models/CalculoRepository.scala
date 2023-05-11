@@ -72,13 +72,10 @@ class CalculoRepository @Inject()(dbapi: DBApi, _globalesCol: GlobalesCol, _func
 
                      val tasan = Conversion.efectiva_a_nominal(tasae, amortizacion)
                      val cuota = Conversion.cuotafija(valor, plazo, tasae, amortizacion)
-                     println("cuota:"+cuota)
 
                      var i = 0
                      for (i <- 1 to (plazo/amortizacion)){
-                        println("tasan:"+tasan)
                         var cuot_interes:BigDecimal = Conversion.round((cuot_saldo * (tasan/100)*(amortizacion)/360).doubleValue,0)
-                        println("interes: " + cuot_interes)
                         var cuot_capital = cuota - cuot_interes
                         var cuot_otros:BigDecimal = 0
                         var cuot_aporte:BigDecimal = 0
@@ -86,7 +83,6 @@ class CalculoRepository @Inject()(dbapi: DBApi, _globalesCol: GlobalesCol, _func
                         cuot_fecha = _funcion.calculoFecha(cuot_fecha, 30)
                         list += tabla
                         cuot_saldo = cuot_saldo - cuot_capital
-                        println(tabla)
                      }
                      val _descuentoColocacion = new ListBuffer[DescuentoColocacion]()
                      val _descuento = SQL("""SELECT * FROM "col$descuentos" WHERE ES_ACTIVO = 1""").as(Descuento._set *)
@@ -139,28 +135,35 @@ class CalculoRepository @Inject()(dbapi: DBApi, _globalesCol: GlobalesCol, _func
                      }
 
                     val _valorTotalAporte = _valor_aporte
-                    val _valorAporte = Conversion.round((_valorTotalAporte / plazo/amortizacion).doubleValue(), 0)
+                    var _valor_cobrar_aporte = Conversion.round((_valorTotalAporte / (plazo/amortizacion)).doubleValue(), 0)
 
 
                      val descuentos = SQL("""SELECT d.* FROM "col$descuentos" d WHERE d.ES_ACTIVO = 1""").as(Descuento._set *)
 
                      val tasan = Conversion.efectiva_a_nominal(tasae, amortizacion)
                      val cuota = Conversion.cuotafija(valor, plazo, tasae, amortizacion)
+                     var _aporte_cobrado = 0
+                     var _saldo_cobrado = 0
                      println("cuota:"+cuota)
 
                      var i = 0
-                     for (i <- 1 to (plazo/amortizacion)){
-                        println("tasan:"+tasan)
+                     val cuotas = plazo/amortizacion
+                     for (i <- 1 to cuotas){
                         var cuot_interes:BigDecimal = Conversion.round((cuot_saldo * (tasan/100)*(amortizacion)/360).doubleValue,0)
-                        println("interes: " + cuot_interes)
                         var cuot_capital = cuota - cuot_interes
+                        if (i == cuotas){
+                            cuot_capital = cuot_saldo
+                        }
                         var cuot_otros:BigDecimal = 0
-                        var cuot_aporte:BigDecimal = _valor_aporte
+                        var cuot_aporte:BigDecimal = _valor_cobrar_aporte
                         val tabla = new Tabla(i, cuot_fecha, cuot_saldo, cuot_capital, cuot_interes, cuot_otros, cuot_aporte)
                         cuot_fecha = _funcion.calculoFecha(cuot_fecha, 30)
                         list += tabla
                         cuot_saldo = cuot_saldo - cuot_capital
-                        println(tabla)
+                        _aporte_cobrado = _aporte_cobrado + _valor_cobrar_aporte.intValue()
+                        if (_valor_cobrar_aporte > (_valorTotalAporte - _aporte_cobrado) ) {
+                            _valor_cobrar_aporte = _valorTotalAporte - _aporte_cobrado
+                        }
                      }
                      val _descuentoColocacion = new ListBuffer[DescuentoColocacion]()
                      val _descuento = SQL("""SELECT * FROM "col$descuentos" WHERE ES_ACTIVO = 1""").as(Descuento._set *)
@@ -168,9 +171,16 @@ class CalculoRepository @Inject()(dbapi: DBApi, _globalesCol: GlobalesCol, _func
                          val _dc = new DescuentoColocacion(d.id_descuento, d.descripcion_descuento, true)
                          _descuentoColocacion += _dc
                      })
+                     println("Descuentos: " + _descuentoColocacion.toList)
                      val _adescontar = _globalesCol.calcularDescuentoPorCuota(list, _descuentoColocacion.toList, valor, amortizacion, valor)
                      for( i <- 0 to list.length - 1){
-                        _listResult += new Tabla(list(i).cuot_num, list(i).cuot_fecha, list(i).cuot_saldo, list(i).cuot_capital, list(i).cuot_interes, _adescontar(i).valor + list(i).cuot_aporte, 0)
+                        var _descuento = BigDecimal(0)
+                        for (j <- 0 to _adescontar.length - 1){
+                            if (_adescontar(j).cuota_numero == (i+1)){
+                                _descuento = _descuento + _adescontar(j).valor
+                            }
+                        }
+                        _listResult += new Tabla(list(i).cuot_num, list(i).cuot_fecha, list(i).cuot_saldo, list(i).cuot_capital, list(i).cuot_interes, _descuento, list(i).cuot_aporte)
                      }
                      
                      _listResult.toList
