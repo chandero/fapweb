@@ -587,6 +587,9 @@ export default {
           document.body.removeChild(downloadLink);
         }
         this.$message.success("Se generó el archivo PazySalvo");
+      }).catch((error) => {
+        loading.close();
+        this.$message.error("Error generando PazySalvo: " + error);
       });
     },
     buscarGarantia(id_colocacion) {

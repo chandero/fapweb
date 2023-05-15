@@ -21,7 +21,8 @@ class Conversion {
     if (amortizacion < 30) {
       amortiza = 30
     }
-    val factor: Double = 12 / (amortiza / 30)
+    var factor: Double = (amortiza / 30)
+    factor = 12 / factor
     var potencia = pow((1 + (tasae / 100)), (1 / factor))
     potencia = ((potencia - 1) * factor * 100)
     round(potencia, 2)

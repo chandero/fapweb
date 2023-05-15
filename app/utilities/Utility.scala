@@ -43,6 +43,24 @@ class Utility {
       texto.toString()
     }
 
+    def fechaatextosindiasemana(fecha: Option[DateTime]): String = {
+      var texto = new StringBuffer()
+      fecha match {
+        case Some(fecha) =>
+              val anho = fecha.year().get()
+              val mes = fecha.monthOfYear().get() - 1
+              val diasemana = fecha.dayOfWeek().get()
+              val dia = fecha.dayOfMonth().get
+              texto.append(dia.toString)
+              texto.append(" de ")
+              texto.append(meses(mes))
+              texto.append(" de ")
+              texto.append(anho.toString)
+        case None => texto.append("")
+      }
+      texto.toString()
+    }    
+
     def validarToken(token: String, secret: String): Boolean = {
       if (token == secret) {
         true

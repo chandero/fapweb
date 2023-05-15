@@ -115,7 +115,9 @@ GET     /api/coco/bpc/:c                controllers.ControlCobroController.obten
 GET     /api/coco/bdp/:i/:p             controllers.ControlCobroController.obtenerDireccion(i: Int, p: String)
 GET     /api/coco/bcc/:i                controllers.ControlCobroController.obtenerControlCobro(i: String)
 POST    /api/coco/ccs                   controllers.ControlCobroController.agregar
-GET     /api/coco/fpys/:c               controllers.ControlCobroController.formatoPazYSalvo(c: String)
+GET     /api/coco/fpys/:c               controllers.ControlCobroController.formatoPazYSalvoAction(c: String)
++nocsrf
+GET     /api/coco/fpysa/:c               controllers.ControlCobroController.formatoPazYSalvoAction(c: String)
 POST    /api/coco/npa                   controllers.ControlCobroController.cartaPrimerAviso
 
 # Informes Graficas

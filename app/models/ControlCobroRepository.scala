@@ -817,7 +817,7 @@ class ControlCobroRepository @Inject()(
       val _carteraSql =
         """SELECT ID_COLOCACION, ID_IDENTIFICACION, ID_PERSONA FROM "col$colocacion" WHERE ID_COLOCACION = {id_colocacion} AND ID_ESTADO_COLOCACION IN (6,7)"""
       val _garantiaSql =
-        """SELECT ID_IDENTIFICACION, ID_PERSONA FROM "col$colgarantias" WHERE ID_COLOCACION = {id_colocacion}"""
+        """SELECT ID_IDENTIFICACION, ID_PERSONA FROM "col$colgarantias" WHERE ID_COLOCACION = {id_colocacion} ORDER BY CSC_GARANTIA ASC"""
       val _parsePersona = str("NOMBRE") ~ str("DOCUMENTO") ~ str("SEXO") map {
         case nombre ~ documento ~ sexo =>
           (nombre, documento, sexo)
@@ -843,24 +843,22 @@ class ControlCobroRepository @Inject()(
             )
             .as(_parsePersona *)
         _persona.map { _p =>
-          _deudores += ((_p._1, _p._2, "SOLICITANTE"))
+          _deudores += ((_p._1, _p._2, "DEUDOR"))
         }
         val _garantia =
-          SQL(_garantiaSql).on('id_colocacion -> _c._1).as(_parseGarantia *)
+          SQL(_garantiaSql).on('id_colocacion -> id_colocacion).as(_parseGarantia *)
         _garantia.map { _g =>
           val persona = SQL(_personaSql)
             .on(
               'id_identificacion -> _g._1,
               'id_persona -> _g._2
             )
-            .as(_parsePersona *)
-          _persona.map { _p =>
-            _deudores += ((_p._1, _p._2, (_p._3 match {
-              case "F" => "CODEUDORA"
+            .as(_parsePersona.single)
+            _deudores += ((persona._1, persona._2, (persona._3 match {
+              case "F" => "CODEUDOR"
               case "M" => "CODEUDOR"
               case _   => "CODEUDOR"
             })))
-          }
         }
       }
     }

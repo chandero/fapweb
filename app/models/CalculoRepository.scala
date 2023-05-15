@@ -110,7 +110,12 @@ class CalculoRepository @Inject()(dbapi: DBApi, _globalesCol: GlobalesCol, _func
                      var list = new  ListBuffer[Tabla]
                      var _listResult = new ListBuffer[Tabla]
                      var _dsDescuento = new ListBuffer[Tabla]
-                     var amortizacion:Int = periodicidad * 30
+                     var amortizacion:Int = periodicidad match {
+                        case 1 => 30
+                        case 2 => 90
+                        case 3 => 180
+                        case _ => 30
+                     }
                      var cuot_saldo:BigDecimal = valor
                      val plazo = plazo_mes * 30
                      var cuot_fecha:DateTime = new DateTime()
@@ -180,7 +185,7 @@ class CalculoRepository @Inject()(dbapi: DBApi, _globalesCol: GlobalesCol, _func
                                 _descuento = _descuento + _adescontar(j).valor
                             }
                         }
-                        _listResult += new Tabla(list(i).cuot_num, list(i).cuot_fecha, list(i).cuot_saldo, list(i).cuot_capital, list(i).cuot_interes, _descuento, list(i).cuot_aporte)
+                        _listResult += new Tabla(list(i).cuot_num, list(i).cuot_fecha, list(i).cuot_saldo, list(i).cuot_capital, list(i).cuot_interes, (_descuento + list(i).cuot_aporte), list(i).cuot_aporte)
                      }
                      
                      _listResult.toList

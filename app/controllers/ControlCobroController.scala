@@ -162,6 +162,43 @@ class ControlCobroController @Inject()(
       }
   }
 
+  def formatoPazYSalvoAction(id_colocacion: String) = Action.async {
+    implicit request: Request[AnyContent] =>
+      cService.getPazYSalvoData(id_colocacion).map { _deudores =>
+        val _data = new java.util.HashMap[String, Object]()
+        var _listDeudor = new ArrayList[ju.HashMap[String, Object]]()
+        _deudores.map { _deudor =>
+          val _map = new ju.HashMap[String, Object]()
+          _map.put("nombre", _deudor._1)
+          _map.put("documento", _deudor._2)
+          _map.put("tipo", _deudor._3)
+          _listDeudor.add(_map)
+        }
+        println("Deudores: " + _listDeudor)
+        _data.put("deudores", _listDeudor)
+        _data.put("id_colocacion", id_colocacion)
+        val os = PdfCreator.pazYSalvoCreator(id_colocacion, _listDeudor)
+
+/*         val os = DocxGenerator.generateDocxFileFromTemplate2(
+          "FaP_Carta_Paz_y_Salvo.docx",
+          _data
+        )
+        val filename: String = "/tmp/fap_paz_y_salvo.docx"
+        Files.write(Paths.get(filename), os)
+        val pdf = DocxGenerator.convertDocxToPdf(os) */
+        if (os != null) {
+        val filename: String = "fap_paz_y_salvo_"+ id_colocacion +".pdf"
+        val attach = "attachment; filename=" + filename
+        Ok(os)
+          .as("application/pdf")
+            .withHeaders("Content-Disposition" -> attach )
+        } else {
+          Ok("No se pudo generar")
+        }
+      }
+  }
+
+
   def cartaPrimerAviso() = authenticatedUserAction.async {
     implicit request: Request[AnyContent] =>
       val json = request.body.asJson.get
