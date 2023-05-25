@@ -145,9 +145,9 @@ class CreditoPreSolicitudRepository @Inject()(
             "prso_evaluacion_previa" -> _evaluacionMora,
             "prso_autorizo" -> 1,
             "prso_autorizo_consulta" -> 1,
-            "pais_id" -> presolicitud.pais_id,
-            "depa_id" -> presolicitud.depa_id,
-            "ciud_id" -> presolicitud.ciud_id,
+            "pais_id" -> presolicitud.pais,
+            "depa_id" -> presolicitud.departamento,
+            "ciud_id" -> presolicitud.ciudad,
             "prso_origen" -> "WEB",
             "id_empleado" -> Option.empty[String],
             "prso_estado" -> 1,
@@ -159,6 +159,7 @@ class CreditoPreSolicitudRepository @Inject()(
       }
     } catch {
       case e: Exception => {
+        println("Error al registrar la solicitud: " + e.getMessage())
         _result = false
       }
     }
@@ -183,7 +184,7 @@ class CreditoPreSolicitudRepository @Inject()(
   ) = {
     val _queryJuridico = """SELECT COUNT(*) FROM "col$colocacion" cc WHERE cc.ID_ESTADO_COLOCACION IN (2,3,6) AND cc.ID_PERSONA = {id_persona}"""
     val _queryNingunPagoVigente = """SELECT MAX((CURRENT_DATE - cc.FECHA_DESEMBOLSO) - cc.AMORTIZA_INTERES) AS DIAS_MORA FROM "col$colocacion" cc
-                                     WHERE cc.ID_PERSONA = {id_persona} AND
+                                     WHERE cc.ID_PERSONA = {id_persona} AND cc.ID_ESTADO_COLOCACION IN (0,1,2,6,7) AND
                                     (SELECT COUNT(*) FROM "col$tablaliquidacion" tl WHERE tl.ID_COLOCACION = cc.ID_COLOCACION AND tl.PAGADA = 1) < 1;"""
     val _query =
       """SELECT MAX(DIAS) FROM (
@@ -192,12 +193,12 @@ class CreditoPreSolicitudRepository @Inject()(
                         WHERE ct.PAGADA = 1 AND cc.ID_PERSONA = {id_persona} AND ct.FECHA_A_PAGAR > CURRENT_DATE - 1825
                         GROUP BY 1
                 )"""
-    val _resultJuridico = SQL(_queryJuridico).on("id_persona" -> id_persona).as(SqlParser.scalar[Int].single)
-    val _diasJuridico = if (_resultJuridico > 0) {
+    val _resultJuridico = SQL(_queryJuridico).on("id_persona" -> id_persona).as(SqlParser.scalar[Int].singleOpt)
+    val _diasJuridico = if (_resultJuridico.getOrElse(0) > 0) {
       9999
     } else { 0 }
     val _diasNingunPago =
-      SQL(_queryNingunPagoVigente).on("id_persona" -> id_persona).as(SqlParser.scalar[Int].single)
+      SQL(_queryNingunPagoVigente).on("id_persona" -> id_persona).as(SqlParser.scalar[Int].singleOpt)
 
     val _result = SQL(_query)
       .on("id_persona" -> id_persona)
@@ -208,10 +209,10 @@ class CreditoPreSolicitudRepository @Inject()(
       case None    => 0
     }
 
-    var _diasMora = if (_diasUltimoPago > _diasNingunPago) {
+    var _diasMora = if (_diasUltimoPago > _diasNingunPago.getOrElse(0)) {
       _diasUltimoPago
     } else {
-      _diasNingunPago
+      _diasNingunPago.getOrElse(0)
     }
     _diasMora = if (_diasMora > _diasJuridico) {
       _diasMora

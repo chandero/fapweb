@@ -89,9 +89,8 @@ class TransaccionalController @Inject()(
       println(id_identificacion)
       println(id_persona)
       println(email)
-      transaccionalService.registrar(id_identificacion, id_persona, email).map {
-        case true  => Ok("Registro Exitoso")
-        case false => BadRequest("Registro Fallido")
+      transaccionalService.registrar(id_identificacion, id_persona, email).map { result =>
+        Ok(Json.toJson(result))
       }
     }
 

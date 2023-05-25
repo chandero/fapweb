@@ -110,7 +110,7 @@
                       <el-button :disabled="
                         id_colocacion_buscar === null ||
                         id_colocacion_buscar === ''
-                      " type="success" icon="el-icon-search" title="Buscar Datos" @click="buscarPorEstado">Buscar
+                      " type="success" icon="el-icon-search" title="Buscar Datos" @click="buscarPorColocacion">Buscar
                       </el-button>
                     </el-form-item>
                   </el-col>

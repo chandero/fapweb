@@ -50,7 +50,7 @@
               <el-form label-position="left">
                 <el-row>
                   <el-col :span="7">
-                    <el-form-item label="Colocacion">
+                    <el-form-item label="Colocación">
                       <el-input v-model="id_colocacion_buscar" />
                     </el-form-item>
                   </el-col>

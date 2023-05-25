@@ -114,9 +114,17 @@ class TransaccionalRepository @Inject()(dbapi: DBApi, config: Configuration, cSe
   def registrar(id_identificacion: Int, id_persona: String, email: String) =
     Future {
       var _result = false
+      var _msg = ""
       db.withTransaction { implicit connection =>
-        val _nombre =
-          SQL("""SELECT FIRST 1 p.NOMBRE || ' ' || p.PRIMER_APELLIDO || ' ' || p.SEGUNDO_APELLIDO AS NOMBRE FROM "col$colocacion" c
+        // Validar si ya registrado
+        val _esRegistrado = SQL("""SELECT COUNT(*) FROM TRAN_USUARIO WHERE TRAN_USUARIO_ID_IDENTIFICACION = {id_identificacion} AND TRAN_USUARIO_ID_PERSONA = {id_persona} AND LOWER(TRAN_USUARIO_EMAIL) = LOWER({email})""").on(
+          'id_identificacion -> id_identificacion,
+          'id_persona -> id_persona,
+          'email -> email
+        ).as(SqlParser.scalar[Long].single) > 0
+        if (!_esRegistrado) {
+          val _nombre =
+            SQL("""SELECT FIRST 1 p.NOMBRE || ' ' || p.PRIMER_APELLIDO || ' ' || p.SEGUNDO_APELLIDO AS NOMBRE FROM "col$colocacion" c
                     INNER JOIN "gen$persona" p ON p.ID_IDENTIFICACION = c.ID_IDENTIFICACION AND p.ID_PERSONA = c.ID_PERSONA
                     WHERE c.ID_IDENTIFICACION = {id_identificacion} AND c.ID_PERSONA = {id_persona} AND c.ID_ESTADO_COLOCACION IN (0,1,2,6,7)
                     AND LOWER(p.EMAIL) = LOWER({email})""")
@@ -126,7 +134,7 @@ class TransaccionalRepository @Inject()(dbapi: DBApi, config: Configuration, cSe
               'email -> email
             )
             .as(SqlParser.str("NOMBRE").singleOpt)
-        _nombre match {
+          _nombre match {
             case Some(_nombre) => val _uuid = randomUUID().toString
               _result = SQL(
                 """INSERT INTO TRAN_ENLACE 
@@ -175,15 +183,21 @@ class TransaccionalRepository @Inject()(dbapi: DBApi, config: Configuration, cSe
                   .executeUpdate() > 0
                 if (_result) {
                   // Enviar correo de enlace
+                  _msg = "Usuario Registrado con Exito!"
                   val enlace = config.get[String]("link.protocol_transaccional") + "/l/" + _uuid
                   EmailSender.sendCredentialInfo(email, _nombre, enlace)
                 }
               case None =>
+                _msg = "Usuario no se encuentra en nuestra base de datos, por favor rectifique!"
                 _result = false
               }
             }
+          } else {
+            _msg = "Usuario ya se encuentra Registrado!"
+            _result = false
+          }
       }
-      _result
+      (_result, _msg)
     }(ec)
 
   def ultimoIngreso(

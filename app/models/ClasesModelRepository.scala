@@ -1442,9 +1442,9 @@ case class PreSolicitud (
   prso_evaluacion_previa: Option[Int],
   prso_autorizo: Option[Int],
   prso_autorizo_consulta: Option[Int],
-  pais_id: Option[Int],
-  depa_id: Option[Int],
-  ciud_id: Option[Int],
+  pais: Option[String],
+  departamento: Option[String],
+  ciudad: Option[String],
   prso_origen: Option[String],
   id_empleado: Option[String],
   prso_estado: Option[Int],
@@ -1475,9 +1475,9 @@ object PreSolicitud {
       get[Option[Int]]("prso_evaluacion_previa") ~ 
       get[Option[Int]]("prso_autorizo") ~ 
       get[Option[Int]]("prso_autorizo_consulta") ~ 
-      get[Option[Int]]("pais_id") ~
-      get[Option[Int]]("depa_id") ~
-      get[Option[Int]]("ciud_id") ~
+      get[Option[String]]("pais_id") ~
+      get[Option[String]]("depa_id") ~
+      get[Option[String]]("ciud_id") ~
       get[Option[String]]("prso_origen") ~ 
       get[Option[String]]("id_empleado") ~ 
       get[Option[Int]]("prso_estado") ~ 
