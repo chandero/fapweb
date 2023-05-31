@@ -75,6 +75,8 @@ POST    /api/calcm/t                    controllers.CalculoController.tablaPagoS
 # Informes
 GET    /api/info/lqweb/:fi/:ff          controllers.InformesController.getLiquidacionAplicadaWeb(fi: Long, ff: Long)
 GET    /api/info/lqwebxlsx/:fi/:ff          controllers.InformesController.getLiquidacionAplicadaWebXlsx(fi: Long, ff: Long)
+GET    /api/info/lqpweb/:fi/:ff          controllers.InformesController.getLiquidacionPendienteWeb(fi: Long, ff: Long)
+GET    /api/info/lqpwebxlsx/:fi/:ff          controllers.InformesController.getLiquidacionPendienteWebXlsx(fi: Long, ff: Long)
 # Informes Otros
 GET     /api/info/genlm/:p/:a/:d           controllers.LibroMayorController.generar(p:Int, a:Int, d:Boolean)
 GET     /api/info/conlm/:a              controllers.LibroMayorController.consultar(a:Int)

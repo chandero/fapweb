@@ -46,5 +46,20 @@ class InformesController @Inject()(
       val filename = "FAP999"+"_RECAUDO_WEB_Periodo_" + sdf.format(fecha_inicial) + "_" + sdf.format(fecha_final) + ".xlsx"
       val attach = "attachment; filename=" + filename
       Future.successful(Ok(os).as("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet").withHeaders("Content-Disposition" -> attach ))
-  }  
+  }
+
+  def getLiquidacionPendienteWeb(fecha_inicial: scala.Long, fecha_final: scala.Long) = authenticatedUserAction.async { implicit request: Request[AnyContent] =>
+    val p = iService.getLiquidacionPendiente(fecha_inicial, fecha_final, "WEB")
+    Future.successful(Ok(write(p)))
+  }
+
+  def getLiquidacionPendienteWebXlsx(fecha_inicial: scala.Long, fecha_final: scala.Long) = authenticatedUserAction.async { implicit request: Request[AnyContent] =>
+    val empr_id = Utility.extraerEmpresa(request)
+    val sdf = new java.text.SimpleDateFormat("yyyy-MM-dd")
+      val os = iService.getLiquidacionPendienteXlsx(fecha_inicial, fecha_final, "WEB", empr_id.get)
+      //val fmt = DateTimeFormat.forPattern("yyyyMMdd")
+      val filename = "FAP999"+"_RECAUDO_PENDIENTE_POR_APLICAR_WEB_Periodo_" + sdf.format(fecha_inicial) + "_" + sdf.format(fecha_final) + ".xlsx"
+      val attach = "attachment; filename=" + filename
+      Future.successful(Ok(os).as("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet").withHeaders("Content-Disposition" -> attach ))
+  }    
 }

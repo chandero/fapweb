@@ -81,7 +81,7 @@ class InformesRepository @javax.inject.Inject()(
       SQL("""SELECT l.FECHA, l.APLICADA_EN, l.REFERENCIA, l.ID_COLOCACION, l.ID_COMPROBANTE, l.ID_IDENTIFICACION, l.ID_PERSONA, (gp.NOMBRE || ' ' || gp.PRIMER_APELLIDO || gp.SEGUNDO_APELLIDO) AS NOMBRE, SUM(ld.DEBITO) AS TOTAL FROM LIQUIDACION l
                 INNER JOIN LIQUIDACION_DETALLE ld ON ld.REFERENCIA = l.REFERENCIA AND ld.ES_CAJABANCO = 1
                 INNER JOIN "gen$persona" gp ON gp.ID_IDENTIFICACION = l.ID_IDENTIFICACION AND gp.ID_PERSONA = l.ID_PERSONA
-                WHERE l.APLICADA = 1 AND l.APLICADA_EN BETWEEN {fecha_inicial} AND {fecha_final} AND l.LIQU_ORIGEN = {origen}
+                WHERE l.CONFIRMADA = 1 AND l.APLICADA = 1 AND l.APLICADA_EN BETWEEN {fecha_inicial} AND {fecha_final} AND l.LIQU_ORIGEN = {origen}
             GROUP BY 1,2,3,4,5,6,7,8""")
         .on(
           'fecha_inicial -> fi,
@@ -201,4 +201,157 @@ class InformesRepository @javax.inject.Inject()(
     println("Stream Listo")
     os.toByteArray
   }
+
+  def getLiquidacionPendiente(
+      fecha_inicial: scala.Long,
+      fecha_final: scala.Long,
+      origen: String
+  ) = {
+    var fi = new DateTime(fecha_inicial)
+    var ff = new DateTime(fecha_final)
+    fi = fi.hourOfDay().setCopy(0)
+    fi = fi.minuteOfHour().setCopy(0)
+    fi = fi.secondOfMinute().setCopy(0)
+    ff = ff.hourOfDay().setCopy(23)
+    ff = ff.minuteOfHour().setCopy(59)
+    ff = ff.secondOfMinute().setCopy(59)
+    val _parser = {
+      get[DateTime]("FECHA") ~
+        get[DateTime]("CONFIRMADA_EN") ~
+        get[String]("REFERENCIA") ~
+        get[String]("ID_COLOCACION") ~
+        get[Int]("ID_IDENTIFICACION") ~
+        get[String]("ID_PERSONA") ~
+        get[String]("NOMBRE") ~
+        get[Double]("TOTAL") map {
+        case fecha ~ confirmada_en ~ referencia ~ id_colocacion ~ id_identificacion ~ id_persona ~ nombre ~ sum =>
+          (
+            fecha,
+            confirmada_en,
+            referencia,
+            id_colocacion,
+            id_identificacion,
+            id_persona,
+            nombre,
+            sum
+          )
+      }
+    }
+    db.withConnection { implicit connection =>
+      SQL("""SELECT l.FECHA, l.CONFIRMADA_EN, l.REFERENCIA, l.ID_COLOCACION, l.ID_IDENTIFICACION, l.ID_PERSONA, (gp.NOMBRE || ' ' || gp.PRIMER_APELLIDO || gp.SEGUNDO_APELLIDO) AS NOMBRE, SUM(ld.DEBITO) AS TOTAL FROM LIQUIDACION l
+                INNER JOIN LIQUIDACION_DETALLE ld ON ld.REFERENCIA = l.REFERENCIA AND ld.ES_CAJABANCO = 1
+                INNER JOIN "gen$persona" gp ON gp.ID_IDENTIFICACION = l.ID_IDENTIFICACION AND gp.ID_PERSONA = l.ID_PERSONA
+                WHERE l.CONFIRMADA = 1 AND l.APLICADA = 0 AND l.CONFIRMADA_EN BETWEEN {fecha_inicial} AND {fecha_final} AND l.LIQU_ORIGEN = {origen}
+            GROUP BY 1,2,3,4,5,6,7""")
+        .on(
+          'fecha_inicial -> fi,
+          'fecha_final -> ff,
+          'origen -> origen
+        )
+        .as(_parser *)
+    }
+  }
+
+  def getLiquidacionPendienteXlsx(
+      fecha_inicial: scala.Long,
+      fecha_final: scala.Long,
+      origen: String,
+      empr_id: Long
+  ): Array[Byte] = {
+    var fi = new DateTime(fecha_inicial)
+    var ff = new DateTime(fecha_final)
+    fi = fi.hourOfDay().setCopy(0)
+    fi = fi.minuteOfHour().setCopy(0)
+    fi = fi.secondOfMinute().setCopy(0)
+    ff = fi.hourOfDay().setCopy(23)
+    ff = fi.minuteOfHour().setCopy(59)
+    ff = fi.secondOfMinute().setCopy(59)
+    var _listRow = new ArrayBuffer[com.norbitltd.spoiwo.model.Row]()
+    val _resultSet = getLiquidacionPendiente(fecha_inicial, fecha_final, origen)
+    val empresa = empresaService.buscarPorId(empr_id).get
+    val format = new SimpleDateFormat("yyyy-MM-dd")
+    val sheet1 = Sheet(
+      name = "Recaudo Por Aplicar",
+      rows = {
+        val titleRow = com.norbitltd.spoiwo.model
+          .Row()
+          .withCellValues(empresa.empr_descripcion)
+        val titleRow1 = com.norbitltd.spoiwo.model
+          .Row()
+          .withCellValues("RECAUDO DE CARTERA PENDIENTE POR APLICAR VIA WEB")
+        val titleRow2 = com.norbitltd.spoiwo.model
+          .Row()
+          .withCellValues(
+            "Periodo Evaluado: " + format.format(fecha_inicial) + " - " + format
+              .format(fecha_final)
+          )
+        val headerRow = com.norbitltd.spoiwo.model
+          .Row()
+          .withCellValues(
+            "Fecha Recaudo",
+            "Colocación",
+            "Referencia",
+            "Documento",
+            "Nombre",
+            "Valor Recaudo"
+          )
+        var j = 4
+        _resultSet.map {
+              i =>
+                j += 1
+                _listRow += com.norbitltd.spoiwo.model.Row(
+                  DateCell(
+                   i._2.toDate(),
+                    Some(0),
+                    style = Some(
+                      CellStyle(dataFormat = CellDataFormat("YYYY-MM-DD"))
+                    ),
+                    CellStyleInheritance.CellThenRowThenColumnThenSheet
+                  ),
+                  StringCell(
+                    i._4,
+                    Some(1),
+                    style = Some(
+                      CellStyle(dataFormat = CellDataFormat("@"))
+                    ),
+                    CellStyleInheritance.CellThenRowThenColumnThenSheet
+                  ),
+                  StringCell(
+                    i._3,
+                    Some(2),
+                    style = Some(CellStyle(dataFormat = CellDataFormat("@"))),
+                    CellStyleInheritance.CellThenRowThenColumnThenSheet
+                  ),
+                  StringCell(
+                    i._6,
+                    Some(3),
+                    style = Some(CellStyle(dataFormat = CellDataFormat("@"))),
+                    CellStyleInheritance.CellThenRowThenColumnThenSheet
+                  ),
+                  StringCell(
+                    i._7,
+                    Some(4),
+                    style = Some(CellStyle(dataFormat = CellDataFormat("@"))),
+                    CellStyleInheritance.CellThenRowThenColumnThenSheet
+                  ),
+                  NumericCell(
+                    i._8,
+                    Some(5),
+                    style =
+                      Some(CellStyle(dataFormat = CellDataFormat("#,#00"))),
+                    CellStyleInheritance.CellThenRowThenColumnThenSheet
+                  )
+                )
+            }
+        titleRow :: titleRow1 :: titleRow :: headerRow :: _listRow.toList
+      }
+    )
+    println("Escribiendo en el Stream")
+    var os: ByteArrayOutputStream = new ByteArrayOutputStream()
+    Workbook(sheet1).writeToOutputStream(os)
+    var file = new File("/tmp/recaudospendientes.xlsx")
+    Workbook(sheet1).writeToOutputStream(new FileOutputStream(file))
+    println("Stream Listo")
+    os.toByteArray
+  }  
 }

@@ -52,7 +52,7 @@ class TipoLineaCreditoRepository @Inject()(dbapi: DBApi)(
                 Tipo(id, descripcion)
             }
           }
-        SQL("""SELECT * FROM \"col$lineas\"""").as(
+        SQL("""SELECT * FROM \"col$lineas\" ORDER BY DESCRIPCION_LINEA ASC""").as(
           _set *
         )
       }
@@ -67,7 +67,7 @@ class TipoLineaCreditoRepository @Inject()(dbapi: DBApi)(
       db.withConnection { implicit connection =>
         val _lineasResult = SQL("""SELECT l1.id_linea as linea_id, l1.descripcion_linea as linea_descripcion, l1.tasa as linea_tasa_efectiva, d1.valor_descuento as linea_comision FROM \"col$lineas\" l1
                                    LEFT JOIN \"col$descuentos\" d1 ON d1.id_descuento = 4
-                                   WHERE ESTADO = 1""")
+                                   WHERE ESTADO = 1 ORDER BY l1.descripcion_linea ASC""")
         .as(TipoLineaCredito._set *)
         _lineasResult
       }

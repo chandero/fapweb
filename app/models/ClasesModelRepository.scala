@@ -665,8 +665,10 @@ case class Liquidacion(
     fecha_capital: Option[DateTime],
     fecha_interes: Option[DateTime],
     fecha_proxima: Option[DateTime],
+    confirmada: Option[Int],
+    confirmada_en: Option[DateTime],
     aplicada: Option[Int],
-    aplicada_en: Option[DateTime],
+    aplicada_en: Option[DateTime],    
     items: Option[List[CuotasLiq]],
 )
 
@@ -688,6 +690,8 @@ object Liquidacion {
       "fecha_capital" -> e.fecha_capital,
       "fecha_interes" -> e.fecha_interes,
       "fecha_proxima" -> e.fecha_proxima,
+      "confirmada" -> e.confirmada,
+      "confirmada_en" -> e.confirmada_en,
       "aplicada" -> e.aplicada,
       "aplicada_en" -> e.aplicada_en,
       "items" -> e.items
@@ -705,6 +709,8 @@ object Liquidacion {
       (__ \ "fecha_capital").readNullable[DateTime] and
       (__ \ "fecha_interes").readNullable[DateTime] and
       (__ \ "fecha_proxima").readNullable[DateTime] and
+      (__ \ "confirmada").readNullable[Int] and
+      (__ \ "confirmada_en").readNullable[DateTime] and
       (__ \ "aplicada").readNullable[Int] and
       (__ \ "aplicada_en").readNullable[DateTime] and
       (__ \ "items").readNullable[List[CuotasLiq]]
@@ -721,10 +727,12 @@ object Liquidacion {
       get[Option[DateTime]]("fecha_capital") ~
       get[Option[DateTime]]("fecha_interes") ~
       get[Option[DateTime]]("fecha_proxima") ~
+      get[Option[Int]]("confirmada") ~
+      get[Option[DateTime]]("confirmada_en") ~
       get[Option[Int]]("aplicada") ~
       get[Option[DateTime]]("aplicada_en") map {
       case referencia ~ fecha ~ id_agencia ~ id_colocacion ~ id_identificacion ~ id_persona ~ saldo ~ fecha_capital ~ fecha_interes ~ fecha_proxima ~
-            aplicada ~ aplicada_en =>
+            confirmada ~ confirmada_en ~ aplicada ~ aplicada_en =>
         Liquidacion(
           referencia,
           fecha,
@@ -736,6 +744,8 @@ object Liquidacion {
           fecha_capital,
           fecha_interes,
           fecha_proxima,
+          confirmada,
+          confirmada_en,
           aplicada,
           aplicada_en,
           None

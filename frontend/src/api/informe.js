@@ -232,3 +232,26 @@ export function getLiquidacionAplicadaWebXlsx(fi,ff) {
     responseType: "blob"
   });
 }
+
+export function getLiquidacionPendienteWeb(fi,ff) {
+  const data = {
+    fi,
+    ff
+  };
+  return request({
+    url: "/info/lqpweb/" + data.fi + "/" + data.ff,
+    method: "get"
+  });
+}
+
+export function getLiquidacionPendienteWebXlsx(fi,ff) {
+  const data = {
+    fi,
+    ff
+  };
+  return request({
+    url: "/info/lqpwebxlsx/" + data.fi + "/" + data.ff,
+    method: "get",
+    responseType: "blob"
+  });
+}

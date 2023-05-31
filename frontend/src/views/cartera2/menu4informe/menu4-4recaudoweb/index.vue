@@ -53,7 +53,7 @@
                   <span style="margin-left: 10px">{{ scope.row._2 | moment("YYYY-MM-DD HH:mm:ss") }}</span>
                 </template>
               </el-table-column>
-              <el-table-column sortable label="Referencia" prop="referencia" width="260">
+              <el-table-column sortable label="Referencia" prop="referencia" width="270">
                 <template slot-scope="scope">
                   <span style="margin-left: 10px">{{ scope.row._3 }}</span>
                 </template>

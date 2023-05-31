@@ -30,10 +30,14 @@ import utilities._
 import java.time.DateTimeException
 import java.sql.Connection
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol, _gd: GlobalesCon, _funcion: Funcion)(
     implicit ec: DatabaseExecutionContext
 ) {
   private val db = dbapi.database("default")
+  final val log: Logger = LoggerFactory.getLogger(this.getClass());
 
   def liquidar(id_agencia:Int, id_colocacion: String, cuotas: Int, fecha_corte: Long, es_web: Boolean): Future[Liquidacion] = {
     var dtf = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
@@ -65,7 +69,7 @@ class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol, _gd: GlobalesCo
           val fechaProxima: String = df.print(_l.fecha_proxima.get)
           println("Validando Liquidacion: Guardando Liquidacion")
           // SQL("""SELECT COUNT(*) FROM "con$puc" """).as(SqlParser.scalar[Int].single)
-          SQL("""INSERT INTO LIQUIDACION VALUES({referencia}, {fecha}, {id_agencia}, {id_colocacion}, {id_identificacion}, {id_persona}, {saldo}, {fecha_capital}, {fecha_interes}, {fecha_proxima}, {aplicada}, {aplicada_en}, {id_comprobante}, {liqu_origen})""").
+          SQL("""INSERT INTO LIQUIDACION VALUES({referencia}, {fecha}, {id_agencia}, {id_colocacion}, {id_identificacion}, {id_persona}, {saldo}, {fecha_capital}, {fecha_interes}, {fecha_proxima}, {aplicada}, {aplicada_en}, {id_comprobante}, {liqu_origen}, {confirmada}, {confirmada_en})""").
             on(
               "referencia" -> _l.referencia,
               "fecha" -> DateTime.now(),
@@ -80,7 +84,9 @@ class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol, _gd: GlobalesCo
               "aplicada" -> Some(0),
               "aplicada_en" -> Option.empty[DateTime],
               "id_comprobante" -> Option.empty[String],
-              "liqu_origen" -> "WEB"
+              "liqu_origen" -> "WEB",
+              "confirmada" -> Some(0),
+              "confirmada_en" -> Option.empty[DateTime]
             ).executeUpdate()
           println("Items: " + _l.items)
           _l.items match {
@@ -152,10 +158,10 @@ class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol, _gd: GlobalesCo
     ).as(_parser.single)
     _g.liquidarCuotaFija(id_colocacion, cuotas, _fecha_corte).map { _l =>
         if (_l._6) {
-            val result = new Liquidacion(uuid, _fecha, id_agencia, id_colocacion, id_identificacion, id_persona, Some(_l._2), Some(_l._3), Some(_l._4), Some(_l._5), Some(0), None, Some(_l._1))
+            val result = new Liquidacion(uuid, _fecha, id_agencia, id_colocacion, id_identificacion, id_persona, Some(_l._2), Some(_l._3), Some(_l._4), Some(_l._5), Some(0), None, Some(0), None, Some(_l._1))
             result
         } else {
-            val result = new Liquidacion(uuid, _fecha, id_agencia, id_colocacion, id_identificacion, id_persona, None, None, None, None, Some(0), None, None)
+            val result = new Liquidacion(uuid, _fecha, id_agencia, id_colocacion, id_identificacion, id_persona, None, None, None, None, Some(0), None, Some(0), None, None)
             result
         }
       }
@@ -175,10 +181,10 @@ class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol, _gd: GlobalesCo
     ).as(_parser.single)    
     _g.liquidarCuotaVariableAnticipada(id_colocacion, cuotas, _fecha_corte).map { _l =>
         if (_l._6) {
-            val result = new Liquidacion(uuid, _fecha, id_agencia, id_colocacion, id_identificacion, id_persona, Some(_l._2), Some(_l._3), Some(_l._4), Some(_l._5), Some(0), None, Some(_l._1))
+            val result = new Liquidacion(uuid, _fecha, id_agencia, id_colocacion, id_identificacion, id_persona, Some(_l._2), Some(_l._3), Some(_l._4), Some(_l._5), Some(0), None, Some(0), None, Some(_l._1))
             result
         } else {
-            val result = new Liquidacion(uuid, _fecha, id_agencia, id_colocacion, id_identificacion, id_persona, None, None, None, None, Some(0), None, None)
+            val result = new Liquidacion(uuid, _fecha, id_agencia, id_colocacion, id_identificacion, id_persona, None, None, None, None, Some(0), None, Some(0), None, None)
             result
         }
       }
@@ -198,13 +204,80 @@ class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol, _gd: GlobalesCo
     ).as(_parser.single)    
     _g.liquidarCuotaVariableVencida(id_colocacion, cuotas, _fecha_corte).map { _l =>
         if (_l._6) {
-            val result = new Liquidacion(uuid, _fecha, id_agencia, id_colocacion, id_identificacion, id_persona, Some(_l._2), Some(_l._3), Some(_l._4), Some(_l._5), Some(0), None, Some(_l._1))
+            val result = new Liquidacion(uuid, _fecha, id_agencia, id_colocacion, id_identificacion, id_persona, Some(_l._2), Some(_l._3), Some(_l._4), Some(_l._5), Some(0), None, Some(0), None, Some(_l._1))
             result
         } else {
-            val result = new Liquidacion(uuid, _fecha, id_agencia, id_colocacion, id_identificacion, id_persona, None, None, None, None, Some(0), None, None)
+            val result = new Liquidacion(uuid, _fecha, id_agencia, id_colocacion, id_identificacion, id_persona, None, None, None, None, Some(0), None, Some(0), None, None)
             result
         }
       }
+  }
+
+  def confirmarLiquidacionWompi(referencia: String)(implicit connection: Connection) = {
+    val _queryBuscarLiquidacion = """SELECT * FROM LIQUIDACION WHERE REFERENCIA = {referencia} AND CONFIRMADA = 0"""
+    val _queryConfirmar = """UPDATE LIQUIDACION SET CONFIRMADA = {confirmada}, CONFIRMADA_EN = {confirmada_en} WHERE REFERENCIA = {referencia}"""
+    val _liquidacion = SQL(_queryBuscarLiquidacion).on("referencia" -> referencia).as(Liquidacion._set.singleOpt)
+    _liquidacion match {
+      case Some(_l) => {
+        val _confirmada = 1
+        val _confirmada_en = new DateTime()
+        SQL(_queryConfirmar).on(
+          "confirmada" -> _confirmada,
+          "confirmada_en" -> _confirmada_en,
+          "referencia" -> referencia
+        ).executeUpdate()
+        _l.copy(confirmada = Some(_confirmada), confirmada_en = Some(_confirmada_en))
+        // Buscar Causacion Mes Anterior
+        val _fechaCausacionAnterior = new DateTime().minusMonths(1).dayOfMonth().withMaximumValue()
+        if (_fechaCausacionAnterior.dayOfMonth().get() > 30) {
+          _fechaCausacionAnterior.withDayOfMonth(30)
+        }
+        println("Fecha Causacion Anterior: " + _fechaCausacionAnterior.toString("yyyy-MM-dd"))
+        val _existeCausacionAnterior = SQL("""SELECT COUNT(*) FROM "col$causacionescontrol" WHERE FECHA = {fecha} AND PROCESADA = {procesada} AND APLICADA = {aplicada}""").
+        on(
+          "procesada" -> 1,
+          "aplicada" -> 1,          
+          "fecha" -> _fechaCausacionAnterior.toString("yyyy-MM-dd")
+        ).as(SqlParser.scalar[Int].single) > 0
+        if (_existeCausacionAnterior) {
+          db.withTransaction { implicit connection =>
+            aplicarLiquidacionWompi(referencia)
+          }
+        }
+      }
+      case None => {
+        log.error("No se encontro la liquidacion con la referencia: " + referencia)
+      }
+    }
+  }
+
+  def validarSiAplicarLiquidacionPendiente(referencia: String)(implicit connection: Connection) = {
+        val _fechaCausacionAnterior = new DateTime().minusMonths(1).dayOfMonth().withMaximumValue()
+        if (_fechaCausacionAnterior.dayOfMonth().get() > 30) {
+          _fechaCausacionAnterior.withDayOfMonth(30)
+        }
+        println("Fecha Causacion Anterior: " + _fechaCausacionAnterior.toString("yyyy-MM-dd"))
+        val _existeCausacionAnterior = SQL("""SELECT COUNT(*) FROM "col$causacionescontrol" WHERE FECHA = {fecha} AND PROCESADA = {procesada} AND APLICADA = {aplicada}""").
+        on(
+          "procesada" -> 1,
+          "aplicada" -> 1,          
+          "fecha" -> _fechaCausacionAnterior.toString("yyyy-MM-dd")
+        ).as(SqlParser.scalar[Int].single) > 0
+        if (_existeCausacionAnterior) {
+          db.withTransaction { implicit connection =>
+            aplicarLiquidacionWompi(referencia)
+          }
+        }    
+  }
+
+  def aplicarLiquidacionPendiente() = {
+    println("Evento: Aplicando Liquidacion Pendiente")
+    db.withTransaction { implicit connection =>
+      val _liquidacionesPendientes = SQL("""SELECT * FROM LIQUIDACION WHERE CONFIRMADA = 1 AND APLICADA = 0""").as(Liquidacion._set *)
+      _liquidacionesPendientes.map { _l =>
+        validarSiAplicarLiquidacionPendiente(_l.referencia)
+      }
+    }
   }
 
   def aplicarLiquidacionWompi(referencia: String)(implicit connection: Connection) = {
@@ -248,12 +321,6 @@ class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol, _gd: GlobalesCo
           case Some(x) => x / 100
           case None => 0
         }
-
-      // Actualizar Liquidación
-      SQL("""UPDATE LIQUIDACION SET ID_COMPROBANTE = {comprobante} WHERE REFERENCIA = {referencia}""").on(
-        'comprobante -> _comprobante,
-        'referencia -> referencia
-      ).executeUpdate()  
 
       _liquidacion_detalle.map { _r =>
         if (_r.cuotaNumero != _cuotaAnterior) {
@@ -500,12 +567,12 @@ class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol, _gd: GlobalesCo
           ).executeUpdate()
       }
 
-
-      SQL("""UPDATE LIQUIDACION SET aplicada = {aplicada}, aplicada_en = {aplicada_en} WHERE referencia = {referencia}""").
-      on(
+      // Actualizar Liquidación
+      SQL("""UPDATE LIQUIDACION SET aplicada = {aplicada}, aplicada_en = {aplicada_en}, ID_COMPROBANTE = {comprobante} WHERE REFERENCIA = {referencia}""").on(
+        'comprobante -> _comprobante,
         'referencia -> referencia,
         'aplicada -> Some(1),
-        'aplicada_en -> new DateTime()
+        'aplicada_en -> new DateTime()        
       ).executeUpdate()
     }
   }
