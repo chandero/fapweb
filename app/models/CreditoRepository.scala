@@ -252,9 +252,9 @@ class CreditoRepository @Inject()(dbapi: DBApi, _g: GlobalesCol, _gd: GlobalesCo
   }
 
   def validarSiAplicarLiquidacionPendiente(referencia: String)(implicit connection: Connection) = {
-        val _fechaCausacionAnterior = new DateTime().minusMonths(1).dayOfMonth().withMaximumValue()
+        var _fechaCausacionAnterior = new DateTime().minusMonths(1).dayOfMonth().withMaximumValue()
         if (_fechaCausacionAnterior.dayOfMonth().get() > 30) {
-          _fechaCausacionAnterior.withDayOfMonth(30)
+          _fechaCausacionAnterior = _fechaCausacionAnterior.withDayOfMonth(30)
         }
         println("Fecha Causacion Anterior: " + _fechaCausacionAnterior.toString("yyyy-MM-dd"))
         val _existeCausacionAnterior = SQL("""SELECT COUNT(*) FROM "col$causacionescontrol" WHERE FECHA = {fecha} AND PROCESADA = {procesada} AND APLICADA = {aplicada}""").
