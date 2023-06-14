@@ -198,6 +198,83 @@ class ControlCobroController @Inject()(
       }
   }
 
+  def formatoComercial(id_identificacion: Int, id_persona: String) = authenticatedUserAction.async {
+    implicit request: Request[AnyContent] =>
+      cService.getComercialData(id_identificacion, id_persona).map { _data =>
+        val _id_de = _data._1
+        val _nombre = _data._2
+        val _fecha_vinculacion = _data._3
+        val _creditos = _data._4
+        var _listCreditos = new ArrayList[ju.HashMap[String, AnyRef]]()
+        _creditos.map { _credito =>
+          val _map = new ju.HashMap[String, AnyRef]()
+          _map.put("id_colocacion", _credito._1)
+          _map.put("saldo", _credito._2.asInstanceOf[AnyRef])
+          _map.put("estado", _credito._3.asInstanceOf[AnyRef])
+          _listCreditos.add(_map)
+        }
+        println("Creditos: " + _listCreditos)
+
+        val os = PdfCreator.referenciaComercialCreator(id_persona, _id_de, _nombre, _fecha_vinculacion, _listCreditos)
+
+/*         val os = DocxGenerator.generateDocxFileFromTemplate2(
+          "FaP_Carta_Paz_y_Salvo.docx",
+          _data
+        )
+        val filename: String = "/tmp/fap_paz_y_salvo.docx"
+        Files.write(Paths.get(filename), os)
+        val pdf = DocxGenerator.convertDocxToPdf(os) */
+        if (os != null) {
+        val filename: String = "fap_referencia_comercial_"+ id_persona +".pdf"
+        val attach = "attachment; filename=" + filename
+        Ok(os)
+          .as("application/pdf")
+            .withHeaders("Content-Disposition" -> attach )
+        } else {
+          Ok("No se pudo generar")
+        }
+      }
+  }
+
+  def formatoComercialAction(id_identificacion: Int, id_persona: String) = Action.async {
+    implicit request: Request[AnyContent] =>
+      cService.getComercialData(id_identificacion, id_persona).map { _data =>
+        val _id_de = _data._1
+        val _nombre = _data._2
+        val _fecha_vinculacion = _data._3
+        val _creditos = _data._4
+        var _listCreditos = new ArrayList[ju.HashMap[String, AnyRef]]()
+        _creditos.map { _credito =>
+          val _map = new ju.HashMap[String, AnyRef]()
+          _map.put("id_colocacion", _credito._1)
+          _map.put("saldo", _credito._2.asInstanceOf[AnyRef])
+          _map.put("estado", _credito._3.asInstanceOf[AnyRef])
+          _listCreditos.add(_map)
+        }
+        println("Creditos: " + _listCreditos)
+
+        val os = PdfCreator.referenciaComercialCreator(id_persona, _id_de, _nombre, _fecha_vinculacion, _listCreditos)
+
+/*         val os = DocxGenerator.generateDocxFileFromTemplate2(
+          "FaP_Carta_Paz_y_Salvo.docx",
+          _data
+        )
+        val filename: String = "/tmp/fap_paz_y_salvo.docx"
+        Files.write(Paths.get(filename), os)
+        val pdf = DocxGenerator.convertDocxToPdf(os) */
+        if (os != null) {
+        val filename: String = "fap_referencia_comercial_"+ id_persona +".pdf"
+        val attach = "attachment; filename=" + filename
+        Ok(os)
+          .as("application/pdf")
+            .withHeaders("Content-Disposition" -> attach )
+        } else {
+          Ok("No se pudo generar")
+        }
+      }
+  }
+
+
 
   def cartaPrimerAviso() = authenticatedUserAction.async {
     implicit request: Request[AnyContent] =>

@@ -11,7 +11,7 @@ import play.api.libs.functional.syntax._
 import play.api.db.DBApi
 
 import anorm._
-import anorm.SqlParser.{get, str, int}
+import anorm.SqlParser.{get, str, int, float, date, bool, double}
 import anorm.JodaParameterMetaData._
 
 import scala.util.{Failure, Success}
@@ -48,6 +48,7 @@ import java.io.ByteArrayOutputStream
 import notifiers.EmailSender
 import java.io.FileInputStream
 import java.io.File
+import java.util.Date
 
 class ControlCobroRepository @Inject()(
     dbapi: DBApi,
@@ -863,6 +864,32 @@ class ControlCobroRepository @Inject()(
       }
     }
     _deudores.toList
+  }
+
+  def getComercialData(id_identificacion: Int, id_persona: String) = Future {
+    var _creditos = mutable.ArrayBuffer.empty[(String, Float)]
+    db.withConnection { implicit connection =>
+      val _carteraSql =
+        """SELECT ID_COLOCACION, (VALOR_DESEMBOLSO - ABONOS_CAPITAL) AS SALDO, ID_ESTADO_COLOCACION FROM "col$colocacion" WHERE ID_IDENTIFICACION  = {id_identificacion} AND ID_PERSONA = {id_persona} AND ID_ESTADO_COLOCACION IN (0,1,2,3)"""
+      val _parseCartera = str("ID_COLOCACION") ~ double("SALDO") ~ int("ID_ESTADO_COLOCACION") map {
+        case id_colocacion ~ saldo ~ id_estado_colocacion =>
+          (id_colocacion, saldo, id_estado_colocacion)
+      }
+      val _personaSQL= """SELECT (NOMBRE || ' ' || PRIMER_APELLIDO || ' ' || SEGUNDO_APELLIDO) AS DEUDOR, LUGAR_EXPEDICION, FECHA_REGISTRO FROM "gen$persona" WHERE ID_IDENTIFICACION  = {id_identificacion} AND ID_PERSONA = {id_persona}"""
+      val _parsePersona = str("DEUDOR") ~ str("LUGAR_EXPEDICION") ~ date("FECHA_REGISTRO") map {
+        case deudor ~ lugar_expedicion ~ fecha_registro =>
+          (deudor, lugar_expedicion, fecha_registro)
+      }
+      val _creditos =
+        SQL(_carteraSql).on('id_identificacion -> id_identificacion, 'id_persona -> id_persona).as(_parseCartera *)
+
+      val _persona = SQL(_personaSQL).on('id_identificacion -> id_identificacion, 'id_persona -> id_persona).as(_parsePersona.singleOpt)
+      _persona match {
+        case Some(_p) =>
+          (_p._1, _p._2, new DateTime(_p._3.getTime()), _creditos)
+        case None => ("", "", new DateTime(), _creditos)
+      }
+    }
   }
 
   def cartaPrimerAviso(

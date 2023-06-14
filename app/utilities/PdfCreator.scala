@@ -217,7 +217,7 @@ class PdfCreator {
         os.toByteArray()
     }
 
-    def referenciaComercialCreator(_id_persona: String, _id_de: String, _nombre: String, _fecha_vinculacion: DateTime, _listCredito: ju.ArrayList[ju.HashMap[String, Object]]): Array[Byte] = {
+    def referenciaComercialCreator(_id_persona: String, _id_de: String, _nombre: String, _fecha_vinculacion: DateTime, _listCredito: ju.ArrayList[ju.HashMap[String, AnyRef]]): Array[Byte] = {
         val _documento = new PDDocument()
         val _pagina = new PDPage()
         _documento.addPage(_pagina)
@@ -326,27 +326,8 @@ class PdfCreator {
         _contenido.beginText()
         _contenido.setFont(_fuenteN, 12)
         _contenido.setTextMatrix(Matrix.getTranslateInstance(_offset.x, _offset.y))
-        _contenido.showText("Intereses Pagados en el")
-        _contenido.endText()        
-        _offset = new Point2D.Float(460, _pagina.getMediaBox().getHeight() - 200)
-        _contenido.beginText()
-        _contenido.setFont(_fuenteN, 12)
-        _contenido.setTextMatrix(Matrix.getTranslateInstance(_offset.x, _offset.y))
-        _contenido.showText("Saldo al final del Periodo")
-        _contenido.endText() 
-
-        _offset = new Point2D.Float(260, _pagina.getMediaBox().getHeight() - 190)
-        _contenido.beginText()
-        _contenido.setFont(_fuenteN, 12)
-        _contenido.setTextMatrix(Matrix.getTranslateInstance(_offset.x, _offset.y))
-        _contenido.showText("Intereses Pagados en el")
-        _contenido.endText()        
-        _offset = new Point2D.Float(460, _pagina.getMediaBox().getHeight() - 190)
-        _contenido.beginText()
-        _contenido.setFont(_fuenteN, 12)
-        _contenido.setTextMatrix(Matrix.getTranslateInstance(_offset.x, _offset.y))
-        _contenido.showText("Saldo al final del Periodo")
-        _contenido.endText()                 
+        _contenido.showText("Saldo")
+        _contenido.endText()                      
 
         // ciclo para imprimir los deudores
         _offset = new Point2D.Float(50, _pagina.getMediaBox().getHeight() - 220)
@@ -361,7 +342,7 @@ class PdfCreator {
             _contenido.beginText()
             _contenido.setFont(_fuente, 10)
             _contenido.setTextMatrix(Matrix.getTranslateInstance(_offset.x, _offset.y))
-            _contenido.showText(_d.get("saldo_actual").toString())
+            _contenido.showText(_d.get("saldo").toString())
             _contenido.endText()
             _offset = new Point2D.Float(50, _offset.y - 15)
         }
