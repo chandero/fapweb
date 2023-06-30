@@ -201,8 +201,8 @@ class ControlCobroController @Inject()(
   def formatoComercial(id_identificacion: Int, id_persona: String) = authenticatedUserAction.async {
     implicit request: Request[AnyContent] =>
       cService.getComercialData(id_identificacion, id_persona).map { _data =>
-        val _id_de = _data._1
-        val _nombre = _data._2
+        val _id_de = _data._2
+        val _nombre = _data._1
         val _fecha_vinculacion = _data._3
         val _creditos = _data._4
         var _listCreditos = new ArrayList[ju.HashMap[String, AnyRef]]()
@@ -210,12 +210,13 @@ class ControlCobroController @Inject()(
           val _map = new ju.HashMap[String, AnyRef]()
           _map.put("id_colocacion", _credito._1)
           _map.put("saldo", _credito._2.asInstanceOf[AnyRef])
-          _map.put("estado", _credito._3.asInstanceOf[AnyRef])
+          _map.put("estado", _credito._3)
           _listCreditos.add(_map)
         }
+        println("Data:"+_data.toString())
         println("Creditos: " + _listCreditos)
 
-        val os = PdfCreator.referenciaComercialCreator(id_persona, _id_de, _nombre, _fecha_vinculacion, _listCreditos)
+        val os  = PdfCreator.referenciaComercialCreator(id_persona, _id_de, _nombre, _fecha_vinculacion, _listCreditos)
 
 /*         val os = DocxGenerator.generateDocxFileFromTemplate2(
           "FaP_Carta_Paz_y_Salvo.docx",
@@ -239,8 +240,8 @@ class ControlCobroController @Inject()(
   def formatoComercialAction(id_identificacion: Int, id_persona: String) = Action.async {
     implicit request: Request[AnyContent] =>
       cService.getComercialData(id_identificacion, id_persona).map { _data =>
-        val _id_de = _data._1
-        val _nombre = _data._2
+        val _id_de = _data._2
+        val _nombre = _data._1
         val _fecha_vinculacion = _data._3
         val _creditos = _data._4
         var _listCreditos = new ArrayList[ju.HashMap[String, AnyRef]]()

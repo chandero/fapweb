@@ -866,14 +866,16 @@ class ControlCobroRepository @Inject()(
     _deudores.toList
   }
 
-  def getComercialData(id_identificacion: Int, id_persona: String) = Future {
-    var _creditos = mutable.ArrayBuffer.empty[(String, Float)]
+  def getComercialData(id_identificacion: Int, id_persona: String):Future[(String, String, DateTime, List[(String, Double, String)])] = Future {
+    var _creditos = mutable.ArrayBuffer.empty[(String, Float, String)]
     db.withConnection { implicit connection =>
       val _carteraSql =
-        """SELECT ID_COLOCACION, (VALOR_DESEMBOLSO - ABONOS_CAPITAL) AS SALDO, ID_ESTADO_COLOCACION FROM "col$colocacion" WHERE ID_IDENTIFICACION  = {id_identificacion} AND ID_PERSONA = {id_persona} AND ID_ESTADO_COLOCACION IN (0,1,2,3)"""
-      val _parseCartera = str("ID_COLOCACION") ~ double("SALDO") ~ int("ID_ESTADO_COLOCACION") map {
-        case id_colocacion ~ saldo ~ id_estado_colocacion =>
-          (id_colocacion, saldo, id_estado_colocacion)
+        """SELECT c.ID_COLOCACION, (c.VALOR_DESEMBOLSO - c.ABONOS_CAPITAL) AS SALDO, e.DESCRIPCION_ESTADO_COLOCACION FROM "col$colocacion" c
+        INNER JOIN "col$estado" e ON e.ID_ESTADO_COLOCACION = c.ID_ESTADO_COLOCACION
+        WHERE c.ID_IDENTIFICACION  = {id_identificacion} AND c.ID_PERSONA = {id_persona} AND c.ID_ESTADO_COLOCACION IN (0,1,2,3)"""
+      val _parseCartera = str("ID_COLOCACION") ~ double("SALDO") ~ str("DESCRIPCION_ESTADO_COLOCACION") map {
+        case id_colocacion ~ saldo ~ estado_colocacion =>
+          (id_colocacion, saldo, estado_colocacion)
       }
       val _personaSQL= """SELECT (NOMBRE || ' ' || PRIMER_APELLIDO || ' ' || SEGUNDO_APELLIDO) AS DEUDOR, LUGAR_EXPEDICION, FECHA_REGISTRO FROM "gen$persona" WHERE ID_IDENTIFICACION  = {id_identificacion} AND ID_PERSONA = {id_persona}"""
       val _parsePersona = str("DEUDOR") ~ str("LUGAR_EXPEDICION") ~ date("FECHA_REGISTRO") map {
@@ -886,7 +888,8 @@ class ControlCobroRepository @Inject()(
       val _persona = SQL(_personaSQL).on('id_identificacion -> id_identificacion, 'id_persona -> id_persona).as(_parsePersona.singleOpt)
       _persona match {
         case Some(_p) =>
-          (_p._1, _p._2, new DateTime(_p._3.getTime()), _creditos)
+         val _data = (_p._1, _p._2, new DateTime(_p._3.getTime()), _creditos)
+         _data
         case None => ("", "", new DateTime(), _creditos)
       }
     }

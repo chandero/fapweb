@@ -14,6 +14,7 @@ import java.io.ByteArrayOutputStream
 
 import java.{util => ju}
 import java.text.SimpleDateFormat
+import java.text.DecimalFormat
 import java.io.ByteArrayInputStream
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject
 import org.apache.pdfbox.pdmodel.common.PDRectangle
@@ -21,6 +22,7 @@ import org.apache.pdfbox.pdmodel.font.PDFont
 import org.apache.pdfbox.util.Matrix
 import java.awt.geom.Point2D
 import org.joda.time.DateTime
+
 
 
 class PdfCreator {
@@ -261,7 +263,7 @@ class PdfCreator {
         _offset = new Point2D.Float(0, 140)
 
         val _texto01 = _nombre + ","
-        _offset = new Point2D.Float(60, _pagina.getMediaBox().getHeight() - 200)
+        _offset = new Point2D.Float(50, 600)
         _contenido.beginText()
         _contenido.setFont(_fuenteN, 12)
         _contenido.setTextMatrix(Matrix.getTranslateInstance(_offset.x, _offset.y))
@@ -284,15 +286,15 @@ class PdfCreator {
         _contenido.showText(_texto03)
         _contenido.endText()
 
-        _offset = new Point2D.Float(_offset.x + (_fuente.getStringWidth(_texto03) / 1000 * 12) + 5,_offset.y)
-        val _texto04 = "Fundación Apoyo,"
+        _offset = new Point2D.Float(_offset.x + (_fuente.getStringWidth(_texto03) / 1000 * 12) + 4,_offset.y)
+        val _texto04 = "Fundación Apoyo"
         _contenido.beginText()
         _contenido.setFont(_fuenteN, 12)
         _contenido.setTextMatrix(Matrix.getTranslateInstance(_offset.x, _offset.y))
         _contenido.showText(_texto04)
         _contenido.endText()
 
-        _offset = new Point2D.Float(_offset.x + (_fuente.getStringWidth(_texto04) / 1000 * 12) + 5,_offset.y)
+        _offset = new Point2D.Float(_offset.x + (_fuente.getStringWidth(_texto04) / 1000 * 12) + 15,_offset.y)
         val _texto05 = "desde el " + Utility.fechaatextosindiasemana(Some(_fecha_vinculacion)) + "."
         _contenido.beginText()
         _contenido.setFont(_fuente, 12)
@@ -305,7 +307,7 @@ class PdfCreator {
         _contenido.beginText()
         _contenido.setFont(_fuente, 12)
         _contenido.setTextMatrix(Matrix.getTranslateInstance(_offset.x, _offset.y))
-        _contenido.showText(_texto05)
+        _contenido.showText(_texto06)
         _contenido.endText()
 
 /*         println("offset: " + _offset)
@@ -316,96 +318,53 @@ class PdfCreator {
         _contenido.lineTo(endX, yCordinate)
         _contenido.stroke() */
 
-        _offset = new Point2D.Float(60, _pagina.getMediaBox().getHeight() - 200)
+        _offset = new Point2D.Float(50, _offset.y - 20)
         _contenido.beginText()
         _contenido.setFont(_fuenteN, 12)
         _contenido.setTextMatrix(Matrix.getTranslateInstance(_offset.x, _offset.y))
         _contenido.showText("Número de Obligación")
         _contenido.endText()
-        _offset = new Point2D.Float(260, _pagina.getMediaBox().getHeight() - 200)
+        _offset = new Point2D.Float(260, _offset.y)
         _contenido.beginText()
         _contenido.setFont(_fuenteN, 12)
         _contenido.setTextMatrix(Matrix.getTranslateInstance(_offset.x, _offset.y))
         _contenido.showText("Saldo")
         _contenido.endText()                      
-
+        _offset = new Point2D.Float(460, _offset.y)
+        _contenido.beginText()
+        _contenido.setFont(_fuenteN, 12)
+        _contenido.setTextMatrix(Matrix.getTranslateInstance(_offset.x, _offset.y))
+        _contenido.showText("Estado")
+        _contenido.endText() 
         // ciclo para imprimir los deudores
-        _offset = new Point2D.Float(50, _pagina.getMediaBox().getHeight() - 220)
         val _it = _listCredito.iterator()
+        val df = new DecimalFormat("$#,###,##0.00")
         while (_it.hasNext) { val _d = _it.next()
+            _offset = new Point2D.Float(50, _offset.y - 20)
             _contenido.beginText()
             _contenido.setFont(_fuente, 10)
             _contenido.setTextMatrix(Matrix.getTranslateInstance(_offset.x, _offset.y))
             _contenido.showText(_d.get("id_colocacion").toString())
             _contenido.endText()
-            _offset = new Point2D.Float(370, _offset.y)
+            _offset = new Point2D.Float(270, _offset.y)
             _contenido.beginText()
             _contenido.setFont(_fuente, 10)
             _contenido.setTextMatrix(Matrix.getTranslateInstance(_offset.x, _offset.y))
-            _contenido.showText(_d.get("saldo").toString())
+            _contenido.showText(df.format(_d.get("saldo")))
             _contenido.endText()
-            _offset = new Point2D.Float(50, _offset.y - 15)
+            _offset = new Point2D.Float(470, _offset.y)
+            _contenido.beginText()
+            _contenido.setFont(_fuente, 10)
+            _contenido.setTextMatrix(Matrix.getTranslateInstance(_offset.x, _offset.y))
+            _contenido.showText(_d.get("estado").toString())
+            _contenido.endText()
         }
-        _offset = new Point2D.Float(50, _offset.y - 20)
-        
-        _contenido.beginText()
-        _contenido.setFont(_fuente, 12)
-        _contenido.setTextMatrix(Matrix.getTranslateInstance(_offset.x, _offset.y))
-        var _texto = "Se encuentran a "
-        _contenido.showText(_texto)
-        _offset = new Point2D.Float(50 + (_fuente.getStringWidth(_texto) / 1000 * 12) + 5,_offset.y)
-        _contenido.setFont(_fuente, 12)
-        _contenido.setTextMatrix(Matrix.getTranslateInstance(_offset.x, _offset.y))
-        _contenido.showText("Paz y Salvo")
-        _offset = new Point2D.Float(_offset.x + (_fuente.getStringWidth("Paz y Salvo") / 1000 * 12),_offset.y)
-        _contenido.setFont(_fuente, 12)
-        _contenido.setTextMatrix(Matrix.getTranslateInstance(_offset.x, _offset.y))
-        _contenido.showText(" por todo concepto en la obligación número ")
-        _offset = new Point2D.Float(_offset.x + (_fuente.getStringWidth(" por todo concepto en la obligación número ") / 1000 * 12) + 5,_offset.y)
-        _contenido.setFont(_fuente, 12)
-        _contenido.setTextMatrix(Matrix.getTranslateInstance(_offset.x, _offset.y))
-        _contenido.showText(" en la")
-        _offset = new Point2D.Float(50, _offset.y - 15)
-        _contenido.setFont(_fuente, 12)
-        _contenido.setTextMatrix(Matrix.getTranslateInstance(_offset.x, _offset.y))
-        _contenido.showText("Fundación Apoyo.")
-        _offset = new Point2D.Float(50,_offset.y - 30)
-        _contenido.setFont(_fuente, 12)
-        _contenido.setTextMatrix(Matrix.getTranslateInstance(_offset.x, _offset.y))
-        _contenido.showText("En razón a la cancelación total de la referida obligación número ")
-        _offset = new Point2D.Float(50 + (_fuente.getStringWidth("En razón a la cancelación total de la referida obligación número ") / 1000 * 12) + 5,_offset.y)
-        _contenido.setFont(_fuente, 12)
-        _contenido.setTextMatrix(Matrix.getTranslateInstance(_offset.x, _offset.y))
-        _contenido.setFont(_fuente, 12)
-        _contenido.setTextMatrix(Matrix.getTranslateInstance(_offset.x, _offset.y))
-        _contenido.showText(" nuestra entidad ")
-        _contenido.endText()
-        _offset = new Point2D.Float(50 ,_offset.y - 15)
-        val _texto1 = "realiza los trámites correspondientes para la actualización de datos registrados en las "
-        val _texto2 = "Centrales de Riesgo, aclarando que el manejo del histórico y de permanencia en la base es "
-        val _texto3 = "responsabilidad directa de la Central de Riesgo y que la información sobre Paz y Salvo"
-        val _texto4 = "se refiere únicamente al producto o servicio referido, establecido en esta entidad."
-        _contenido.setFont(_fuente, 12)
-        // _contenido.setTextMatrix(Matrix.getTranslateInstance(_offset.x, _offset.y))
-        //_contenido.showText(_texto1)
-        addJustifyText(_texto1, _fuente, 12, _contenido, _pagina, _offset)
-        _offset = new Point2D.Float(50 ,_offset.y - 15)
-        //_contenido.setTextMatrix(Matrix.getTranslateInstance(_offset.x, _offset.y))
-        //_contenido.showText(_texto2)
-        addJustifyText(_texto2, _fuente, 12, _contenido, _pagina, _offset)
-        _offset = new Point2D.Float(50 ,_offset.y - 15)
-        //_contenido.setTextMatrix(Matrix.getTranslateInstance(_offset.x, _offset.y))
-        //_contenido.showText(_texto3)
-        addJustifyText(_texto3, _fuente, 12, _contenido, _pagina, _offset)
-        _offset = new Point2D.Float(50 ,_offset.y - 15)
-        // _contenido.setTextMatrix(Matrix.getTranslateInstance(_offset.x, _offset.y))
-        //_contenido.showText(_texto4)
-        addJustifyText(_texto4, _fuente, 12, _contenido, _pagina, _offset)
+
         _offset = new Point2D.Float(50 ,_offset.y - 60)
         _contenido.beginText()
         _contenido.setFont(_fuente, 12)
         _contenido.setTextMatrix(Matrix.getTranslateInstance(_offset.x, _offset.y))
-        _contenido.showText("Se expide en Bucaramanga el día " + Utility.fechaatextosindiasemana(Some(new DateTime())).toLowerCase + ".")
+        _contenido.showText("La presente certificación se expide a solicitud del interesado, el día " + Utility.fechaatextosindiasemana(Some(new DateTime())).toLowerCase + ".")
         _offset = new Point2D.Float(50 ,_offset.y - 45)
         _contenido.setFont(_fuente, 12)
         _contenido.setTextMatrix(Matrix.getTranslateInstance(_offset.x, _offset.y))
@@ -413,8 +372,8 @@ class PdfCreator {
         _contenido.endText()
         val pdImage2 = PDImageXObject.createFromFile(s"${System.getProperty("user.dir")}/resources/image/FirmaEliecer.png", _documento);
 
-        _offset = new Point2D.Float(50 ,_offset.y - 120)
-        _contenido.drawImage(pdImage2, 50, _offset.y, 210, 120);
+        _offset = new Point2D.Float(50 ,_offset.y - 160)
+        _contenido.drawImage(pdImage2, _offset.x, _offset.y, 210, 120);
 
         _offset = new Point2D.Float(50 , 640)
         addCenteredText("Cra 20 N° 36-06 Ofc. 405 y 407 Edificio Sagrada Familia- Centro Bucaramanga – Santander", _fuente, 10, _contenido, _pagina, _offset)

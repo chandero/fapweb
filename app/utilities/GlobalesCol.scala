@@ -1930,6 +1930,21 @@ class GlobalesCol @Inject()(dbapi: DBApi, _funcion: Funcion, _colocacionService:
                 'id_agencia -> id_agencia,
                 'id_colocacion -> id_colocacion
             ).as(_parser.single)
+
+            var _nuevoEstado: Int = if ((_saldo == 0) && (_estado == _esVigente) || (_estado == _esFallecido) || (_estado == _esIncapacitado)) {
+                _esSaldado
+            } else if ((_saldo == 0 ) && ((_estado == _esPrejuridico) || (_estado == _esJuridico) || (_estado == _esCastigado))) {
+                _esCancelado
+            } else {
+                _estado
+            }
+
+            SQL("""UPDATE "col$colocacion" SET ID_ESTADO_COLOCACION = {nuevoEstado} WHERE ID_AGENCIA = {id_agencia} AND ID_COLOCACION = {id_colocacion}""").
+                on(
+                    'nuevoEstado -> _nuevoEstado,
+                    'id_agencia -> id_agencia,
+                    'id_colocacion -> id_colocacion
+                ).executeUpdate()
         }
     }
 }
