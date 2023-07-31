@@ -394,6 +394,7 @@ class CreditoRepository @Inject()(
           confirmada_en = Some(_confirmada_en)
         )
         // Buscar Causacion Mes Anterior
+        /*
         val _fechaCausacionAnterior =
           new DateTime().minusMonths(1).dayOfMonth().withMaximumValue()
         if (_fechaCausacionAnterior.dayOfMonth().get() > 30) {
@@ -421,7 +422,7 @@ class CreditoRepository @Inject()(
             case None => None
           }
           _g.verificacionCancelacionCredito(_l.id_agencia, _l.id_colocacion)
-        }
+        }*/
       }
       case None => {
         log.error(
