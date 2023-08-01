@@ -535,7 +535,7 @@ class TransaccionalRepository @Inject()(dbapi: DBApi, config: Configuration, cSe
       evento.tran_status match {
         case Some(status) =>
           if (status == "APPROVED") {
-            val _liquidacion = SQL("""SELECT * FROM LIQUIDACION WHERE REFERENCIA = {referencia} AND APLICADA = 0""").on('referencia -> evento.tran_reference).as(Liquidacion._set.singleOpt)
+            val _liquidacion = SQL("""SELECT * FROM LIQUIDACION WHERE UPPER(REFERENCIA) = UPPER({referencia}) AND APLICADA = 0""").on('referencia -> evento.tran_reference).as(Liquidacion._set.singleOpt)
             _liquidacion match {
               case Some(_liquidacion) => _liquidacion.aplicada match {
                 case Some(0) => cService.confirmarLiquidacionWompi(_liquidacion.referencia)

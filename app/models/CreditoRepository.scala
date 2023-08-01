@@ -102,7 +102,7 @@ class CreditoRepository @Inject()(
           println("Validando Liquidacion: Guardando Liquidacion")
           // SQL("""SELECT COUNT(*) FROM "con$puc" """).as(SqlParser.scalar[Int].single)
           SQL(
-            """INSERT INTO LIQUIDACION VALUES({referencia}, {fecha}, {id_agencia}, {id_colocacion}, {id_identificacion}, {id_persona}, {saldo}, {fecha_capital}, {fecha_interes}, {fecha_proxima}, {aplicada}, {aplicada_en}, {id_comprobante}, {liqu_origen}, {confirmada}, {confirmada_en})"""
+            """INSERT INTO LIQUIDACION VALUES(UPPER({referencia}), {fecha}, {id_agencia}, {id_colocacion}, {id_identificacion}, {id_persona}, {saldo}, {fecha_capital}, {fecha_interes}, {fecha_proxima}, {aplicada}, {aplicada_en}, {id_comprobante}, {liqu_origen}, {confirmada}, {confirmada_en})"""
           ).on(
               "referencia" -> _l.referencia,
               "fecha" -> DateTime.now(),
@@ -372,9 +372,9 @@ class CreditoRepository @Inject()(
       referencia: String
   )(implicit connection: Connection) = {
     val _queryBuscarLiquidacion =
-      """SELECT * FROM LIQUIDACION WHERE REFERENCIA = {referencia} AND CONFIRMADA = 0"""
+      """SELECT * FROM LIQUIDACION WHERE UPPER(REFERENCIA) = UPPER({referencia}) AND CONFIRMADA = 0"""
     val _queryConfirmar =
-      """UPDATE LIQUIDACION SET CONFIRMADA = {confirmada}, CONFIRMADA_EN = {confirmada_en} WHERE REFERENCIA = {referencia}"""
+      """UPDATE LIQUIDACION SET CONFIRMADA = {confirmada}, CONFIRMADA_EN = {confirmada_en} WHERE UPPER(REFERENCIA) = UPPER({referencia})"""
     val _liquidacion = SQL(_queryBuscarLiquidacion)
       .on("referencia" -> referencia)
       .as(Liquidacion._set.singleOpt)
@@ -457,7 +457,7 @@ class CreditoRepository @Inject()(
         aplicarLiquidacionWompi(referencia)
       }
       val _l = SQL(
-        """SELECT * FROM LIQUIDACION WHERE REFERENCIA = {referencia}"""
+        """SELECT * FROM LIQUIDACION WHERE UPPER(REFERENCIA) = UPPER({referencia})"""
       ).on("referencia" -> referencia).as(Liquidacion._set.single)
       _factura match {
         case Some(_f) => _http.enviarDocumento(_f)
@@ -513,13 +513,13 @@ class CreditoRepository @Inject()(
         """SELECT CODIGO FROM "gen$bancosconnal" WHERE ID_BANCO = 7"""
       ).as(SqlParser.str("CODIGO").single)
       val _transaccion = SQL(
-        """SELECT * FROM TRAN_TRANSACCION WHERE TRAN_TRAN_REFERENCE = {referencia}"""
+        """SELECT * FROM TRAN_TRANSACCION WHERE UPPER(TRAN_TRAN_REFERENCE) = UPPER({referencia})"""
       ).on('referencia -> referencia).as(Transaccion._set.single)
       val _liquidacion = SQL(
-        """SELECT * FROM LIQUIDACION WHERE REFERENCIA = {referencia}"""
+        """SELECT * FROM LIQUIDACION WHERE UPPER(REFERENCIA) = UPPER({referencia})"""
       ).on('referencia -> referencia).as(Liquidacion._set.single)
       val _liquidacion_detalle = SQL(
-        """SELECT * FROM LIQUIDACION_DETALLE WHERE REFERENCIA = {referencia}"""
+        """SELECT * FROM LIQUIDACION_DETALLE WHERE UPPER(REFERENCIA) = UPPER({referencia})"""
       ).on('referencia -> referencia).as(CuotasLiq._set *)
       /// Consecutivo Comprobante
       var _comprobante = SQL(
@@ -814,7 +814,7 @@ class CreditoRepository @Inject()(
 
       // Actualizar Liquidación
       SQL(
-        """UPDATE LIQUIDACION SET aplicada = {aplicada}, aplicada_en = {aplicada_en}, ID_COMPROBANTE = {comprobante} WHERE REFERENCIA = {referencia}"""
+        """UPDATE LIQUIDACION SET aplicada = {aplicada}, aplicada_en = {aplicada_en}, ID_COMPROBANTE = {comprobante} WHERE UPPER(REFERENCIA) = UPPER({referencia})"""
       ).on(
           'comprobante -> _comprobante,
           'referencia -> referencia,
