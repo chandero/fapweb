@@ -1755,8 +1755,10 @@ class FacturaRepository @Inject()(
         )
         val direccion = persona.direcciones(0)
         val cod_municipio = direccion.cod_municipio.get
-        val codigo_municipio = "%05d".format(cod_municipio);
+        val codigo_municipio = f"${cod_municipio}%05d"
+        println("cod_municipio: " + cod_municipio)
         val depa_id = codigo_municipio.toString.substring(0, 2)
+        println("depa_id :" + depa_id)
         val depa_nombre = SQL("""SELECT DPTO FROM "gen$municipios" WHERE COD_MUNICIPIO = {cod_municipio}""").
         on(
           'cod_municipio -> cod_municipio
@@ -1842,7 +1844,14 @@ class FacturaRepository @Inject()(
         var (_ident, _dv) = tipoiden match {
           case 31 =>
             var _id = f.id_persona.get.split("-");
-            (_id(0), _id(1))
+            if (_id.length == 2)
+              (_id(0), _id(1))
+            else
+            {
+              val _dv = _id(0).substring(_id(0).length() - 1)
+              val _num = _id(0).substring(0, _id(0).length() - 1)
+              (_num, _dv)
+            }
           case _ => (f.id_persona.get, "")
         }
 
@@ -1851,7 +1860,7 @@ class FacturaRepository @Inject()(
           direccion.municipio,
           tipoiden match {
             case 42 => Option.empty[String]
-            case _ => Some(direccion.cod_municipio.get.toString)
+            case _ => Some(codigo_municipio)
           },
           tipoiden match {
             case 42 => Option.empty[String]
@@ -1859,7 +1868,7 @@ class FacturaRepository @Inject()(
           },
           tipoiden match {
             case 42 => Option.empty[String]
-            case _ => Some(direccion.cod_municipio.get.toString())
+            case _ => Some(codigo_municipio)
           },
           persona.d.get.email,
           Some(_dv),
@@ -1874,8 +1883,8 @@ class FacturaRepository @Inject()(
           Some(
             persona.a.get.nombre.get.concat(
               " ".concat(
-                persona.a.get.primer_apellido.get
-                  .concat(" ".concat(persona.a.get.segundo_apellido.get))
+                persona.a.get.primer_apellido.getOrElse("")
+                  .concat(" ".concat(persona.a.get.segundo_apellido.getOrElse("")))
               )
             )
           ),
@@ -2242,8 +2251,10 @@ class FacturaRepository @Inject()(
         )
         val direccion = persona.direcciones(0)
         val cod_municipio = direccion.cod_municipio.get
-        val codigo_municipio = "%05d".format(cod_municipio);
+        val codigo_municipio = f"${cod_municipio}%05d"
+        println("cod_municipio: " + cod_municipio)
         val depa_id = codigo_municipio.toString.substring(0, 2)
+        println("depa_id :" + depa_id)
         val depa_nombre = SQL("""SELECT DPTO FROM "gen$municipios" WHERE COD_MUNICIPIO = {cod_municipio}""").
         on(
           'cod_municipio -> cod_municipio
@@ -2337,7 +2348,7 @@ class FacturaRepository @Inject()(
           direccion.municipio,
           tipoiden match {
             case 42 => Option.empty[String]
-            case _ => Some(direccion.cod_municipio.get.toString)
+            case _ => Some(codigo_municipio)
           },
           tipoiden match {
             case 42 => Option.empty[String]
@@ -2345,7 +2356,7 @@ class FacturaRepository @Inject()(
           },
           tipoiden match {
             case 42 => Option.empty[String]
-            case _ => Some(direccion.cod_municipio.get.toString())
+            case _ => Some(codigo_municipio)
           },
           persona.d.get.email,
           Some(_dv),
@@ -2571,8 +2582,10 @@ class FacturaRepository @Inject()(
         )
         val direccion = persona.direcciones(0)
         val cod_municipio = direccion.cod_municipio.get
-        val codigo_municipio = "%05d".format(cod_municipio);
+        val codigo_municipio = f"${cod_municipio}%05d"
+        println("cod_municipio: " + cod_municipio)
         val depa_id = codigo_municipio.toString.substring(0, 2)
+        println("depa_id :" + depa_id)
         val depa_nombre = SQL("""SELECT DPTO FROM "gen$municipios" WHERE COD_MUNICIPIO = {cod_municipio}""").
         on(
           'cod_municipio -> cod_municipio
@@ -2666,7 +2679,7 @@ class FacturaRepository @Inject()(
           direccion.municipio,
           tipoiden match {
             case 42 => Option.empty[String]
-            case _ => Some(direccion.cod_municipio.get.toString)
+            case _ => Some(codigo_municipio)
           },
           tipoiden match {
             case 42 => Option.empty[String]
@@ -2674,7 +2687,7 @@ class FacturaRepository @Inject()(
           },
           tipoiden match {
             case 42 => Option.empty[String]
-            case _ => Some(direccion.cod_municipio.get.toString())
+            case _ => Some(codigo_municipio)
           },
           persona.d.get.email,
           Some(_dv),
@@ -2899,8 +2912,10 @@ class FacturaRepository @Inject()(
         )
         val direccion = persona.direcciones(0)
         val cod_municipio = direccion.cod_municipio.get
-        val codigo_municipio = "%05d".format(cod_municipio);
+        val codigo_municipio = f"${cod_municipio}%05d"
+        println("cod_municipio: " + cod_municipio)
         val depa_id = codigo_municipio.toString.substring(0, 2)
+        println("depa_id :" + depa_id)
         val depa_nombre = SQL("""SELECT DPTO FROM "gen$municipios" WHERE COD_MUNICIPIO = {cod_municipio}""").
         on(
           'cod_municipio -> cod_municipio
@@ -2996,7 +3011,7 @@ class FacturaRepository @Inject()(
           direccion.municipio,
           tipoiden match {
             case 42 => Option.empty[String]
-            case _ => Some(direccion.cod_municipio.get.toString)
+            case _ => Some(codigo_municipio)
           },
           tipoiden match {
             case 42 => Option.empty[String]
@@ -3004,7 +3019,7 @@ class FacturaRepository @Inject()(
           },
           tipoiden match {
             case 42 => Option.empty[String]
-            case _ => Some(direccion.cod_municipio.get.toString())
+            case _ => Some(codigo_municipio)
           },
           persona.d.get.email,
           Some(_dv),
@@ -3228,8 +3243,10 @@ class FacturaRepository @Inject()(
         )
         val direccion = persona.direcciones(0)
         val cod_municipio = direccion.cod_municipio.get
-        val codigo_municipio = "%05d".format(cod_municipio);
+        val codigo_municipio = f"${cod_municipio}%05d"
+        println("cod_municipio: " + cod_municipio)
         val depa_id = codigo_municipio.toString.substring(0, 2)
+        println("depa_id :" + depa_id)
         val depa_nombre = SQL("""SELECT DPTO FROM "gen$municipios" WHERE COD_MUNICIPIO = {cod_municipio}""").
         on(
           'cod_municipio -> cod_municipio
@@ -3361,7 +3378,7 @@ class FacturaRepository @Inject()(
           direccion.municipio,
           tipoiden match {
             case 42 => Option.empty[String]
-            case _ => Some(direccion.cod_municipio.get.toString)
+            case _ => Some(codigo_municipio)
           },
           tipoiden match {
             case 42 => Option.empty[String]
@@ -3369,7 +3386,7 @@ class FacturaRepository @Inject()(
           },
           tipoiden match {
             case 42 => Option.empty[String]
-            case _ => Some(direccion.cod_municipio.get.toString())
+            case _ => Some(codigo_municipio)
           },
           persona.d.get.email,
           Some(_dv),

@@ -46,6 +46,13 @@ class CreditoRepository @Inject()(
   private val db = dbapi.database("default")
   final val log: Logger = LoggerFactory.getLogger(this.getClass());
 
+  def getColocacionesVigentes(): List[Credito] = {
+    val _query = """SELECT * FROM "col$colocacion" WHERE ID_ESTADO_COLOCACION IN (0,1,2,3)"""
+    db.withConnection { implicit connection =>
+      SQL(_query).as(Credito._setModelo *)
+    }
+  }
+
   def liquidar(
       id_agencia: Int,
       id_colocacion: String,

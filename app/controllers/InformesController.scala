@@ -62,4 +62,14 @@ class InformesController @Inject()(
       val attach = "attachment; filename=" + filename
       Future.successful(Ok(os).as("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet").withHeaders("Content-Disposition" -> attach ))
   }    
+
+  def informeRotacionCreditosXlsx() = authenticatedUserAction.async {
+    implicit request =>
+      val empr_id = Utility.extraerEmpresa(request)
+      val os = iService.informeRotacionCreditosXlsx(empr_id.get)
+      //val fmt = DateTimeFormat.forPattern("yyyyMMdd")
+      val filename = "FAP999"+"_INFORME_ROTACION_CREDITOS.xlsx"
+      val attach = "attachment; filename=" + filename
+      Future.successful(Ok(os).as("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet").withHeaders("Content-Disposition" -> attach ))
+  }
 }

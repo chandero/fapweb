@@ -5,12 +5,12 @@ packageSummary in Windows := "FAPWEB v1.0.0"
 packageDescription in Windows := "Sistema de Gestión Financiera FAP"
 maintainer := "aldacm2001@gmail.com"
 
-scalaVersion := "2.12.11"
-
+scalaVersion := "2.12.17"
+javacOptions ++= Seq("-source", "11", "-target", "11")
 scalacOptions += "-feature"
 scalacOptions += "-language:postfixOps"
 
-crossScalaVersions := Seq("2.12.7", "2.12.11")
+// crossScalaVersions := Seq("2.12.7", "2.12.11")
 
 lazy val `fapweb` = (project in file(".")).enablePlugins(PlayScala)
 
@@ -21,9 +21,15 @@ libraryDependencies ++= Seq(
   cacheApi,
   ws,
   specs2 % Test,
-  "org.slf4j" % "log4j-over-slf4j" % "2.0.6",
-  "org.slf4j" % "slf4j-simple" % "2.0.6",
-  "com.typesafe.play" %% "anorm" % "2.5.3",
+  "ch.qos.logback" % "logback-classic" % "1.4.4",
+  "org.slf4j" % "log4j-over-slf4j" % "1.7.36",
+  "org.slf4j" % "slf4j-simple" % "1.7.36" % Provided,
+  "javax.xml.bind" % "jaxb-api" % "2.3.1",
+  "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.11.4",
+  "com.fasterxml.jackson.core" % "jackson-databind" % "2.11.1",
+//  "com.typesafe" %% "jse" % "1.2.4" exclude("org.slf4j", "slf4j-simple"),
+  "org.playframework.anorm" %% "anorm" % "2.7.0",
+  "com.jaroop" %% "anorm-relational" % "0.4.0",
   "org.firebirdsql.jdbc" % "jaybird" % "4.0.8.java11",
   "com.typesafe.play" %% "play-json" % "2.6.10",
   "com.typesafe.play" %% "play-json-joda" % "2.6.10",
@@ -33,7 +39,6 @@ libraryDependencies ++= Seq(
   // "com.github.maricn" % "logback-slack-appender" % "1.6.1",
   //
   "org.apache.commons" % "commons-email" % "1.5",
-  "com.jaroop" %% "anorm-relational" % "0.3.0",
   // Jasper Report
   "org.olap4j" % "olap4j" % "1.2.0",
   "com.lowagie" % "itext" % "2.1.7.js7",

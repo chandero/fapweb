@@ -99,6 +99,7 @@ GET     /api/incrac/busc/:i/:p          controllers.InformacionCreditoController
 GET     /api/inmu/busc/:i               controllers.BienRaizController.buscar(i: String)
 GET     /api/vehi/busc/:i               controllers.VehiculoController.buscar(i: Int)
 GET     /api/info/bcol                  controllers.BancolombiaInformeController.consultar 
+GET     /api/info/ircxlsx               controllers.InformesController.informeRotacionCreditosXlsx
 # Colocaciones
 GET     /api/col/busc/:i/:p             controllers.ColocacionController.buscarColocacion(i: Int, p: String)
 

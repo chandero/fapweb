@@ -504,6 +504,128 @@ object Credito {
         )
     }
   }
+
+  val _setModelo = {
+    get[Option[Int]]("id_agencia") ~
+      get[Option[String]]("id_colocacion") ~
+      get[Option[Int]]("id_identificacion") ~
+      get[Option[String]]("id_persona") ~
+      get[Option[Int]]("id_clasificacion") ~
+      get[Option[Int]]("id_linea") ~
+      get[Option[Int]]("id_inversion") ~
+      get[Option[Int]]("id_respaldo") ~
+      get[Option[Int]]("id_garantia") ~
+      get[Option[String]]("id_categoria") ~
+      get[Option[String]]("id_evaluacion") ~
+      get[Option[DateTime]]("fecha_desembolso") ~
+      get[Option[BigDecimal]]("valor_desembolso") ~
+      get[Option[Int]]("plazo_colocacion") ~
+      get[Option[DateTime]]("fecha_vencimiento") ~
+      get[Option[String]]("tipo_interes") ~
+      get[Option[Int]]("id_interes") ~
+      get[Option[Double]]("tasa_interes_corriente") ~
+      get[Option[Double]]("tasa_interes_mora") ~
+      get[Option[Double]]("puntos_interes") ~
+      get[Option[Int]]("id_tipo_cuota") ~
+      get[Option[Int]]("amortiza_capital") ~
+      get[Option[Int]]("amortiza_interes") ~
+      get[Option[Int]]("periodo_gracia") ~
+      get[Option[Int]]("dias_prorrogados") ~
+      get[Option[BigDecimal]]("valor_cuota") ~
+      get[Option[BigDecimal]]("abonos_capital") ~
+      get[Option[DateTime]]("fecha_capital") ~
+      get[Option[DateTime]]("fecha_interes") ~
+      get[Option[Int]]("id_estado_colocacion") ~
+      get[Option[Int]]("id_ente_aprobador") ~
+      get[Option[String]]("id_empleado") ~
+      get[Option[String]]("nota_contable") ~
+      get[Option[Int]]("numero_cuenta") ~
+      get[Option[Int]]("es_anormal") ~
+      get[Option[Int]]("dias_pago") ~
+      get[Option[Double]]("reciprocidad") ~
+      get[Option[DateTime]]("fecha_saldado") ~
+      get[Option[String]]("tipo") map {
+      case id_agencia ~
+            id_colocacion ~
+            id_identificacion ~
+            id_persona ~
+            id_clasificacion ~
+            id_linea ~
+            id_inversion ~
+            id_respaldo ~
+            id_garantia ~
+            id_categoria ~
+            id_evaluacion ~
+            fecha_desembolso ~
+            valor_desembolso ~
+            plazo_colocacion ~
+            fecha_vencimiento ~
+            tipo_interes ~
+            id_interes ~
+            tasa_interes_corriente ~
+            tasa_interes_mora ~
+            puntos_interes ~
+            id_tipo_cuota ~
+            amortiza_capital ~
+            amortiza_interes ~
+            periodo_gracia ~
+            dias_prorrogados ~
+            valor_cuota ~
+            abonos_capital ~
+            fecha_capital ~
+            fecha_interes ~
+            id_estado_colocacion ~
+            id_ente_aprobador ~
+            id_empleado ~
+            nota_contable ~
+            numero_cuenta ~
+            es_anormal ~
+            dias_pago ~
+            reciprocidad ~
+            fecha_saldado ~
+            tipo => Credito(
+        id_agencia,
+        id_colocacion,
+        id_identificacion,
+        id_persona,
+        id_clasificacion,
+        id_linea,
+        id_inversion,
+        id_respaldo,
+        id_garantia,
+        id_categoria,
+        id_evaluacion,
+        fecha_desembolso,
+        valor_desembolso,
+        plazo_colocacion,
+        fecha_vencimiento,
+        tipo_interes,
+        id_interes,
+        tasa_interes_corriente,
+        tasa_interes_mora,
+        puntos_interes,
+        id_tipo_cuota,
+        amortiza_capital,
+        amortiza_interes,
+        periodo_gracia,
+        dias_prorrogados,
+        valor_cuota,
+        abonos_capital,
+        fecha_capital,
+        fecha_interes,
+        id_estado_colocacion,
+        id_ente_aprobador,
+        id_empleado,
+        nota_contable,
+        numero_cuenta,
+        es_anormal,
+        dias_pago,
+        reciprocidad,
+        fecha_saldado,
+        tipo
+      )
+    }
+  }
 }
 
 case class CuotasLiq(

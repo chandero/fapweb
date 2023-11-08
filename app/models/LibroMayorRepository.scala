@@ -212,7 +212,7 @@ class LibroMayorRepository @Inject()(dbapi: DBApi, conf: Configuration)(implicit
           _fecha_inicial.set(Calendar.MINUTE, 0)
           _fecha_inicial.set(Calendar.SECOND, 0)
           _fecha_inicial.set(Calendar.MILLISECOND, 0)
-          var _last_day = _fecha_inicial.getActualMaximum(Calendar.DAY_OF_MONTH);        
+          var _last_day = _fecha_inicial.getActualMaximum(Calendar.DAY_OF_MONTH);
           _fecha_inicial.set(Calendar.MONTH, 0)
           _fecha_final.set(Calendar.YEAR, anho)
           _fecha_final.set(Calendar.MONTH, periodo-2)
