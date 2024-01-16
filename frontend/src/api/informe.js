@@ -255,3 +255,11 @@ export function getLiquidacionPendienteWebXlsx(fi,ff) {
     responseType: "blob"
   });
 }
+
+export function getRotacionCarteraXlsx(){
+  return request({
+    url: "/info/ircxlsx",
+    method: "get",
+    responseType: "blob"
+  });
+}

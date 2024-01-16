@@ -52,7 +52,9 @@ POST    /api/empr/save                  controllers.EmpresaController.guardarEmp
 POST    /api/empr/upd                   controllers.EmpresaController.actualizarEmpresa
 
 # Municipios
-GET     /api/muni/get/:id               controllers.MunicipioController.buscarpordepartamento(id: Long)
+GET     /api/muni/get/:id               controllers.MunicipioController.buscarpordepartamento(id: String)
++ nocsrf
+GET     /api/muni/getweb/:id               controllers.MunicipioController.buscarpordepartamento(id: String)
 GET     /api/muni/all                   controllers.MunicipioController.todos
 
 GET     /api/barr/get/:id/:p/:c         controllers.BarrioController.buscarpormunicipio(id: Long, p:Long, c:Long)
@@ -65,11 +67,12 @@ POST    /api/barr/upd                   controllers.BarrioController.actualizarB
 GET     /api/tipobarr/get               controllers.BarrioController.obtenertipobarrio
 
 GET     /api/depa/get                   controllers.DepartamentoController.todos()
-
++ nocsrf
+GET     /api/depa/getweb                controllers.DepartamentoController.todos()   
 GET     /api/perf/get/:p/:c             controllers.PerfilController.todos(p:Long, c:Long)
 
 POST    /api/calc/t                     controllers.CalculoController.tabla
-+nocsrf
++ nocsrf
 POST    /api/calcm/t                    controllers.CalculoController.tablaPagoSimulador
 
 # Informes
@@ -259,6 +262,7 @@ POST    /api/bala/axls                  controllers.BalanceController.aExcel
 GET    /api/http/status                 controllers.HttpClientController.status
 GET    /api/http/gtbi/:f/:p/:d          controllers.HttpClientController.gettransactionbyid(f: String, p: String, d:String)
 GET    /api/http/st/:f                  controllers.HttpClientController.setdocumentbyjson(f: Int)
+GET    /api/http/st2003/:f              controllers.HttpClientController.setdocumentbyjson(f: Int)
 GET    /api/http/dsast/:f               controllers.HttpClientController.setdocumentbydsajson(f: Int)
 GET    /api/http/stnd/:f                controllers.HttpClientController.setnotadebitobyjson(f: Int)
 GET    /api/http/stnc/:f                controllers.HttpClientController.setnotacreditobyjson(f: Int)

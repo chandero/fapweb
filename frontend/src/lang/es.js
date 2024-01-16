@@ -77,6 +77,7 @@ export default {
     'menu_cartera_menu4informe_menu4-3bancolombia': 'Bancolombia',
     'menu_cartera_menu4informe_menu4-4recaudoweb': 'Recaudo Web Aplicado',
     'menu_cartera_menu4informe_menu4-5recaudopendienteweb': 'Recaudo Web Pendiente',
+    'menu_cartera_menu4informe_menu4-6rotacioncartera': 'Rotación Cartera',
     menu_cartera_menu5consulta: 'Consulta',
     'menu_cartera_menu5consulta_menu5-1colocacion': 'Colocacion',
     informe: 'Informes',

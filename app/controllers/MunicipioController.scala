@@ -19,7 +19,7 @@ class MunicipioController @Inject()(municipioService: MunicipioRepository, cc: C
         }
     }
 
-    def buscarpordepartamento(depa_id: Long): Action[AnyContent] = Action.async { request =>
+    def buscarpordepartamento(depa_id: String): Action[AnyContent] = Action.async { request =>
         municipioService.buscarPorDepartamento(depa_id).map { municipios =>
             Ok(Json.toJson(municipios))
         }

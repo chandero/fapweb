@@ -54,6 +54,7 @@ class EmailSender {
       }
     }
   }
+
   def sendHtml(email: String, subject: String, body: String) {
     val mail = new MailloyContext with Mailloy
     mail.setSubject(subject)
@@ -68,6 +69,24 @@ class EmailSender {
       case e: Exception => {
         println("Error al enviar correo")
       }
+    }
+  }
+
+  def sendEmailLey2300(email: String, nombre: String) = {
+    val mail = new MailloyContext with Mailloy
+    mail.setSubject("FUNDACION APOYO - Conozca Información importante Ley 2300 de 2023")
+    mail.addRecipient(email)
+    mail.addFrom("Fundación Apoyo <notificaciones@fundacionapoyo.com>")
+    try {
+      mail.send(
+        views.html.ley2300(nombre).body,
+        views.html.ley2300(nombre).body
+      )
+    } catch {
+      case e: Exception => {
+        println("Error al enviar correo")
+      }
+      ""
     }
   }
 }

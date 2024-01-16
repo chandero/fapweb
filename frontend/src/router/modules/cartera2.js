@@ -109,7 +109,13 @@ const cartera2Router = {
           component: () => import('@/views/cartera2/menu4informe/menu4-5recaudopendienteweb'),
           name: 'menu_cartera_menu4informe_menu4-5recaudopendienteweb',
           meta: { title: 'menu_cartera_menu4informe_menu4-5recaudopendienteweb', icon: 'recaudo02', roles: ['admin', 'cartera', 'gerencia'] }
-        },        
+        },
+        {
+          path: 'menu4-6rotacioncartera',
+          component: () => import('@/views/cartera2/menu4informe/menu4-6rotacioncartera'),
+          name: 'menu_cartera_menu4informe_menu4-6rotacioncartera',
+          meta: { title: 'menu_cartera_menu4informe_menu4-6rotacioncartera', icon: 'recaudo02', roles: ['admin', 'cartera', 'gerencia'] }
+        },
       ]
     },
     {

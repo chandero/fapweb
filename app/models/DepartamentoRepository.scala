@@ -20,29 +20,8 @@ import scala.concurrent.{Await, Future}
 import org.joda.time.DateTime
 import org.joda.time.LocalDate
 
-case class Departamento(depa_id: Long, depa_descripcion: String, depa_codigo: Int)
+case class Departamento(depa_id: String, depa_descripcion: String)
 
-object Departamento {
-  implicit val yourJodaDateReads =
-    JodaReads.jodaDateReads("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-  implicit val yourJodaDateWrites =
-    JodaWrites.jodaDateWrites("yyyy-MM-dd'T'HH:mm:ss.SSSZ'")
-
-  implicit val depaWrites = new Writes[Departamento] {
-      def writes(depa: Departamento) = Json.obj(
-          "depa_id" -> depa.depa_id,
-          "depa_descripcion" -> depa.depa_descripcion,
-          "depa_codigo" -> depa.depa_codigo
-      )
-  }
-
-  implicit val depaReads: Reads[Departamento] = (
-      (__ \ "depa_id").read[Long] and
-      (__ \ "depa_descripcion").read[String] and
-      (__ \ "depa_codigo").read[Int]
-  )(Departamento.apply _)
-
-}
 
 class DepartamentoRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecutionContext) {
     private val db = dbapi.database("default")
@@ -51,20 +30,17 @@ class DepartamentoRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecut
     * Parsear un Departamento desde el ResultSet
     */
     private val simple = {
-        get[Long]("departamento.depa_id") ~
-        get[String]("departamento.depa_descripcion") ~
-        get[Int]("departamento.depa_codigo") map {
-            case depa_id ~ depa_descripcion ~ depa_codigo => Departamento(depa_id, depa_descripcion, depa_codigo)
-        }
+        get[String]("DPTO") map {
+            case depa_id => Departamento(depa_id, depa_id) }
     }
 
     /*
     * Recuperar un Departamento usando su depa_id
     * @param depa_id: Long
     */
-    def buscarPorId(depa_id: Long): Option[Departamento] = {
+    def buscarPorId(depa_id: String): Option[Departamento] = {
         db.withConnection { implicit connection =>
-            SQL("SELECT * FROM siap.departamento WHERE depa_id = {depa_id}").on(
+            SQL("SELECT DPTO FROM \"gen$municipios\" WHERE DPTO = {depa_id}").on(
                 'depa_id -> depa_id
             ).as(simple.singleOpt)
         }
@@ -75,7 +51,7 @@ class DepartamentoRepository @Inject()(dbapi: DBApi)(implicit ec: DatabaseExecut
     */
     def todos(): Future[Iterable[Departamento]] = Future[Iterable[Departamento]] {
         db.withConnection { implicit connection => 
-            SQL("SELECT d.* FROM siap.departamento d ORDER BY depa_descripcion")
+            SQL("SELECT DISTINCT d.DPTO FROM \"gen$municipios\" d ORDER BY DPTO ASC")
             .as(simple *)
         }
     }

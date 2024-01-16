@@ -17,6 +17,9 @@ import anorm.JodaParameterMetaData._
 import play.api.db.DBApi
 import scala.concurrent.Future
 
+import java.time.LocalDate
+import java.time.temporal.TemporalAdjusters
+
 // Excel Export
 import com.norbitltd.spoiwo.model._
 import com.norbitltd.spoiwo.model.enums.CellStyleInheritance
@@ -366,25 +369,35 @@ class InformesRepository @javax.inject.Inject()(
   def informeRotacionCreditosXlsx(empr_id: scala.Long): Array[Byte] = {
     val anho = Calendar.getInstance().get(Calendar.YEAR)
     val mes = Calendar.getInstance().get(Calendar.MONTH) + 1
-    var _fcc = new DateTime(anho, mes, 1, 0, 0, 0)
-    var _last_day = _fcc.dayOfMonth().getMaximumValue();
-    _fcc = _fcc.dayOfMonth().setCopy(_last_day)
-    var _fcb = new DateTime(anho, mes, 1, 0, 0, 0)
-    _fcb = _fcb.plusMonths(-1)
-    _last_day = _fcb.dayOfMonth().getMaximumValue();
-    _fcb = _fcb.dayOfMonth().setCopy(_last_day)
+    var _fecha_corte_base = Calendar.getInstance()
+    _fecha_corte_base.add(Calendar.MONTH, -1)
+    var _max_days = _fecha_corte_base.getActualMaximum(Calendar.DAY_OF_MONTH)
+    var _last_day = _max_days match {
+      case 31 => 30
+      case _ => _max_days
+    }
+    _fecha_corte_base.set(Calendar.DAY_OF_MONTH, _last_day) 
+    val _fcc = new DateTime(_fecha_corte_base.getTimeInMillis()).toString("yyyy-MM-dd") 
+    _fecha_corte_base.add(Calendar.MONTH, -1)
+    _max_days = _fecha_corte_base.getActualMaximum(Calendar.DAY_OF_MONTH)
+    _last_day = _max_days match {
+      case 31 => 30
+      case _ => _max_days
+    }
+    _fecha_corte_base.set(Calendar.DAY_OF_MONTH, _last_day) 
+    var _fcb = new DateTime(_fecha_corte_base.getTimeInMillis()).toString("yyyy-MM-dd")
     var ft = new DateTime()
     var _listRow = new ArrayBuffer[com.norbitltd.spoiwo.model.Row]()
     val _query =
       """SELECT 
                         c.ID_COLOCACION, 
                         p.NOMBRE || ' ' || p.PRIMER_APELLIDO || ' ' || p.SEGUNDO_APELLIDO AS DEUDOR,
-                        c.VALOR_DESEMBOLSO - c.ABONOS_A_CAPITAL AS SALDO_ACTUAL,
+                        c.VALOR_DESEMBOLSO - c.ABONOS_CAPITAL AS SALDO_ACTUAL
                     FROM "col$colocacion" c
-
-                    WHERE ID_ESTADO_COLOCACION IN (0,1,2,3)"""
+                    INNER JOIN "gen$persona" p ON p.ID_IDENTIFICACION = c.ID_IDENTIFICACION AND p.ID_PERSONA = c.ID_PERSONA
+                    WHERE c.ID_ESTADO_COLOCACION IN (0,1,2,3)"""
     val _queryCorte =
-      """SELECT DEUDA, ID_ARRASTRE, MOROSIDAD FROM "col$causaciondiaria" WHERE ID_COLOCACION = c.ID_COLOCACION AND FECHA_CORTE = {fecha_corte}"""
+      """SELECT DEUDA, ID_ARRASTRE, MOROSIDAD FROM "col$causaciondiaria" WHERE ID_COLOCACION = {id_colocacion} AND FECHA_CORTE = {fecha_corte}"""
     val _parserCredito = str("ID_COLOCACION") ~ str("DEUDOR") ~ double(
       "SALDO_ACTUAL"
     ) map {
@@ -395,7 +408,7 @@ class InformesRepository @javax.inject.Inject()(
           saldo_actual
         )
     }
-    val _parserCorte = double("DEUDA") ~ int("ID_ARRASTRE") ~ int("MOROSIDAD") map {
+    val _parserCorte = double("DEUDA") ~ str("ID_ARRASTRE") ~ int("MOROSIDAD") map {
       case deuda ~ id_arrastre ~ morosidad =>
         (
           deuda,
@@ -439,8 +452,29 @@ class InformesRepository @javax.inject.Inject()(
           var j = 4
           _resultSet.map { i =>
             j += 1
-            val (_saldocb, _edadcb, _moracb) = SQL(_queryCorte).on('fecha_corte -> _fcb).as(_parserCorte.single)
-            val (_saldocc, _edadcc, _moracc) = SQL(_queryCorte).on('fecha_corte -> _fcc).as(_parserCorte.single)
+            val _r1= SQL(_queryCorte).on('id_colocacion -> i._1,'fecha_corte -> _fcb).as(_parserCorte.singleOpt)
+            val _r2 = SQL(_queryCorte).on('id_colocacion -> i._1,'fecha_corte -> _fcc).as(_parserCorte.singleOpt)
+            var _saldocb: Double = 0
+            var _edadcb: String = ""
+            var _moracb: Int = 0
+            var _saldocc: Double = 0
+            var _edadcc: String = ""
+            var _moracc: Int = 0
+            _r1 match {
+              case Some(value) =>             
+                _saldocb = value._1
+                _edadcb = value._2
+                _moracb = value._3 
+              case None        => None
+            }
+            _r2 match {
+              case Some(value) =>             
+                _saldocc = value._1
+                _edadcc = value._2
+                _moracc = value._3 
+              case None        => None
+            }
+
             val _moraactual: Double = if (i._3 > 0) {
               var dias_mora:Double = _gcol.obtenerDiasMora(i._1).toDouble
               if (dias_mora < -1.toDouble) {
@@ -484,10 +518,10 @@ class InformesRepository @javax.inject.Inject()(
                 style = Some(CellStyle(dataFormat = CellDataFormat("#,#00"))),
                 CellStyleInheritance.CellThenRowThenColumnThenSheet
               ),
-              NumericCell(
+              StringCell(
                 _edadcb,
                 Some(5),
-                style = Some(CellStyle(dataFormat = CellDataFormat("#,#00"))),
+                style = Some(CellStyle(dataFormat = CellDataFormat("@"))),
                 CellStyleInheritance.CellThenRowThenColumnThenSheet
               ),
               NumericCell(
@@ -502,10 +536,10 @@ class InformesRepository @javax.inject.Inject()(
                 style = Some(CellStyle(dataFormat = CellDataFormat("#,#00"))),
                 CellStyleInheritance.CellThenRowThenColumnThenSheet
               ),
-              NumericCell(
+              StringCell(
                 _edadcc,
                 Some(8),
-                style = Some(CellStyle(dataFormat = CellDataFormat("#,#00"))),
+                style = Some(CellStyle(dataFormat = CellDataFormat("@"))),
                 CellStyleInheritance.CellThenRowThenColumnThenSheet
               ),
               NumericCell(

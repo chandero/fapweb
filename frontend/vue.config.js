@@ -20,8 +20,8 @@ module.exports = {
         target: "http://localhost:9000",
         secure: false,
         changeOrigin: true,
-        proxyTimeout: 0,
-        timeout: 0,
+        proxyTimeout: 1200,
+        timeout: 1200,
         onProxyReq: (proxyReq, req, res) => req.setTimeout(0)
       },
       "^/ipa": {

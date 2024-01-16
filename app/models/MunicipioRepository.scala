@@ -85,9 +85,9 @@ class MunicipioRepository @Inject()(dbapi: DBApi)(implicit ec:DatabaseExecutionC
     *  Recupear todos los Municipio de un Departamento usando el depa_id
     *  @param depa_id: Long
     */
-    def buscarPorDepartamento(depa_id: Long):Future[Iterable[Municipio]] = Future[Iterable[Municipio]] {
+    def buscarPorDepartamento(depa_id: String):Future[Iterable[Municipio]] = Future[Iterable[Municipio]] {
         db.withConnection { implicit connection => 
-            SQL("SELECT * FROM \"gen$municipio\" WHERE depa_id = {depa_id} ORDER BY nombre").
+            SQL("SELECT * FROM \"gen$municipios\" WHERE DPTO = {depa_id} ORDER BY NOMBRE ASC").
             on(
                 'depa_id -> depa_id
             ).

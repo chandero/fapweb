@@ -180,10 +180,12 @@ trait Mailloy {
     email.setAuthenticator(new DefaultAuthenticator(smtpUser, smtpPass));
     email.setDebug(true);
 
-    email.send
+    val id = email.send
 
     // now flush the stored context and send
     notifications.remove
+
+    id
   }
 
   /**
