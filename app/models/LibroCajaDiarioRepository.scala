@@ -221,9 +221,10 @@ class LibroCajaDiarioRepository @Inject()(dbapi: DBApi, conf: Configuration)(imp
                     ).as(LibroCajaDiario._set *)
 
             // Resumen
-            val resumen = SQL("""SELECT a.CODIGO, p.NOMBRE, SUM(a.DEBITO) AS DEBITO, SUM(a.CREDITO) AS CREDITO FROM "con$auxiliar" a
+            val resumen = SQL("""SELECT a.CODIGO, p.NOMBRE, SUM(a.DEBITO) AS DEBITO, SUM(a.CREDITO) AS CREDITO FROM "con$comprobante" c
+                        INNER JOIN "con$auxiliar" a ON a.TIPO_COMPROBANTE = c.TIPO_COMPROBANTE AND a.ID_COMPROBANTE = c.ID_COMPROBANTE
                         INNER JOIN "con$puc" p ON a.CODIGO = p.CODIGO
-                        WHERE EXTRACT(MONTH FROM a.FECHA) = {mes} and a.ESTADOAUX = 'C'
+                        WHERE EXTRACT(MONTH FROM a.FECHA) = {mes} and c.ESTADO = 'C'
                         GROUP BY a.CODIGO, p.NOMBRE
                         ORDER BY CODIGO ASC
                 """).on(
